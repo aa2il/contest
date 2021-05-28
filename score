@@ -1,0 +1,114 @@
+#! /usr/bin/tcsh
+################################################################################
+#
+# score - Rev 1.0
+# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+#
+# Script to run cabrillo converter/scoring code.
+#
+################################################################################
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+################################################################################
+
+# Select a contest
+set CONTEST=""
+
+#set CONTEST="CWops"
+#set CONTEST="sst"
+#set CONTEST="cqww"
+#set CONTEST="ss"
+#set CONTEST="arrl_dx"
+#set CONTEST="fd"
+#set CONTEST="cqp"
+#set CONTEST="wpx"
+#set CONTEST="arrl_10m"
+
+set d=`date`
+if( X$CONTEST == "X" && $d[1] == "Wed" )then
+    set CONTEST="CWops"
+else if( X$CONTEST == "X" && $d[1] != "Wed" )then
+    set CONTEST="sst"
+endif
+
+################################################################################
+
+if( $CONTEST == "CWops" )then
+    # CW Ops Mini Test
+    cabrillo.py -cwops
+
+else if( $CONTEST == "sst" )then
+    # Slow Speed Test
+    cabrillo.py -sst
+
+else
+    echo Unknown contest $CONTEST
+    exit
+endif
+
+# Need to bring the rest of these into this if-then-else structure
+
+# ARRL CW SS - works in 2020
+#cabrillo.py -cwss -i aa2il_2017.adif
+#cabrillo.py -cwss
+
+# ARRL RTTY RU - works in 2020
+#cabrillo.py -rttyru
+
+# ARRL 10 meter
+#cabrillo.py -ten
+
+# FT8 RU - works in 2020
+#cabrillo.py -ft8ru
+
+# ARRL VHF+
+#cabrillo.py -vhf 
+
+# RTTY RU  - Code still needs to be converted 
+#### cabrillo.py -rttyru -i aa2il_2019.adif
+#cabrillo.py -rttyru -i rttyru_2019_combined.adif
+
+# NAQP - CW wasn't tested but should work, RTTY was tested
+#cabrillo.py -naqpcw 
+#cabrillo.py -naqprtty
+
+# CQ WPX
+#cabrillo.py -wpx
+
+# Cal QSO Party  - works in 2020
+#cabrillo.py -cqp
+
+# CQ WW RTTY
+#cabrillo.py -wwrtty
+
+# CQ WW CW - seems to work in 2020
+#cabrillo.py -wwcw
+
+# 13 Colonies
+#cabrillo.py -cols13
+
+# Satellites
+#cabrillo.py -sats
+
+# WW Digi  - Code still needs to be converted - seem to have lost 2019 log file
+#cabrillo.py -wwdigi
+
+# Makroten
+#cabrillo.py -mak
+
+# Field Day  - works in 2020
+#cabrillo.py -fd
+
+
+#cat AA2IL.LOG
+#exit
+
