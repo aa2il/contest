@@ -32,6 +32,7 @@ set CONTEST=""
 #set CONTEST="cqp"
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
+set CONTEST="vhf"
 
 set d=`date`
 if( X$CONTEST == "X" && $d[1] == "Wed" )then
@@ -49,6 +50,10 @@ if( $CONTEST == "CWops" )then
 else if( $CONTEST == "sst" )then
     # Slow Speed Test
     cabrillo.py -sst
+
+else if( $CONTEST == "vhf" )then
+    # ARRL VHF+
+    cabrillo.py -vhf
 
 else
     echo Unknown contest $CONTEST
@@ -69,9 +74,6 @@ endif
 
 # FT8 RU - works in 2020
 #cabrillo.py -ft8ru
-
-# ARRL VHF+
-#cabrillo.py -vhf 
 
 # RTTY RU  - Code still needs to be converted 
 #### cabrillo.py -rttyru -i aa2il_2019.adif

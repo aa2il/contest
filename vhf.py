@@ -30,7 +30,10 @@ from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 # Scoring class for ARRL VHF contest - Inherits the base contest scoring class
 class ARRL_VHF_SCORING(CONTEST_SCORING):
  
-    def __init__(self,contest):
+    def __init__(self,P):
+        contest = P.contest_name
+        self.MY_CALL = P.SETTINGS['MY_CALL']
+        self.MY_GRID = P.SETTINGS['MY_GRID']
         CONTEST_SCORING.__init__(self,contest)
 
         self.BANDS = ['6m','2m','70cm']
@@ -40,10 +43,11 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             grids.append((b,set([])))
             self.NQSOS[b]=0
         self.grids = OrderedDict(grids)
+        self.nqsos=0
 
     # Scoring routine for ARRL VHF contest for a single qso
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
-        #print('\n',rec)
+        #print('\nrec=',rec)
 
         # Pull out relavent entries
         call = rec["call"]
@@ -57,14 +61,22 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         #freq_mhz = int( float(rec["freq"]) )
 
         if 'gridsquare' in rec:
-            grid = rec["gridsquare"]
+            grid = rec["gridsquare"].upper()
         elif 'srx_string' in rec:
-            grid = rec["srx_string"]
+            grid = rec["srx_string"].upper()
         else:
             print('\nUnable to determine grid',rec)
             sys.exit(0)
         self.grids[band].add(grid)
 
+        # Check for valid grid
+        valid = len(grid)==4 and grid[0:2].isalpha() and grid[2:4].isdigit()
+        if not valid:
+            print('\nVHF SCORING: Not a valid grid: call=',call,'\tgrid=',grid)
+            sys.exit(0)
+
+        #print('call=',call)
+        
         dx_station = Station(call)
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
@@ -73,9 +85,13 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             mode='DG'
         elif rec["mode"]=='CW':
             mode='CW'
-        else:
+        elif rec["mode"]=='FM' or  rec["mode"]=='USB':
             mode='PH'
+        else:
+            print('Unknown mode:',rec["mode"])
+            sys.exit(0)
 
+        self.nqsos+=1
         if not dupe:
             if band=='70cm':
                 qso_points=2
@@ -95,7 +111,8 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
 #1234567890123456789012345678901234567890123456789012345678901234567890123456789
 
         line='QSO: %5d %2s %10s %4s %-17s %-6s %-17s %-6s' % \
-            (freq_mhz,mode,date_off,time_off,MY_CALL,MY_GRID[:4],call,grid)
+            (freq_mhz,mode,date_off,time_off, \
+             self.MY_CALL,self.MY_GRID[:4],call,grid)
 
         #print(line)
         return line
@@ -110,11 +127,12 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             grids = list( self.grids[b] )
             grids.sort()
             print('\n',b,'Grids:',grids)
-            print('nqsos,mults:',self.NQSOS[b],len(grids))
+            print(' No. QSOs,Mults:',self.NQSOS[b],len(grids))
             mults+=len(grids)
 
-        print('\nnqsos         =',self.nqsos2)
-        print('qso points    =',self.total_points)
-        print('mults         =',mults)
-        print('Claimed score =',self.total_points*mults)
+        print('\nNo. QSOs      =',self.nqsos)
+        print('No. Uniques   =',self.nqsos2)
+        print('QSO points    =',self.total_points)
+        print('Multipliers   =',mults)
+        print('Claimed Score =',self.total_points*mults)
     

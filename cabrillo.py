@@ -42,6 +42,7 @@ from rttyru import *
 from cqww import *
 from colonies import *
 from satellites import *
+from settings import *
 
 #######################################################################################
 
@@ -137,7 +138,7 @@ elif args.vhf:
     contest='ARRL-VHF-JUN'
     category_band='VHF-3-BAND'
     MY_MODE='MIXED'
-    date0 = datetime.datetime.strptime( "20200613 1800" , "%Y%m%d %H%M")  # Start of contest
+    date0 = datetime.datetime.strptime( "20210612 1800" , "%Y%m%d %H%M")  # Start of contest
     date1 = date0 + datetime.timedelta(hours=33)
 
     # Need to merge FT8 and CW/phone logs
@@ -146,15 +147,21 @@ elif args.vhf:
     #output_file = 'AA2IL.LOG'
 
     fnames=[]
-    if True:
-        fname = 'AA2IL.adif'
+    if False:
+        fname    = 'AA2IL.adif'
         DIR_NAME = '../pyKeyer'
         fnames = [DIR_NAME+'/'+fname]
-    if True:
+    if False:
         fname = 'wsjtx_log.adi'
         DIR_NAME = '/home/joea/.local/share/WSJT-X'
         fnames.append( DIR_NAME+'/'+fname )
 
+    # Need to merge FT8 and CW/Phone logs
+    fnames=[]
+    for fname in ['AA2IL_VHF_Jun2021.adif','wsjtx_VHF_Jun2021.adi']:
+        f=os.path.expanduser( DIR_NAME+'/'+fname )
+        fnames.append(f)
+        
 elif args.fd:
     contest='ARRL-FD'
     MY_MODE='MIXED'
@@ -349,8 +356,14 @@ else:
 ################################################################################
 
 # Function to open output Cabrillo file and write out header
-def open_output_file(contest,outfile):
+def open_output_file(P,outfile):
     fp = open(outfile, 'w')
+
+    contest = P.contest_name
+    MY_SECTION = P.SETTINGS['MY_SEC']
+    MY_STATE = P.SETTINGS['MY_STATE']
+    MY_CALL = P.SETTINGS['MY_CALL']
+    MY_POWER='LOW'
     
     fp.write('START-OF-LOG:3.0\n')
     fp.write('CONTEST: %s\n' % contest)
@@ -440,6 +453,9 @@ print('\nCabrillo converter beginning for',contest)
 print('\nInput file(s):',input_files)
 print('OUTPUT FILE=',output_file)
 
+P=CONFIG_PARAMS('.keyerrc')
+P.contest_name=contest
+
 # Init
 istart  = -1
 cum_gap = 0
@@ -453,7 +469,7 @@ elif contest=='ARRL-SS-CW':
 #elif contest=='Slow Speed Mini-Test':
 #    sc = SST_SCORING(contest)
 elif contest=='ARRL-VHF-JUN':
-    sc = ARRL_VHF_SCORING(contest)
+    sc = ARRL_VHF_SCORING(P)
 elif contest=='NAQP-CW' or contest=='NAQP-RTTY':
     sc = NAQP_SCORING(contest)
 elif contest[:6]=='CQ-WPX':
@@ -480,7 +496,7 @@ elif not sc:
 # Read adif input file(s)
 qsos2=[]
 for fname in input_files:
-    print('Input file:',fname)
+    print('\nInput file:',fname)
     
     p,n,ext=parse_file_name(fname)
     print('fname=',fname)
@@ -498,8 +514,12 @@ for fname in input_files:
     qsos2 = qsos2 + qsos1
     #print qsos2
     
+    #print(qsos1[0])
+    #print(qsos1[-1])
     print("There are ",len(qsos1),len(qsos2)," QSOs")
 
+#sys.exit(0)
+    
 # Ignore entries outside contest window &
 # Sort list of QSOs by date/time - needed if we merge multiple logs (e.g. for ARRL RTTY w/ FT8
 qsos=[]
@@ -521,7 +541,7 @@ if contest=='NAQP-CW' or contest=='NAQP-RTTY':
             rec["qth"]  = rec["srx_string"].upper()
 
 # Open output file
-fp=open_output_file(contest,output_file)
+fp=open_output_file(P,output_file)
 
 # Load history file
 print('History file:',history,'\n')
