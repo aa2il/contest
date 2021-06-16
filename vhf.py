@@ -31,10 +31,10 @@ from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 class ARRL_VHF_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        contest = P.contest_name
+        CONTEST_SCORING.__init__(self,P.contest_name)
+
         self.MY_CALL = P.SETTINGS['MY_CALL']
         self.MY_GRID = P.SETTINGS['MY_GRID']
-        CONTEST_SCORING.__init__(self,contest)
 
         self.BANDS = ['6m','2m','70cm']
         self.NQSOS = OrderedDict()

@@ -253,9 +253,12 @@ elif args.wwrtty:
 elif args.wpx:
     contest='CQ-WPX-CW'
     MY_MODE='CW'
-    date0 = datetime.datetime.strptime( "20190525 0000" , "%Y%m%d %H%M")  # Start of contest
+    #date0 = datetime.datetime.strptime( "20190525 0000" , "%Y%m%d %H%M")  # Start of contest
+    date0 = datetime.datetime.strptime( "20210529 0000" , "%Y%m%d %H%M")  # Start of contest
     date1 = date0 + datetime.timedelta(hours=48)
-    fname = 'WPX_2019.LOG'
+    #fname = 'WPX_2019.LOG'
+    #DIR_NAME = '~/logs'
+    fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
 
 elif args.cqp:
@@ -473,7 +476,7 @@ elif contest=='ARRL-VHF-JUN':
 elif contest=='NAQP-CW' or contest=='NAQP-RTTY':
     sc = NAQP_SCORING(contest)
 elif contest[:6]=='CQ-WPX':
-    sc = CQ_WPX_SCORING(contest)
+    sc = CQ_WPX_SCORING(P)
 elif contest=='CA-QSO-PARTY':
     sc = CQP_SCORING(contest)
 elif contest=='MAKROTHEN-RTTY':
@@ -495,7 +498,8 @@ elif not sc:
 
 # Read adif input file(s)
 qsos2=[]
-for fname in input_files:
+for f in input_files:
+    fname=os.path.expanduser( f )
     print('\nInput file:',fname)
     
     p,n,ext=parse_file_name(fname)

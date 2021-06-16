@@ -30,9 +30,9 @@ set CONTEST=""
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"
 #set CONTEST="cqp"
-#set CONTEST="wpx"
+set CONTEST="wpx"
 #set CONTEST="arrl_10m"
-set CONTEST="vhf"
+#set CONTEST="vhf"
 
 set d=`date`
 if( X$CONTEST == "X" && $d[1] == "Wed" )then
@@ -54,6 +54,10 @@ else if( $CONTEST == "sst" )then
 else if( $CONTEST == "vhf" )then
     # ARRL VHF+
     cabrillo.py -vhf
+
+else if( $CONTEST == "wpx" )then
+    # CQ WPX
+    cabrillo.py -wpx
 
 else
     echo Unknown contest $CONTEST
@@ -82,9 +86,6 @@ endif
 # NAQP - CW wasn't tested but should work, RTTY was tested
 #cabrillo.py -naqpcw 
 #cabrillo.py -naqprtty
-
-# CQ WPX
-#cabrillo.py -wpx
 
 # Cal QSO Party  - works in 2020
 #cabrillo.py -cqp
