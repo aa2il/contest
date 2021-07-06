@@ -30,10 +30,12 @@ from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 # Scoring class for Sat Comm - Inherits the base contest scoring class
 class SATCOM(CONTEST_SCORING):
  
-    def __init__(self,contest):
-        CONTEST_SCORING.__init__(self,contest)
+    def __init__(self,contest='Satellites Worked'):
+        CONTEST_SCORING.__init__(self,contest,mode='MIXED')
 
-        pass
+        # Determine contest time - this one is for all time!
+        self.date0 = datetime.datetime.strptime( "20000101 0000" , "%Y%m%d %H%M")
+        self.date1 = datetime.datetime.strptime( "21000101 0000" , "%Y%m%d %H%M")
 
     # Scoring routine for satellites.
     # Really just spits out a list of QSOs 
@@ -41,6 +43,10 @@ class SATCOM(CONTEST_SCORING):
     def satellites(self,fp,qsos):
 
         print('nqsos=',len(qsos))
+        hdr='Date\t\tTime\t\tSatellite\tMode\tCall\t\tGrid'
+        print('\n',hdr)
+        fp.write(hdr+'\n')
+        
         for rec in qsos:
             #keys = list(rec.keys())
             if 'sat_name' in rec:
@@ -56,11 +62,11 @@ class SATCOM(CONTEST_SCORING):
                     srx=rec['srx_string']
                 else:
                     srx=''
-                print(Date,rec['sat_name'],t,rec['call'],
-                      srx,rec['mode'])
-                fp.write('%s\t%s\t%s\t%s\t%s\t%s\n' %
-                         (Date,rec['sat_name'],t,rec['call'],
-                          srx,rec['mode']))
+                print(Date,'\t',t,'\t',rec['sat_name'],'  \t',rec['mode'],
+                      ' \t',rec['call'],'   \t',srx)
+                fp.write('%12s\t%6s\t\t%-8s\t%-3s\t%-10s\t%s\n' %
+                         (Date,t,rec['sat_name'],rec['mode'],rec['call'],
+                          srx))
         sys.exit(0)
 
 

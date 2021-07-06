@@ -26,14 +26,22 @@ from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 
 ############################################################################################
+
+BONUS_STATIONS=['WM3PEN','GB13COL','TM13COL']
+
+############################################################################################
     
 # Scoring class for 13 Colonies - Inherits the base contest scoring class
 class THIRTEEN_COLONIES(CONTEST_SCORING):
  
-    def __init__(self,contest):
-        CONTEST_SCORING.__init__(self,contest)
+    def __init__(self,contest='13 Colonies Special Event'):
+        CONTEST_SCORING.__init__(self,contest,mode='MIXED')
 
-        pass
+        # Determine contest time - assumes this is dones within a few days of the contest
+        now = datetime.datetime.utcnow()
+        start_time=0
+        self.date0=datetime.datetime(now.year,7,1,start_time)
+        self.date1 = self.date0 + datetime.timedelta(days=7)
 
     # Scoring routine for 13 Colonies Special Event
     # Really just spits out a list of QSOs for each SES
@@ -43,10 +51,10 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
 
         # Init - make list of SES stations
         nqsos13=0
-        stations=['WM3PEN','GB13COL']
-        for a in 'ABCDEFGHIJKLMZ':
+        stations=BONUS_STATIONS
+        for a in 'ABCDEFGHIJKLM':                       # Z some years also
             stations.append('K2'+a)
-        print(stations)
+        print('Stations=',stations)
 
         n=len(stations)
         worked      = n*[False]
@@ -57,12 +65,15 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
         n=-1
         for station in stations:
             n+=1
+
+            # Print headers
+            if station=='WM3PEN':
+                print('\nDate\t\tTime\t\tFreq\tRSTin\tMode\tRSTout' )
+                fp.write('\n%s\t\t%s\t%7s\t\t%s\t%s\t%s\n' %
+                         ('Date','Time','Freq','RSTin','Mode','RSTout' ) )
             print('\n',station)
             fp.write('\n%s\n' % station)
-            if station=='WM3PEN':
-                fp.write('%s\t\t%s\t%7s\t\t%s\t%s\t%s\n' %
-                         ('Date','Time','Freq','RSTin','Mode','RSTout' ) )
-            
+
             for rec in qsos:
                 call = rec["call"].upper()
                 if call==station:
@@ -77,7 +88,8 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
                     Date =datetime.datetime.strptime( rec['qso_date_off'] ,'%Y%m%d').strftime('%b %d, %Y')
                     frq  = int( 1e3*float(rec['freq']) +0.5)
                     mode = rec['mode']
-                    print(Date,rec['time_off'],frq,rec['rst_rcvd'],mode,rec['rst_sent'])   #,rec['time_stamp']
+                    print(Date,'\t',rec['time_off'],'\t',frq,'\t',rec['rst_rcvd'], \
+                          '\t',mode,'\t',rec['rst_sent'])   
                     fp.write('%s\t%s\t%7s\t\t%s\t%s\t%s\n' %
                              (Date,rec['time_off'],frq,rec['rst_rcvd'],rec['mode'],rec['rst_sent'] ) )
                     nqsos13+=1
@@ -86,7 +98,7 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
                     worked[n]=True
                     if mode=='CW':
                         worked_cw[n]=True
-                    elif mode=='FT8' or mode=='MSK':
+                    elif mode=='FT8' or mode=='MFSK':
                         worked_digi[n]=True
         
         print("\nThere were ",nqsos13," QSOs with the 13 Colonies.\n")
@@ -97,9 +109,9 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
         clean_sweep      = True
         clean_sweep_cw   = True
         clean_sweep_digi = True
-        for i in range(2,15):
-            clean_sweep       = clean_sweep      and worked[i]
-            clean_sweep_cw    = clean_sweep_cw   and worked_cw[i]
+        for i in range(len(BONUS_STATIONS),len(stations)):
+            clean_sweep      = clean_sweep      and worked[i]
+            clean_sweep_cw   = clean_sweep_cw   and worked_cw[i]
             clean_sweep_digi = clean_sweep_digi and worked_digi[i]
             if False:
                 print(i,stations[i])
@@ -108,11 +120,14 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
 
         if clean_sweep:
             print('Clean sweep!')
+            fp.write('Clean sweep!')
         if clean_sweep_cw:
             print('CW Clean sweep!')
+            fp.write('CW Clean sweep!')
         if clean_sweep_digi:
             print('DIGI Clean sweep!')
-        
+            fp.write('DIGI Clean sweep!')
+        print(' ')
         
         sys.exit(0)
 

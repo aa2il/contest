@@ -281,8 +281,6 @@ elif args.sst:
     MY_MODE=sc.my_mode
     date0=sc.date0
     date1=sc.date1
-    print(date0)
-    print(date1)
 
     if False:
         # Manual override
@@ -299,8 +297,6 @@ elif args.cwops:
     MY_MODE=sc.my_mode
     date0=sc.date0
     date1=sc.date1
-    print(date0)
-    print(date1)
 
     if False:
         # Manual override
@@ -313,15 +309,18 @@ elif args.cwops:
     DIR_NAME = '../pyKeyer/'
 
 elif args.cols13:
-    contest='13 Colonies Special Event'
-    MY_MODE='CW'
-    date0 = datetime.datetime.strptime( "20200701 1300" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(days=7)
-    print(date1)
-    date1 = datetime.datetime.strptime( "20200708 0400" , "%Y%m%d %H%M")  # Start of contest
-    print(date1)
+    sc=THIRTEEN_COLONIES()
+    contest=sc.contest
+    date0=sc.date0
+    date1=sc.date1
     history = ''
-    
+
+    if False:
+        # Manual override
+        date0 = datetime.datetime.strptime( "20210701 1300" , "%Y%m%d %H%M")  # Start of contest
+        date1 = datetime.datetime.strptime( "20210708 0400" , "%Y%m%d %H%M")  # Start of contest
+
+    # Need to merge FT8/FT4 and CW/Phone logs
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer'
     fnames = [DIR_NAME+'/'+fname]
@@ -330,11 +329,10 @@ elif args.cols13:
     fnames.append( DIR_NAME+'/'+fname )
 
 elif args.sats:
-    contest='Satellites Worked'
-    MY_MODE='MIXED'
-    date0 = datetime.datetime.strptime( "20000101 0000" , "%Y%m%d %H%M")  # Start of contest
-    date1 = datetime.datetime.strptime( "21001231 2359" , "%Y%m%d %H%M")  # Start of contest
-    print(date1)
+    sc = SATCOM()
+    contest=sc.contest
+    date0=sc.date0
+    date1=sc.date1
     history = ''
     
     fname = 'AA2IL.adif'
@@ -453,6 +451,8 @@ def qso_time(rec):
 # Start of main
 print('\n****************************************************************************')
 print('\nCabrillo converter beginning for',contest)
+print('Start Date=',date0)
+print('Stop Date =',date1)
 print('\nInput file(s):',input_files)
 print('OUTPUT FILE=',output_file)
 
@@ -485,12 +485,6 @@ elif contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW':
     sc = CQ_WW_SCORING(contest)
 elif contest=='ARRL-RTTY' or contest=='FT8-RU' or contest=='ARRL 10': \
     sc = ARRL_RTTY_RU_SCORING(contest)
-elif contest=='13 Colonies Special Event':
-    sc = THIRTEEN_COLONIES(contest)
-    sc.cols13(fp,qsos)
-elif contest=='Satellites Worked':
-    sc = SATCOM(contest)
-    sc.satellites(fp,qsos)
 elif not sc:
     #sc = contest_scoring(contest)
     print('Unrecognized contest - aborting')
@@ -527,12 +521,25 @@ for f in input_files:
 # Ignore entries outside contest window &
 # Sort list of QSOs by date/time - needed if we merge multiple logs (e.g. for ARRL RTTY w/ FT8
 qsos=[]
+nqsos=0
 for rec in qsos2:
+    nqsos+=1
     keys = list(rec.keys())
+    if len(keys)==0:
+        print('Skipping blank record')
+        print('\n',nqsos,rec)
+        continue
+    
     if 'qso_date_off' in keys:
         date_off = datetime.datetime.strptime( rec['qso_date_off']+" " + rec["time_off"] , "%Y%m%d %H%M%S")
-    else:
+    elif 'qso_date' in keys:
         date_off = datetime.datetime.strptime( rec['qso_date']+" " + rec["time_on"] , "%Y%m%d %H%M%S")
+    else:
+        print('\nHmmmmmmmmmm - cant figure out date!')
+        print(rec)
+        print(keys)
+        sys.exit(0)
+        
     if date_off>=date0 and date_off<=date1:
         rec["time_stamp"]=date_off
         qsos.append(rec)
@@ -608,6 +615,17 @@ for i in range(len(qsos)):
         if contest=='WW-DIGI':
             # This is the only one left to convert
             line = sc.ww_digi(rec,dupe,HIST)
+        elif contest=='13 Colonies Special Event':
+            # This one has a different API - leaving it like this for now
+            # but would be nice to be consistent!
+            sc.cols13(fp,qsos)
+            sys.exit(0)
+
+        elif contest=='Satellites Worked':
+            # This one also has a different API - leaving it like this for now
+            # but would be nice to be consistent!
+            sc.satellites(fp,qsos)
+            sys.exit(0)
 
         else:
             # This is how things should be for all contests

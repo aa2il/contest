@@ -23,46 +23,29 @@
 # Select a contest
 set CONTEST=""
 
-#set CONTEST="CWops"
+#set CONTEST="cwops"
 #set CONTEST="sst"
 #set CONTEST="cqww"
 #set CONTEST="ss"
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"
 #set CONTEST="cqp"
-set CONTEST="wpx"
+#set CONTEST="wpx"
 #set CONTEST="arrl_10m"
 #set CONTEST="vhf"
+set CONTEST="cols13"
+set CONTEST="sats"
 
 set d=`date`
 if( X$CONTEST == "X" && $d[1] == "Wed" )then
-    set CONTEST="CWops"
+    set CONTEST="cwops"
 else if( X$CONTEST == "X" && $d[1] != "Wed" )then
     set CONTEST="sst"
 endif
 
 ################################################################################
 
-if( $CONTEST == "CWops" )then
-    # CW Ops Mini Test
-    cabrillo.py -cwops
-
-else if( $CONTEST == "sst" )then
-    # Slow Speed Test
-    cabrillo.py -sst
-
-else if( $CONTEST == "vhf" )then
-    # ARRL VHF+
-    cabrillo.py -vhf
-
-else if( $CONTEST == "wpx" )then
-    # CQ WPX
-    cabrillo.py -wpx
-
-else
-    echo Unknown contest $CONTEST
-    exit
-endif
+cabrillo.py -$CONTEST
 
 # Need to bring the rest of these into this if-then-else structure
 
@@ -95,9 +78,6 @@ endif
 
 # CQ WW CW - seems to work in 2020
 #cabrillo.py -wwcw
-
-# 13 Colonies
-#cabrillo.py -cols13
 
 # Satellites
 #cabrillo.py -sats
