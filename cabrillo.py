@@ -72,7 +72,7 @@ arg_proc.add_argument('-naqprtty', action='store_true',help='NAQP RTTY')
 arg_proc.add_argument('-wpx', action='store_true',help='CQ WPX')
 arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
 arg_proc.add_argument("-i", help="Input ADIF file",
-                              type=str,default='aa2il_2019.adif')
+                              type=str,default=None)
 #                              type=str,default='naqp_aug2018.adif')
 arg_proc.add_argument("-o", help="Output Cabrillo file",
                               type=str,default='AA2IL.txt')
@@ -85,6 +85,8 @@ history = ''
 sc=None
 
 category_band='ALL'
+
+P=CONFIG_PARAMS('.keyerrc')
 
 #######################################################################################
 
@@ -309,7 +311,7 @@ elif args.cwops:
     DIR_NAME = '../pyKeyer/'
 
 elif args.cols13:
-    sc=THIRTEEN_COLONIES()
+    sc=THIRTEEN_COLONIES(P)
     contest=sc.contest
     date0=sc.date0
     date1=sc.date1
@@ -321,12 +323,15 @@ elif args.cols13:
         date1 = datetime.datetime.strptime( "20210708 0400" , "%Y%m%d %H%M")  # Start of contest
 
     # Need to merge FT8/FT4 and CW/Phone logs
-    fname = 'AA2IL.adif'
-    DIR_NAME = '../pyKeyer'
-    fnames = [DIR_NAME+'/'+fname]
-    fname = 'wsjtx_log.adi'
-    DIR_NAME = '/home/joea/.local/share/WSJT-X'
-    fnames.append( DIR_NAME+'/'+fname )
+    if not fname:
+        fname = 'AA2IL.adif'
+        DIR_NAME = '../pyKeyer'
+        fnames = [DIR_NAME+'/'+fname]
+        fname = 'wsjtx_log.adi'
+        DIR_NAME = '/home/joea/.local/share/WSJT-X'
+        fnames.append( DIR_NAME+'/'+fname )
+    else:
+        fnames=[fname]
 
 elif args.sats:
     sc = SATCOM()
@@ -456,7 +461,6 @@ print('Stop Date =',date1)
 print('\nInput file(s):',input_files)
 print('OUTPUT FILE=',output_file)
 
-P=CONFIG_PARAMS('.keyerrc')
 P.contest_name=contest
 
 # Init

@@ -24,6 +24,7 @@ import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
+from fileio import write_adif_record
 
 ############################################################################################
 
@@ -34,15 +35,32 @@ BONUS_STATIONS=['WM3PEN','GB13COL','TM13COL']
 # Scoring class for 13 Colonies - Inherits the base contest scoring class
 class THIRTEEN_COLONIES(CONTEST_SCORING):
  
-    def __init__(self,contest='13 Colonies Special Event'):
+    def __init__(self,P,contest='13 Colonies Special Event'):
         CONTEST_SCORING.__init__(self,contest,mode='MIXED')
+
+        # Init
+        self.P=P
 
         # Determine contest time - assumes this is dones within a few days of the contest
         now = datetime.datetime.utcnow()
-        start_time=0
+        start_time=13
         self.date0=datetime.datetime(now.year,7,1,start_time)
         self.date1 = self.date0 + datetime.timedelta(days=7)
 
+        # Make a separate ADIF file that we can use to make cert request
+        MY_CALL = P.SETTINGS['MY_CALL']
+        self.fp_adif = open("13_Colonies_"+MY_CALL.replace('/','_')+".adif","w")
+        print("ADIF file name=", self.fp_adif) 
+
+        #<ADIF_VER:5>2.2.7
+        #<PROGRAMID:6>fldigi
+        #<PROGRAMVERSION:6>4.1.19
+        #<EOH>
+        #WSJT-X ADIF Export<eoh>
+        self.fp_adif.write('ADIF Export<eoh>\n')
+
+
+        
     # Scoring routine for 13 Colonies Special Event
     # Really just spits out a list of QSOs for each SES
     # Not quite same API as regular contests
@@ -100,7 +118,13 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
                         worked_cw[n]=True
                     elif mode=='FT8' or mode=='MFSK':
                         worked_digi[n]=True
+
+                    # Make a separate ADIF file that we can use to make cert request
+                    if mode=='CW':
+                        write_adif_record(self.fp_adif,rec,self.P)
+                        self.fp_adif.write('\n')
         
+        self.fp_adif.close()
         print("\nThere were ",nqsos13," QSOs with the 13 Colonies.\n")
         #print(worked)
         #print(worked_cw)

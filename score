@@ -28,13 +28,13 @@ set CONTEST=""
 #set CONTEST="cqww"
 #set CONTEST="ss"
 #set CONTEST="arrl_dx"
-#set CONTEST="fd"
+#set CONTEST="fd"               # Field Day  - worked in 2020
 #set CONTEST="cqp"
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
 #set CONTEST="vhf"
-set CONTEST="cols13"
-set CONTEST="sats"
+set CONTEST="cols13"            # 13 colonies special event - worked in 2021
+#set CONTEST="sats"              # Satellites worked  - worked in 2021
 
 set d=`date`
 if( X$CONTEST == "X" && $d[1] == "Wed" )then
@@ -79,19 +79,10 @@ cabrillo.py -$CONTEST
 # CQ WW CW - seems to work in 2020
 #cabrillo.py -wwcw
 
-# Satellites
-#cabrillo.py -sats
-
 # WW Digi  - Code still needs to be converted - seem to have lost 2019 log file
 #cabrillo.py -wwdigi
 
 # Makroten
 #cabrillo.py -mak
 
-# Field Day  - works in 2020
-#cabrillo.py -fd
-
-
-#cat AA2IL.LOG
-#exit
 
