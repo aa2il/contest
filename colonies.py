@@ -112,6 +112,10 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
                              (Date,rec['time_off'],frq,rec['rst_rcvd'],rec['mode'],rec['rst_sent'] ) )
                     nqsos13+=1
 
+                    # Fix-up freq 
+                    #frq  = int( 1e3*float(rec['freq']) +0.5)
+                    #rec['freq'] = str( 1e-3*frq )
+                    
                     # Keep track of worked status
                     worked[n]=True
                     if mode=='CW':

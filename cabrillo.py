@@ -36,6 +36,7 @@ from cwops import *
 from sst import *
 from naqp import *
 from wpx import *
+from iaru import *
 from cqp import *
 from mak import *
 from rttyru import *
@@ -70,6 +71,7 @@ arg_proc.add_argument('-sats', action='store_true',help='Satellites Worked')
 arg_proc.add_argument('-naqpcw', action='store_true',help='NAQP CW')
 arg_proc.add_argument('-naqprtty', action='store_true',help='NAQP RTTY')
 arg_proc.add_argument('-wpx', action='store_true',help='CQ WPX')
+arg_proc.add_argument('-iaru', action='store_true',help='IARU HF')
 arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
 arg_proc.add_argument("-i", help="Input ADIF file",
                               type=str,default=None)
@@ -258,10 +260,24 @@ elif args.wpx:
     #date0 = datetime.datetime.strptime( "20190525 0000" , "%Y%m%d %H%M")  # Start of contest
     date0 = datetime.datetime.strptime( "20210529 0000" , "%Y%m%d %H%M")  # Start of contest
     date1 = date0 + datetime.timedelta(hours=48)
-    #fname = 'WPX_2019.LOG'
-    #DIR_NAME = '~/logs'
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
+
+elif args.iaru:
+    sc = IARU_HF_SCORING(P)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+    
+    if False:
+        # Manual override
+        date0 = datetime.datetime.strptime( "20210710 1200" , "%Y%m%d %H%M")  # Start of contest
+        date1 = date0 + datetime.timedelta(hours=24)
+        
+    fname = 'AA2IL.adif'
+    DIR_NAME = '../pyKeyer/'
+    history = '../history/data/master.csv'
 
 elif args.cqp:
     contest='CA-QSO-PARTY'
@@ -374,7 +390,7 @@ def open_output_file(P,outfile):
     fp.write('START-OF-LOG:3.0\n')
     fp.write('CONTEST: %s\n' % contest)
 
-    if contest=='ARRL-SS-CW' or contest[:6]=='CQ-WPX' or \
+    if contest=='ARRL-SS-CW' or contest[:6]=='CQ-WPX' or contest=='IARU-HF' or \
        contest=='WW-DIGI' or contest=='ARRL-VHF-JUN'  or contest=='ARRL-FD' :
         fp.write('LOCATION: %s\n' % MY_SECTION)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
@@ -473,8 +489,6 @@ elif contest=='ARRL-SS-CW':
 #elif contest=='CW Ops Mini-Test':
     # This is all done above now - model for rest of code eventually
     #    sc = CWOPS_SCORING(contest)
-#elif contest=='Slow Speed Mini-Test':
-#    sc = SST_SCORING(contest)
 elif contest=='ARRL-VHF-JUN':
     sc = ARRL_VHF_SCORING(P)
 elif contest=='NAQP-CW' or contest=='NAQP-RTTY':
@@ -491,7 +505,7 @@ elif contest=='ARRL-RTTY' or contest=='FT8-RU' or contest=='ARRL 10': \
     sc = ARRL_RTTY_RU_SCORING(contest)
 elif not sc:
     #sc = contest_scoring(contest)
-    print('Unrecognized contest - aborting')
+    print('\nUnrecognized contest - aborting -',contest,'\n')
     sys.exit(0)
 
 # Read adif input file(s)
