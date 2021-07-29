@@ -30,18 +30,25 @@ from pprint import pprint
     
 # Scoring class for CWops mini tests - Inherits the base contest scoring class
 class CWOPS_SCORING(CONTEST_SCORING):
- 
-    def __init__(self,contest='CW Ops Mini-Test'):
-        CONTEST_SCORING.__init__(self,contest,mode='CW')
+
+    def __init__(self,P):
+        CONTEST_SCORING.__init__(self,'CW Ops Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.sec_cnt = np.zeros((len(self.BANDS)))
         self.calls=set([])
 
+        self.MY_CALL     = P.SETTINGS['MY_CALL']
+        self.MY_NAME     = P.SETTINGS['MY_NAME']
+        self.MY_STATE    = P.SETTINGS['MY_STATE']
+        
         # Determine contest time - assumes this is dones wihtin a few hours of the contest
         now = datetime.datetime.utcnow()
-        #print(now)
-        #print(now.hour)
+        day=now.day
+        today = now.strftime('%A')
+        #if today=='Wednesday':
+        if today=='Thursday':
+            day-=1
         if now.hour>=19 and now.hour<24:
             self.date0=datetime.datetime(now.year,now.month,now.day,19)
         elif now.hour>=0 and now.hour<19:
@@ -51,6 +58,12 @@ class CWOPS_SCORING(CONTEST_SCORING):
             sys.exit(0)
             
         self.date1 = self.date0 + datetime.timedelta(hours=1+30/3600.)
+        if False:
+            print(now)
+            print(now.hour)
+            print(now.weekday())
+            print(now.strftime('%A'))
+            sys.exit(0)
     
         
 
@@ -121,7 +134,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
             self.list_similar_calls(call,qsos)
 
         line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
-            (freq_khz,mode,date_off,time_off,MY_CALL,MY_NAME,MY_STATE,call,name,qth)
+            (freq_khz,mode,date_off,time_off,self.MY_CALL,self.MY_NAME,self.MY_STATE,call,name,qth)
         
         return line
                         

@@ -310,7 +310,7 @@ elif args.sst:
     DIR_NAME = '../pyKeyer/'
 
 elif args.cwops:
-    sc = CWOPS_SCORING()
+    sc = CWOPS_SCORING(P)
     contest=sc.contest
     MY_MODE=sc.my_mode
     date0=sc.date0
