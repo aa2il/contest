@@ -117,7 +117,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
         # Check against history
         if call2 in keys:
             #print 'hist=',HIST[call2]
-            state=HIST[call2]['CWops']
+            state=HIST[call2]['cwops']
             if len(state)==0:
                 state=HIST[call2]['state']
             name9=HIST[call2]['name']

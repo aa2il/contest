@@ -318,8 +318,8 @@ elif args.cwops:
 
     if False:
         # Manual override
-        date0 = datetime.datetime.strptime( "20210428 1900" , "%Y%m%d %H%M")  # Start of contest - noon/11AM local
-        date0 = datetime.datetime.strptime( "20210429 0300" , "%Y%m%d %H%M")  # Start of contest - 7PM/8PM local
+        date0 = datetime.datetime.strptime( "20210804 1900" , "%Y%m%d %H%M")  # Start of contest - noon/11AM local
+        #date0 = datetime.datetime.strptime( "20210429 0300" , "%Y%m%d %H%M")  # Start of contest - 7PM/8PM local
         date1 = date0 + datetime.timedelta(hours=1+30/3600.)
         
     history = '../history/data/master.csv'
