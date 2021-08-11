@@ -30,6 +30,9 @@ set CONTEST=""
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"               # Field Day  - worked in 2020
 #set CONTEST="cqp"
+#set CONTEST="naqpcw"
+#set CONTEST="naqprtty"
+set CONTEST="wwdigi"
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
 #set CONTEST="vhf"
@@ -80,7 +83,7 @@ cabrillo.py -$CONTEST
 # CQ WW CW - seems to work in 2020
 #cabrillo.py -wwcw
 
-# WW Digi  - Code still needs to be converted - seem to have lost 2019 log file
+# WW Digi  - Code still needs to be converted 
 #cabrillo.py -wwdigi
 
 # Makroten

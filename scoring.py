@@ -28,8 +28,8 @@ import numpy as np
 from difflib import SequenceMatcher
 
 # Need this for Makrothen and WW-DIGI - it was broke but looking up error helped to fix it
-from pyhamtools.locator import calculate_distance
-#from pyhamtools import LookupLib, Callinfo
+#from pyhamtools.locator import calculate_distance
+####from pyhamtools import LookupLib, Callinfo
 
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
@@ -225,14 +225,6 @@ class contest_scoring:
         self.total_points_all = 0
         self.warnings    = 0
 
-        if contest=='WW-DIGI':
-            self.BANDS = ['160m','80m','40m','20m','15m','10m']
-            grids = []
-            for b in self.BANDS:
-                grids.append((b,set([])))
-            self.grid_fields = OrderedDict(grids)
-            
-            
     #######################################################################################
 
     # Function to list all qsos with callsigns similar to a particular call
@@ -337,8 +329,8 @@ class contest_scoring:
 
     #######################################################################################
 
-    # Scoring routine for WW Digi
-    def ww_digi(self,rec,dupe,HIST):
+    # Scoring routine for WW Digi- PRObaBLY OBSOLETE 
+    def ww_digi_OLD(self,rec,dupe,HIST):
         #print ' '
         #print rec
 

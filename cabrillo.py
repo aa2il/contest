@@ -38,6 +38,7 @@ from naqp import *
 from wpx import *
 from iaru import *
 from cqp import *
+from wwdigi import *
 from mak import *
 from rttyru import *
 from cqww import *
@@ -186,11 +187,26 @@ elif args.fd:
         fnames.append(f)
     
 elif args.wwdigi:
+    sc = WWDIGI_SCORING(P)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+    
+    #print(contest)
+    #print(MY_MODE)
+    #print(date0)
+    #sys.exit(0)
+    
     contest='WW-DIGI'
     MY_MODE='DIGI'
-    date0 = datetime.datetime.strptime( "20190831 1200" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=24)
-    fname = 'wsjtx_log.adi'
+    
+    if True:
+        # Manual override
+        date0 = datetime.datetime.strptime( "20190831 1200" , "%Y%m%d %H%M")  # Start of contest
+        date1 = date0 + datetime.timedelta(hours=24)
+
+    fname = '2019_rtty_ru.adi'
     DIR_NAME = '/home/joea/.local/share/WSJT-X - CONTEST'
     output_file = 'AA2IL.LOG'
 
@@ -223,19 +239,38 @@ elif args.naqprtty:
     DIR_NAME = '/home/joea/.fllog/'
     
 elif args.naqpcw:
-    contest='NAQP-CW'
-    MY_MODE='CW'
-    date0 = datetime.datetime.strptime( "20190112 1800" , "%Y%m%d %H%M")  # Start of contest
-    #date0 = datetime.datetime.strptime( "20180804 1800" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=12)
+    sc = NAQP_SCORING(P,'CW')
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+
+    print(contest)
+    print(MY_MODE)
+    print(date0)
+    #sys.exit(0)
+    
+    if False:
+        # Manual override
+        date0 = datetime.datetime.strptime( "20190112 1800" , "%Y%m%d %H%M")  # Start of contest
+        date1 = date0 + datetime.timedelta(hours=12)
+
+    fname = 'AA2IL.adif'
+    DIR_NAME = '../pyKeyer/'
+    history = '../history/data/master.csv'
+
+    """
     #history = '../data/NAQPCW.txt'
     #history = '../data/NAQP_CallHistory_AOCC072717.txt'
     history = 'data/NAQP_Call_History_Aug2018.txt'
     history = '../history/data/master.csv'
-    DIR_NAME = './'
-    fname = 'AA2IL.LOG'
-    #DIR_NAME = '../pyKeyer/'
-    #fname = 'AA2IL.adif'
+    #DIR_NAME = './'
+    #fname = 'AA2IL.LOG'
+    DIR_NAME = '../pyKeyer/'
+    fname = 'AA2IL.adif'
+    DIR_NAME = '../../logs/'
+    fname = 'aa2il_2019.adif'
+    """
 
 elif args.wwcw:
     contest='CQ-WW-CW'
@@ -491,8 +526,9 @@ elif contest=='ARRL-SS-CW':
     #    sc = CWOPS_SCORING(contest)
 elif contest=='ARRL-VHF-JUN':
     sc = ARRL_VHF_SCORING(P)
-elif contest=='NAQP-CW' or contest=='NAQP-RTTY':
-    sc = NAQP_SCORING(contest)
+#elif contest=='WW-DIGI':
+#    sc = contest_scoring(contest)
+    #sc = CQ_WPX_SCORING(P)
 elif contest[:6]=='CQ-WPX':
     sc = CQ_WPX_SCORING(P)
 elif contest=='CA-QSO-PARTY':
@@ -581,7 +617,7 @@ j=-1
 lines=[]
 for i in range(len(qsos)):
     rec=qsos[i]
-    #print '\n',i,rec
+    print('\n',i,rec)
     #date_off = datetime.datetime.strptime( rec["qso_date_off"]+" "+rec["time_off"] , "%Y%m%d %H%M%S")
     date_off = rec['time_stamp']
 
@@ -630,10 +666,7 @@ for i in range(len(qsos)):
             sc.nskipped+=1
             continue
 
-        if contest=='WW-DIGI':
-            # This is the only one left to convert
-            line = sc.ww_digi(rec,dupe,HIST)
-        elif contest=='13 Colonies Special Event':
+        if contest=='13 Colonies Special Event':
             # This one has a different API - leaving it like this for now
             # but would be nice to be consistent!
             sc.cols13(fp,qsos)

@@ -26,22 +26,36 @@ from scoring import CONTEST_SCORING
 
 ############################################################################################
     
+TRAP_ERRORS = False
+TRAP_ERRORS = True
+
+############################################################################################
+    
 # Scoring class for NAQP CW & RTTY - Inherits the base contest scoring class
 class NAQP_SCORING(CONTEST_SCORING):
  
-    def __init__(self,contest):
-        CONTEST_SCORING.__init__(self,contest)
+    def __init__(self,P,MODE):
+        CONTEST_SCORING.__init__(self,'NAQP-'+MODE,mode=MODE)
+        print('NAQP Scoring Init')
 
-        self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)))
-
-        self.fp_simple = open("SIMPLE.LOG","w")
-        self.fp_simple.write('QSO_DATE_OFF,TIME_OFF,CALL,FREQ,BAND,MODE,SRX_STRING\n')
+        self.MY_CALL     = P.SETTINGS['MY_CALL']
+        self.MY_NAME     = P.SETTINGS['MY_NAME']
+        self.MY_STATE    = P.SETTINGS['MY_STATE']
         
+        self.BANDS = ['160m','80m','40m','20m','15m','10m']
+        self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)))        
+
+        # Determine contest time - assumes this is dones wihtin a few hours of the contest
+        now = datetime.datetime.utcnow()
+        day=7
+        start_hour=18
+        self.date0=datetime.datetime(now.year,now.month,day,start_hour)
+        self.date1 = self.date0 + datetime.timedelta(hours=12)
+                
 
     # Scoring routine for NAQP CW and RTTY
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
-        #print rec
+        #print('rec=',rec)
         keys=list(HIST.keys())
 
         # Pull out relavent entries
@@ -60,6 +74,7 @@ class NAQP_SCORING(CONTEST_SCORING):
             print('Invalid mode',MY_MODE)
             sys.exit(1)
 
+        """
         # In 2017, there was some inconsistancies in how the name & state were saved
         if call=='AA2IL' or qth==name:
             print('\n******** Houston, we have a problem:')
@@ -74,13 +89,19 @@ class NAQP_SCORING(CONTEST_SCORING):
         elif len(qth)==2 and len(name)==2 and (not (qth in NAQP_SECS)) or (name in NAQP_SECS):
             print('\n--- Check this one for to make sure name & qth are not reversed ---')
             print('call=',call,'\t\tname=',name,'\t\tqth=',qth)
-            #sys.exit(0)
+        """
 
         # Sometimes, I'll put a "?" to indicate that I need to review
         if '?' in call+name+qth:
             print('\n??? Check this one again: ???')
             print('call=',call,'\t\tname=',name,'\t\tqth=',qth)
             self.list_all_qsos(call,qsos)
+            if TRAP_ERRORS:
+                sys.exit(0)
+
+        # Misc fix-ups
+        if qth=='PY':
+            qth='DX'
 
         try:
             idx1 = NAQP_SECS.index(qth)
@@ -88,10 +109,11 @@ class NAQP_SCORING(CONTEST_SCORING):
             self.sec_cnt[idx1,idx2] = 1
         except:
             print('\n$$$$$$$$$$$$$$$$$$$$$$')
-            print(qth,' not found in list of NAQP sections')
+            print(qth,' not found in list of NAQP sections',len(qth))
             print(rec)
             print('$$$$$$$$$$$$$$$$$$$$$$')
-            #sys.exit(0)
+            if TRAP_ERRORS:
+                sys.exit(0)
     
         if not dupe:
             self.nqsos2 += 1;
@@ -102,18 +124,25 @@ class NAQP_SCORING(CONTEST_SCORING):
 #QSO: 14042 CW 1999-09-05 0000 N5KO            TREY       CA  N6TR          1 TREE       OR
 
         line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
-            (freq_khz,mode,date_off,time_off,MY_CALL,MY_NAME,MY_STATE,call,name,qth)
+            (freq_khz,mode,date_off,time_off, \
+             self.MY_CALL,self.MY_NAME,self.MY_STATE,
+             call,name,qth)
         #print line
 
         # Check against history
         if call in keys:
             state=HIST[call]['state']
+            if state=='':
+                sec  =HIST[call]['sec']
+                if sec in STATES+PROVINCES:
+                    state=sec
             name9=HIST[call]['name']
             #print call,qth,state
             if qth!=state or name!=name9:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
                 print(call,':  Current:',qth,name,' - History:',state,name9)
                 self.list_all_qsos(call,qsos)
+                print('hist=',HIST[call])
                 print(' ')
 
         else:
@@ -123,14 +152,6 @@ class NAQP_SCORING(CONTEST_SCORING):
 
             #print 'dist=',similar('K5WA','N5WA')
             #sys.exit(0)
-
-
-        # Save in simple log format in case we want to use it later
-        date_off0 = rec["qso_date_off"]
-        time_off0 = rec["time_off"]
-        exch = name+','+qth
-        self.fp_simple.write('%s,%s,%s,%s,%s,%s,"%s"\n' % (date_off0,time_off0,call,freq_khz,band,mode,exch))
-        self.fp_simple.flush()
 
         return line
             
