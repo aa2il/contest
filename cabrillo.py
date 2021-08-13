@@ -617,7 +617,7 @@ j=-1
 lines=[]
 for i in range(len(qsos)):
     rec=qsos[i]
-    print('\n',i,rec)
+    #print('\n',i,rec)
     #date_off = datetime.datetime.strptime( rec["qso_date_off"]+" "+rec["time_off"] , "%Y%m%d %H%M%S")
     date_off = rec['time_stamp']
 
@@ -724,15 +724,16 @@ print(" ")
 
 # Actual stop time & average qso rate
 gap_min = (date1 - date_off).total_seconds() / 60.0
+print('Start time gap:\t\t%8.1f minutes' % cum_gap)
 cum_gap += gap_min
-print('Stop time gap:\t\t',gap_min,'minutes')
-print('Total time off:\t\t',cum_gap,'minutes \t=',cum_gap/60.,'hours')
+print('Stop time gap:\t\t%8.1f minutes' % gap_min)
+print('Total time off:\t\t%8.1f minutes\t=%8.1f hours' % (cum_gap, cum_gap/60.) )
 duration = (date1 - date0).total_seconds() / 60.0
-print('Contest duration:\t',duration,'minutes \t=',duration/60.,'hours')
+print('Contest duration:\t%8.1f minutes \t=%8.1f hours' %(duration,duration/60.) )
 op_time=duration-cum_gap
-print('Operating time:\t\t',op_time,'minutes \t=',op_time/60.,'hours')
+print('Operating time:\t\t%8.1f minutes \t=%8.1f hours' % (op_time,op_time/60.) )
 ave_rate = sc.nqsos2/(op_time/60.)
-print('Average rate:\t\t',ave_rate,'per hour\n')
+print('Average rate:\t\t%8.1f per hour\n' % ave_rate)
         
 
 # Not quite sure how to use these yet
