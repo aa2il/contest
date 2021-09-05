@@ -57,7 +57,7 @@ class CONTEST_SCORING:
         self.total_points_all = 0
         self.warnings    = 0
         self.trap_errors = True
-
+        
     # Routine to replace cut numbers with their numerical equivalents
     def reverse_cut_numbers(self,x,n=0):
         x=x.upper()
