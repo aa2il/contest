@@ -46,17 +46,17 @@ class CWOPEN_SCORING(CONTEST_SCORING):
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
+        self.MY_SECTION = P.SETTINGS['MY_SEC']
+        self.MY_STATE = P.SETTINGS['MY_STATE']
         
         # Determine contest time - need to automate this!
         self.date0 = datetime.datetime.strptime( "20210904 0000" , "%Y%m%d %H%M")  # Start of contest
         self.date1 = self.date0 + datetime.timedelta(hours=4)
         
-        
-    def output_header(self,fp,P):
-        MY_SECTION = P.SETTINGS['MY_SEC']
-        MY_STATE = P.SETTINGS['MY_STATE']
-        fp.write('LOCATION: %s\n' % MY_STATE)
-        fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
         
 
     # Scoring routine for CW Ops CW Open

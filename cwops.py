@@ -41,6 +41,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
         self.MY_STATE    = P.SETTINGS['MY_STATE']
+        self.MY_SECTION = P.SETTINGS['MY_SEC']
         
         # Determine contest time - assumes this is dones wihtin a few hours of the contest
         now = datetime.datetime.utcnow()
@@ -65,7 +66,11 @@ class CWOPS_SCORING(CONTEST_SCORING):
             print(now.strftime('%A'))
             sys.exit(0)
     
-        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
+                    
 
     # Scoring routine for CW Ops Mini Tests
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):

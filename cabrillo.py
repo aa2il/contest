@@ -33,6 +33,7 @@ from fd import *
 from arrl_ss import *
 from vhf import *
 from cwops import *
+from cwopen import *
 from sst import *
 from naqp import *
 from wpx import *
@@ -66,6 +67,7 @@ arg_proc.add_argument('-vhf', action='store_true',help='ARRL VHF')
 arg_proc.add_argument('-fd', action='store_true',help='ARRL Field Day')
 arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
 arg_proc.add_argument('-cwops', action='store_true',help='CW Ops Mini-Test')
+arg_proc.add_argument('-cwopen', action='store_true',help='CW Ops CW Open')
 arg_proc.add_argument('-sst', action='store_true',help='Slow Speed Mini-Test')
 arg_proc.add_argument('-cols13', action='store_true',help='13 Colonies Special Event')
 arg_proc.add_argument('-sats', action='store_true',help='Satellites Worked')
@@ -329,7 +331,7 @@ elif args.cqp:
     output_file = 'AA2IL_CQP_2020.LOG'
     
 elif args.sst:
-    sc = SST_SCORING()
+    sc = SST_SCORING(P)
     contest=sc.contest
     MY_MODE=sc.my_mode
     date0=sc.date0
@@ -357,6 +359,17 @@ elif args.cwops:
         #date0 = datetime.datetime.strptime( "20210429 0300" , "%Y%m%d %H%M")  # Start of contest - 7PM/8PM local
         date1 = date0 + datetime.timedelta(hours=1+30/3600.)
         
+    history = '../history/data/master.csv'
+    fname = 'AA2IL.adif'
+    DIR_NAME = '../pyKeyer/'
+
+elif args.cwopen:
+    sc = CWOPEN_SCORING(P)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+
     history = '../history/data/master.csv'
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
@@ -417,14 +430,22 @@ def open_output_file(P,outfile):
     fp = open(outfile, 'w')
 
     contest = P.contest_name
-    MY_SECTION = P.SETTINGS['MY_SEC']
-    MY_STATE = P.SETTINGS['MY_STATE']
+    #MY_SECTION = P.SETTINGS['MY_SEC']
+    #MY_STATE = P.SETTINGS['MY_STATE']
     MY_CALL = P.SETTINGS['MY_CALL']
     MY_POWER='LOW'
     
     fp.write('START-OF-LOG:3.0\n')
     fp.write('CONTEST: %s\n' % contest)
 
+    try:
+        sc.output_header(fp)
+    except:
+        # Need to add a routine to each contest - copy from sst.py, etc.
+        print('OPEN_OUTPUT_FILE - Needs some easy work!')
+        sys.exit(0)
+
+    """
     if contest=='ARRL-SS-CW' or contest[:6]=='CQ-WPX' or contest=='IARU-HF' or \
        contest=='WW-DIGI' or contest=='ARRL-VHF-JUN'  or contest=='ARRL-FD' :
         fp.write('LOCATION: %s\n' % MY_SECTION)
@@ -433,8 +454,8 @@ def open_output_file(P,outfile):
         fp.write('LOCATION: %s\n' % MY_COUNTY)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
     elif contest=='MAKROTHEN-RTTY' or contest=='ARRL-RTTY' or contest=='NAQP-CW' or \
-         contest=='NAQP-RTTY' or contest=='FT8-RU' or contest=='CW Ops Mini-Test' or \
-         contest=='Slow Speed Mini-Test' or contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW' or\
+         contest=='NAQP-RTTY' or contest=='FT8-RU' or \
+    contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW' or\
          contest=='ARRL 10':
         fp.write('LOCATION: %s\n' % MY_STATE)
     elif contest=='13 Colonies Special Event' or \
@@ -443,6 +464,7 @@ def open_output_file(P,outfile):
     else:
         print('OPEN_OUTPUT_FILE: Unknown contest -',contest)
         sys.exit(0)
+    """
 
     fp.write('CALLSIGN: %s\n' % MY_CALL)
     fp.write('CATEGORY-OPERATOR: SINGLE-OP\n');
@@ -526,9 +548,6 @@ elif contest=='ARRL-SS-CW':
     #    sc = CWOPS_SCORING(contest)
 elif contest=='ARRL-VHF-JUN':
     sc = ARRL_VHF_SCORING(P)
-#elif contest=='WW-DIGI':
-#    sc = contest_scoring(contest)
-    #sc = CQ_WPX_SCORING(P)
 elif contest[:6]=='CQ-WPX':
     sc = CQ_WPX_SCORING(P)
 elif contest=='CA-QSO-PARTY':
