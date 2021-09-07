@@ -30,13 +30,18 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 # Scoring class for CWops mini tests - Inherits the base contest scoring class
 class SST_SCORING(CONTEST_SCORING):
  
-    def __init__(self,contest='Slow Speed Mini-Test'):
-        CONTEST_SCORING.__init__(self,contest,mode='CW')
+    def __init__(self,P):
+        CONTEST_SCORING.__init__(self,'Slow Speed Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros(len(self.BANDS),np.int32)
         self.sec_cnt = np.zeros(len(SST_SECS))
 
+        self.MY_CALL     = P.SETTINGS['MY_CALL']
+        self.MY_NAME     = P.SETTINGS['MY_NAME']
+        self.MY_STATE    = P.SETTINGS['MY_STATE']
+        self.MY_SECTION = P.SETTINGS['MY_SEC']
+        
         # Determine contest time - assumes this is dones wihtin a few hours of the contest
         now = datetime.datetime.utcnow()
         if now.strftime('%A') == 'Friday':
@@ -54,7 +59,12 @@ class SST_SCORING(CONTEST_SCORING):
             print(self.date0)
             print(self.date1)
             sys.exit(0)
-        
+
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
+                    
     # Scoring routine for Slow Speed Mini Tests
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
         #print 'rec=',rec
@@ -121,7 +131,9 @@ class SST_SCORING(CONTEST_SCORING):
             self.list_similar_calls(call,qsos)
 
         line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
-            (freq_khz,mode,date_off,time_off,MY_CALL,MY_NAME,MY_STATE,call,name,qth)
+            (freq_khz,mode,date_off,time_off,
+             self.MY_CALL,self.MY_NAME,self.MY_STATE,
+             call,name,qth)
         
         return line
                         
