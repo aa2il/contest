@@ -31,10 +31,19 @@ from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 class ARRL_VHF_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,P.contest_name)
 
+        # Determine contest based on month
+        now = datetime.datetime.utcnow()
+        month = now.strftime('%b').upper()
+        print(month)
+
+        # Init base class
+        CONTEST_SCORING.__init__(self,'ARRL-VHF-'+month,mode='MIXED')
+
+        # Init special items for this class
         self.MY_CALL = P.SETTINGS['MY_CALL']
         self.MY_GRID = P.SETTINGS['MY_GRID']
+        self.MY_SEC  = P.SETTINGS['MY_SEC']
 
         self.BANDS = ['6m','2m','70cm']
         self.NQSOS = OrderedDict()
@@ -44,10 +53,36 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             self.NQSOS[b]=0
         self.grids = OrderedDict(grids)
         self.nqsos=0
+        self.category_band='VHF-3-BAND'
+        
+        # Contest occurs on 2nd full weekend of June and Sept (not sure about Jan??)
+        day1=datetime.date(now.year,now.month,1).isoweekday() % 7      # Day of week of 1st of month 0=Sunday, 6=Saturday
+        sat2=14-day1                                                   # Day no. for 2nd Saturday
+        self.date0=datetime.datetime(now.year,now.month,sat2,18)       # Contest starts at 1800 UTC on Saturday ...
+        self.date1 = self.date0 + datetime.timedelta(hours=33)         # ... and ends at 0300 UTC on Monday
+        print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+        #sys.exit(0)
 
+        # Manual override
+        if False:
+            self.date0 = datetime.datetime.strptime( "20210612 1800" , "%Y%m%d %H%M")  # Start of contest
+            self.date0 = datetime.datetime.strptime( "20210911 1800" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = date0 + datetime.timedelta(hours=33)
+      
+        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_SEC)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SEC)
+                    
     # Scoring routine for ARRL VHF contest for a single qso
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
-        #print('\nrec=',rec)
+        keys=list(HIST.keys())
+        if False:
+            #print('\nrec=',rec)
+            #print('\nqsos=',qsos)
+            print('\nHIST=',HIST)
+            sys,exit(0)
 
         # Pull out relavent entries
         call = rec["call"]
@@ -67,6 +102,11 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         else:
             print('\nUnable to determine grid',rec)
             sys.exit(0)
+
+        if ',' in grid:
+            a=grid.split(',')
+            grid=a[0]
+            print(call,a,grid)
         self.grids[band].add(grid)
 
         # Check for valid grid
@@ -114,9 +154,52 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             (freq_mhz,mode,date_off,time_off, \
              self.MY_CALL,self.MY_GRID[:4],call,grid)
 
+        # Check against history
+        # Assume WSJT decode was correct and only show cw/phone qsos
+        if call in keys:
+            grid2=HIST[call]['grid']
+            if grid!=grid2 and rec["mode"]!='FT8':
+                print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
+                print(call,':  Current:',grid,' - History:',grid2)
+                self.list_all_qsos(call,qsos)
+                print(' ')
+
+        else:
+            if rec["mode"]!='FT8':
+                print('\n++++++++++++ Warning - no history for call:',call)
+                self.list_all_qsos(call,qsos)
+        
         #print(line)
         return line
 
+
+    def check_multis(self,qsos):
+
+        print('There were multiple qsos with the following stations:')
+        qsos2=qsos.copy()
+        qsos2.sort(key=lambda x: x['call'])
+        calls=[]
+        for rec in qsos2:
+            calls.append(rec['call'])
+        #print(calls)
+        uniques = list(set(calls))
+        uniques.sort()
+        #print(uniques)
+
+        for call in uniques:
+            #print(call,calls.count(call))
+            if calls.count(call)>1:
+                for rec in qsos:
+                    if rec['call']==call:
+                        mode = rec["mode"]
+                        band = rec["band"]
+                        if 'qth' in rec:
+                            qth  = rec["qth"].upper()
+                        else:
+                            qth  = rec["gridsquare"].upper()
+                        print(call,'\t',band,'\t',mode,'\t',qth)
+                print(' ')
+                        
 
     # Summary & final tally
     def summary(self):
@@ -136,3 +219,30 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         print('Multipliers   =',mults)
         print('Claimed Score =',self.total_points*mults)
     
+
+
+    # Function to list all qsos with a particular call
+    def list_all_qsos(self,call2,qsos):
+        print('All QSOs with ',call2,':')
+        same=True
+        qth_old = None
+        for rec in qsos:
+            call = rec["call"].upper()
+            if call==call2:
+                print(rec)
+                if 'qth' in rec:
+                    qth  = rec["qth"].upper()
+                else:
+                    qth  = rec["gridsquare"].upper()
+                band = rec["band"]
+                print('call=',call,'\tqth=',qth,'\tband=',band)
+
+                if qth_old:
+                    same = same and (qth==qth_old)
+                qth_old = qth
+
+        if not same:
+            print('&*&*&*&*&*&*&*& QTH MISMATCH *&*&*&*&*&*&*&&*&')
+            #sys.exit(0)
+
+        

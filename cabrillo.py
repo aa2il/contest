@@ -6,6 +6,14 @@
 #
 # Program to convert contest log to cabrillo format and compute claimed score.
 #
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# NOTE:
+#     Most up-to-date contest module is the VHF CONTEST.
+#     Use it as model for subsequent contests
+#
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
 ############################################################################################
 #
 # This program is free software: you can redistribute it and/or modify
@@ -142,32 +150,22 @@ elif args.ten:
     output_file = 'AA2IL_10m_2020.LOG'
     
 elif args.vhf:
-    contest='ARRL-VHF-JUN'
-    category_band='VHF-3-BAND'
-    MY_MODE='MIXED'
-    date0 = datetime.datetime.strptime( "20210612 1800" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=33)
-
-    # Need to merge FT8 and CW/phone logs
-    #fname = 'wsjtx_log.adi'
-    #DIR_NAME = '/home/joea/.local/share/WSJT-X'
-    #output_file = 'AA2IL.LOG'
-
-    fnames=[]
-    if False:
-        fname    = 'AA2IL.adif'
-        DIR_NAME = '../pyKeyer'
-        fnames = [DIR_NAME+'/'+fname]
-    if False:
-        fname = 'wsjtx_log.adi'
-        DIR_NAME = '/home/joea/.local/share/WSJT-X'
-        fnames.append( DIR_NAME+'/'+fname )
+    sc = ARRL_VHF_SCORING(P)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    category_band=sc.category_band
+    date0=sc.date0
+    date1=sc.date1
 
     # Need to merge FT8 and CW/Phone logs
     fnames=[]
-    for fname in ['AA2IL_VHF_Jun2021.adif','wsjtx_VHF_Jun2021.adi']:
+    #DIR_NAME='.'
+    #for fname in ['AA2IL.adif','wsjtx_log.adi']:
+    for fname in ['AA2IL_VHF_Sep2021.adif','wsjtx_VHF_Sep2021.adi']:
         f=os.path.expanduser( DIR_NAME+'/'+fname )
         fnames.append(f)
+
+    history = '../history/data/master.csv'
         
 elif args.fd:
     contest='ARRL-FD'
@@ -447,7 +445,7 @@ def open_output_file(P,outfile):
 
     """
     if contest=='ARRL-SS-CW' or contest[:6]=='CQ-WPX' or contest=='IARU-HF' or \
-       contest=='WW-DIGI' or contest=='ARRL-VHF-JUN'  or contest=='ARRL-FD' :
+       contest=='WW-DIGI' or contest=='ARRL-FD' :
         fp.write('LOCATION: %s\n' % MY_SECTION)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
     elif contest=='CA-QSO-PARTY':
@@ -546,8 +544,6 @@ elif contest=='ARRL-SS-CW':
 #elif contest=='CW Ops Mini-Test':
     # This is all done above now - model for rest of code eventually
     #    sc = CWOPS_SCORING(contest)
-elif contest=='ARRL-VHF-JUN':
-    sc = ARRL_VHF_SCORING(P)
 elif contest[:6]=='CQ-WPX':
     sc = CQ_WPX_SCORING(P)
 elif contest=='CA-QSO-PARTY':
@@ -737,6 +733,7 @@ if contest=='WW-DIGI':
     print('\n&&&&&&&&&&&&&&&& Need to update code &&&&&&&&&&&&&&&&&&&&&&&&&&&')
     
 else:
+    sc.check_multis(qsos)
     sc.summary()
     
 print(" ")

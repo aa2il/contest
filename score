@@ -6,6 +6,14 @@
 #
 # Script to run cabrillo converter/scoring code.
 #
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# NOTE:
+#     Most up-to-date contest module is the VHF CONTEST.
+#     Use it as model for subsequent contests
+#
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
 ################################################################################
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,7 +44,7 @@ set CONTEST="sst"
 #set CONTEST="wwdigi"
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
-#set CONTEST="vhf"
+set CONTEST="vhf"
 #set CONTEST="iaru"
 #set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
