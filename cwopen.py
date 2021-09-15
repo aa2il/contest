@@ -46,18 +46,32 @@ class CWOPEN_SCORING(CONTEST_SCORING):
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
-        self.MY_SECTION = P.SETTINGS['MY_SEC']
-        self.MY_STATE = P.SETTINGS['MY_STATE']
+        self.MY_SECTION  = P.SETTINGS['MY_SEC']
+        self.MY_STATE    = P.SETTINGS['MY_STATE']
         
-        # Determine contest time - need to automate this!
-        self.date0 = datetime.datetime.strptime( "20210904 0000" , "%Y%m%d %H%M")  # Start of contest
-        self.date1 = self.date0 + datetime.timedelta(hours=4)
+        # History file
+        self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
+        
+        # Determine contest date/time - first Sat in Sept.
+        now = datetime.datetime.utcnow()
+        day1=datetime.date(now.year,9,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat2=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                       #    plus no. days until 1st Saturday (day 5)
+        start_time=0                                                   # 1st session is 0000-0400 UTC                           
+        self.date0=datetime.datetime(now.year,9,sat2,start_time)       # Need to add more code for other sessions next year
+        self.date1 = self.date0 + datetime.timedelta(hours=4)          # Each session is 4hrs long
+        print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+        #sys.exit(0)
+
+        # Manual override
+        if False:
+            self.date0 = datetime.datetime.strptime( "20210904 0000" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=4)
         
     # Contest-dependent header stuff
     def output_header(self,fp):
         fp.write('LOCATION: %s\n' % self.MY_STATE)
         fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
-        
 
     # Scoring routine for CW Ops CW Open
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):

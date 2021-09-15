@@ -32,8 +32,8 @@
 set CONTEST=""
 
 #set CONTEST="cwops"
-#set CONTEST="cwopen"
-set CONTEST="sst"
+set CONTEST="cwopen"
+#set CONTEST="sst"
 #set CONTEST="cqww"
 #set CONTEST="ss"
 #set CONTEST="arrl_dx"
@@ -44,7 +44,7 @@ set CONTEST="sst"
 #set CONTEST="wwdigi"
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
-set CONTEST="vhf"
+#set CONTEST="vhf"
 #set CONTEST="iaru"
 #set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021

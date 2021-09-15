@@ -20,6 +20,7 @@
 ############################################################################################
 
 import sys
+import os
 import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
@@ -54,10 +55,16 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         self.grids = OrderedDict(grids)
         self.nqsos=0
         self.category_band='VHF-3-BAND'
+
+        # History file
+        self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
         
         # Contest occurs on 2nd full weekend of June and Sept (not sure about Jan??)
-        day1=datetime.date(now.year,now.month,1).isoweekday() % 7      # Day of week of 1st of month 0=Sunday, 6=Saturday
-        sat2=14-day1                                                   # Day no. for 2nd Saturday
+        #day1=datetime.date(now.year,now.month,1).isoweekday() % 7      # Day of week of 1st of month 0=Sunday, 6=Saturday
+        #sat2=14-day1                                                   # Day no. for 2nd Saturday
+        day1=datetime.date(now.year,now.month,1).weekday()             # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 2nd Saturday = 1 since day1 is the 1st of the month
+                                                                       #    no. days until 1st Saturday (day 5) + 7 more days 
         self.date0=datetime.datetime(now.year,now.month,sat2,18)       # Contest starts at 1800 UTC on Saturday ...
         self.date1 = self.date0 + datetime.timedelta(hours=33)         # ... and ends at 0300 UTC on Monday
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
@@ -173,6 +180,7 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         return line
 
 
+    # Routine to sift thorugh station we had multiple contacts with to identify any discrepancies
     def check_multis(self,qsos):
 
         print('There were multiple qsos with the following stations:')

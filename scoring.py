@@ -36,6 +36,11 @@ from pprint import pprint
 
 ############################################################################################
 
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
+
+############################################################################################
+
 # Base contest scorer class
 class CONTEST_SCORING:
     def __init__(self,contest,mode=None):
@@ -204,129 +209,14 @@ class CONTEST_SCORING:
             print('&*&*&*&*&*&*&*& NAME and/or QTH MISMATCH *&*&*&*&*&*&*&&*&')
             #sys.exit(0)
 
-#######################################################################################
-
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
-
-class contest_scoring:
-    def __init__(self,contest):
-        self.contest = contest
-        self.total_score = 0
-
-        self.total_km    = 0
-        self.max_km      = 0
-        self.nskipped    = 0
-        self.ndupes      = 0
-        self.nqsos1      = 0
-        self.nqsos2      = 0
-        self.countries   = set([])
-        self.longest     = None
-        self.total_points = 0
-        self.total_points_all = 0
-        self.warnings    = 0
-
     #######################################################################################
 
-    # Function to list all qsos with callsigns similar to a particular call
-    def list_similar_calls(self,call2,qsos):
-        thresh =0.7
-        print('QSOs with calls similar to',call2,':')
-        for i in range(0,len(qsos)):
-            rec=qsos[i]
-            call = rec["call"].upper()
-            dx = similar(call,call2)
-            if dx>=thresh and dx<1.0:
-                if True:
-                    qth  = rec["qth"].upper()
-                    name = rec["name"].upper()
-                    band = rec["band"]
-                    print('call=',call,'\t\tname=',name,'\t\tqth=',qth,'\t\tband=',band,'\t\tdist=',dx)
-                else:
-                    print(rec)
+    # Routine to sift through stations we had multiple contacts with to identify any discrepancies
+    def check_multis(self,qsos):
 
-    # Function to list all qsos with a particular call
-    def list_all_qsos(self,call2,qsos):
-        print('All QSOs with ',call2,':')
-        same=True
-        name_old = None
-        qth_old = None
-        #for i in range(0,len(qsos)):
-        #    rec=qsos[i]
-        for rec in qsos:
-            call = rec["call"].upper()
-            if call==call2:
-                if True:
-                    qth  = rec["qth"].upper()
-                    name = rec["name"].upper()
-                    band = rec["band"]
-                    print('call=',call,'\tname=',name,'\tqth=',qth,'\tband=',band)
-
-                    if name_old:
-                        same = same and (name==name_old) and (qth==qth_old)
-                    name_old = name
-                    qth_old = qth
-                else:
-                    print(rec)
-
-        if not same:
-            print('&*&*&*&*&*&*&*& NAME and/or QTH MISMATCH *&*&*&*&*&*&*&&*&')
-            #sys.exit(0)
-
-    #######################################################################################
-
-    # Routine to check for dupes
-    def check_dupes(self,rec,qsos,i,istart):
-
-        # Count no. of raw qsos
-        self.nqsos1+=1
-
-        # Check for dupes
-        call = rec["call"]
-        band = rec["band"]
-        if self.contest=='ARRL-FD':
-            mode = self.group_modes( rec["mode"] )
-        duplicate=False
-        rapid=False
-        for j in range(istart,i):
-            rec2  = qsos[j]
-            call2 = rec2["call"]
-            band2 = rec2["band"]
-            mode2 = rec2["mode"]
-            if self.contest=='ARRL-SS-CW':
-                dupe  = call==call2
-            elif self.contest=='ARRL-FD':
-                mode2 = self.group_modes(mode2)
-                dupe  = call==call2 and band==band2 and mode==mode2
-            else:
-                dupe  = call==call2 and band==band2
-            if dupe:
-                if i-j<=2:
-                    print("\n*** WARNING - RAPID Dupe",call,band,' ***')
-                    rapid = True
-                else:
-                    print("\n*** WARNING - Dupe",call,band,' ***')
-                print(j,rec2)
-                print(i,rec)
-                print(" ")
-                duplicate = True
-
-        return (duplicate,rapid)
-
-    # Routine to replace cut numbers with their numerical equivalents
-    def reverse_cut_numbers(self,x):
-        x=x.upper()
-        x=x.replace('T','0')
-        x=x.replace('O','0')
-        x=x.replace('A','1')
-        x=x.replace('N','9')
-
-        # Strip leading 0's
-        #return x
-        try:
-            return str(int(x))
-        except:
-            return x
+        print('There were multiple qsos with the following stations:')
+        print('NEED SOME CODE FOR THIS CONTEST - see vhf.py for an example')
+        
 
     #######################################################################################
 
@@ -447,6 +337,4 @@ class contest_scoring:
         #sys,exit(0)
         
         return line
-
-    #######################################################################################
 

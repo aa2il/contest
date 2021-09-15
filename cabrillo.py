@@ -156,6 +156,7 @@ elif args.vhf:
     category_band=sc.category_band
     date0=sc.date0
     date1=sc.date1
+    history = sc.history
 
     # Need to merge FT8 and CW/Phone logs
     fnames=[]
@@ -165,8 +166,6 @@ elif args.vhf:
         f=os.path.expanduser( DIR_NAME+'/'+fname )
         fnames.append(f)
 
-    history = '../history/data/master.csv'
-        
 elif args.fd:
     contest='ARRL-FD'
     MY_MODE='MIXED'
@@ -365,10 +364,11 @@ elif args.cwopen:
     sc = CWOPEN_SCORING(P)
     contest=sc.contest
     MY_MODE=sc.my_mode
+    category_band=sc.category_band
     date0=sc.date0
     date1=sc.date1
+    history = sc.history
 
-    history = '../history/data/master.csv'
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
 
