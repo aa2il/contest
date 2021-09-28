@@ -314,18 +314,20 @@ elif args.iaru:
     history = '../history/data/master.csv'
 
 elif args.cqp:
-    contest='CA-QSO-PARTY'
-    MY_MODE='CW'
-    date0 = datetime.datetime.strptime( "20201003 1600" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=30)
-    history = '../history/data/master.csv'
+    print('P=',P)
+    sc = CQP_SCORING(P)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+    history = sc.history
 
-    fname = 'AA2IL.adif'
+    fname = 'AA2IL_6.adif'
     DIR_NAME = '../pyKeyer'
     fnames = [DIR_NAME+'/'+fname]
-    fname = 'AA2IL_6.adif'
-    fnames.append( DIR_NAME+'/'+fname )
-    output_file = 'AA2IL_CQP_2020.LOG'
+    #fname = 'AA2IL.adif'                   # In 2020, used both calls
+    #fnames.append( DIR_NAME+'/'+fname )
+    output_file = 'AA2IL_CQP_2021.LOG'
     
 elif args.sst:
     sc = SST_SCORING(P)
@@ -396,8 +398,10 @@ elif args.cols13:
         fnames=[fname]
 
 elif args.sats:
-    sc = SATCOM()
+    sc = SATCOM(P)
     contest=sc.contest
+    MY_MODE=sc.my_mode
+    category_band=sc.category_band
     date0=sc.date0
     date1=sc.date1
     history = ''
@@ -447,9 +451,6 @@ def open_output_file(P,outfile):
     if contest=='ARRL-SS-CW' or contest[:6]=='CQ-WPX' or contest=='IARU-HF' or \
        contest=='WW-DIGI' or contest=='ARRL-FD' :
         fp.write('LOCATION: %s\n' % MY_SECTION)
-        fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
-    elif contest=='CA-QSO-PARTY':
-        fp.write('LOCATION: %s\n' % MY_COUNTY)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
     elif contest=='MAKROTHEN-RTTY' or contest=='ARRL-RTTY' or contest=='NAQP-CW' or \
          contest=='NAQP-RTTY' or contest=='FT8-RU' or \
@@ -546,8 +547,6 @@ elif contest=='ARRL-SS-CW':
     #    sc = CWOPS_SCORING(contest)
 elif contest[:6]=='CQ-WPX':
     sc = CQ_WPX_SCORING(P)
-elif contest=='CA-QSO-PARTY':
-    sc = CQP_SCORING(contest)
 elif contest=='MAKROTHEN-RTTY':
     sc = MAKROTHEN_SCORING(contest)
 elif contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW':

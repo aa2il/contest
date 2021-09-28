@@ -38,7 +38,7 @@ set CONTEST="cwopen"
 #set CONTEST="ss"
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"               # Field Day  - worked in 2020
-#set CONTEST="cqp"
+set CONTEST="cqp"
 #set CONTEST="naqpcw"
 #set CONTEST="naqprtty"
 #set CONTEST="wwdigi"
@@ -82,9 +82,6 @@ cabrillo.py -$CONTEST
 # NAQP - CW wasn't tested but should work, RTTY was tested
 #cabrillo.py -naqpcw 
 #cabrillo.py -naqprtty
-
-# Cal QSO Party  - works in 2020
-#cabrillo.py -cqp
 
 # CQ WW RTTY
 #cabrillo.py -wwrtty

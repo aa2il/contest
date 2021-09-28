@@ -30,7 +30,7 @@ from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
     
 # Scoring class for ARRL VHF contest - Inherits the base contest scoring class
 class ARRL_VHF_SCORING(CONTEST_SCORING):
- 
+
     def __init__(self,P):
 
         # Determine contest based on month

@@ -34,13 +34,43 @@ CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','DX']
 # Scoring class for CQP - Inherits the base contest scoring class
 class CQP_SCORING(CONTEST_SCORING):
  
-    def __init__(self,contest):
-        CONTEST_SCORING.__init__(self,contest)
+    def __init__(self,P):
+        CONTEST_SCORING.__init__(self,'CA-QSO-PARTY',mode='CW')
         print('CQP Scoring Init')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.sec_cnt = np.zeros(len(CQP_MULTS))
         self.calls = []
+
+        self.MY_CALL     = P.SETTINGS['MY_CALL']
+        self.MY_NAME     = P.SETTINGS['MY_NAME']
+        self.MY_SECTION  = P.SETTINGS['MY_SEC']
+        self.MY_COUNTY   = P.SETTINGS['MY_COUNTY']
+
+        # History file
+        self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
+                
+        # Determine contest date/time - first Sat in Oct.
+        now = datetime.datetime.utcnow()
+        day1=datetime.date(now.year,10,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat2=1 + ((5-day1) % 7)                                         # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                        #    plus no. days until 1st Saturday (day 5)
+        start_time=16                                                   # 1600 UTC                           
+        self.date0=datetime.datetime(now.year,10,sat2,start_time)       # Need to add more code for other sessions next year
+        self.date1 = self.date0 + datetime.timedelta(hours=30)          # Contest is 30-hrs long
+        print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+        #sys.exit(0)
+
+        # Manual override
+        if False:
+            self.date0 = datetime.datetime.strptime( "20201003 1600" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=30)
+
+            
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_COUNTY)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
 
     # Scoring routine for CQP
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):

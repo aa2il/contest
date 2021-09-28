@@ -24,19 +24,40 @@ import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
+from fileio import write_adif_record
 
 #######################################################################################
     
 # Scoring class for Sat Comm - Inherits the base contest scoring class
 class SATCOM(CONTEST_SCORING):
  
-    def __init__(self,contest='Satellites Worked'):
-        CONTEST_SCORING.__init__(self,contest,mode='MIXED')
+    def __init__(self,P):
+        CONTEST_SCORING.__init__(self,'Satellites Worked',mode='MIXED')
+
+        # Init
+        self.P=P
 
         # Determine contest time - this one is for all time!
         self.date0 = datetime.datetime.strptime( "20000101 0000" , "%Y%m%d %H%M")
         self.date1 = datetime.datetime.strptime( "21000101 0000" , "%Y%m%d %H%M")
 
+        # Make a separate ADIF file that we can use to make cert request
+        MY_CALL = P.SETTINGS['MY_CALL']
+        self.fp_adif = open("Satellites_"+MY_CALL.replace('/','_')+".adif","w")
+        print("ADIF file name=", self.fp_adif) 
+
+        #<ADIF_VER:5>2.2.7
+        #<PROGRAMID:6>fldigi
+        #<PROGRAMVERSION:6>4.1.19
+        #<EOH>
+        #WSJT-X ADIF Export<eoh>
+        self.fp_adif.write('ADIF Export<eoh>\n')
+
+        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        pass
+                    
     # Scoring routine for satellites.
     # Really just spits out a list of QSOs 
     # Not quite same API as regular contests
@@ -67,6 +88,12 @@ class SATCOM(CONTEST_SCORING):
                 fp.write('%12s\t%6s\t\t%-8s\t%-3s\t%-10s\t%s\n' %
                          (Date,t,rec['sat_name'],rec['mode'],rec['call'],
                           srx))
+
+                # Make a separate ADIF file that contains all sat contacts
+                write_adif_record(self.fp_adif,rec,self.P,True)
+                self.fp_adif.write('\n')
+        
+        self.fp_adif.close()
         sys.exit(0)
 
 
