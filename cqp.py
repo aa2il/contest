@@ -38,9 +38,14 @@ class CQP_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,'CA-QSO-PARTY',mode='CW')
         print('CQP Scoring Init')
         
-        self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.sec_cnt = np.zeros(len(CQP_MULTS))
-        self.calls = []
+        self.BANDS       = ['160m','80m','40m','20m','15m','10m']
+        self.sec_cnt     = np.zeros(len(CQP_MULTS))
+        self.dx_cnt      = 0
+        self.calls       = []
+        self.county_cnt  = np.zeros(len(CA_COUNTIES))
+        self.band_cnt    = np.zeros(len(self.BANDS))
+        self.num_prev    = 0
+        self.rec_prev    = []
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
@@ -82,16 +87,30 @@ class CQP_SCORING(CONTEST_SCORING):
         call = rec["call"].upper()
         rx   = rec["srx_string"].strip().upper()
         a    = rx.split(',') 
-        #num_in = self.reverse_cut_numbers( a[0] )
-        num_in = int( a[0] )
+        try:
+            num_in = int( self.reverse_cut_numbers( a[0] ) )
+        except:
+            print('rec=',rec)
+            print('Problem with serial:',a)
+            #sys.exit(0)
+
         qth_in = a[1]
         my_call = rec["station_callsign"].strip().upper()
 
         tx   = rec["stx_string"].strip().upper()
         b    = tx.split(',')
-        num_out = self.reverse_cut_numbers( b[0] )
+        num_out = int( self.reverse_cut_numbers( b[0] ) )
         qth_out = b[1]
-        
+
+        if num_out-self.num_prev!=1:
+            print('\nHmmmm - we seem to have failure to communicate here!')
+            print(num_out,self.num_prev)
+            #print(self.rec_prev)
+            #print(rec)
+            #sys.exit(0)
+        self.num_prev = num_out
+        self.rec_prev = rec
+
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
@@ -114,16 +133,24 @@ class CQP_SCORING(CONTEST_SCORING):
         # Determine multipliers
         if qth_in in CA_COUNTIES:
             qth='CA'
+            idx1 = CA_COUNTIES.index(qth_in)
+            self.county_cnt[idx1] += 1
         elif qth_in in ['NB', 'NL', 'NS', 'PE']:
             qth_in='MR'
             qth='MR'
         else:
             qth=qth_in
+
+        idx1 = self.BANDS.index(band)
+        self.band_cnt[idx1] += 1
             
         if not dupe:
             try:
-                idx1 = CQP_MULTS.index(qth)
-                self.sec_cnt[idx1] += 1
+                if qth!='DX':
+                    idx1 = CQP_MULTS.index(qth)
+                    self.sec_cnt[idx1] += 1
+                else:
+                    self.dx_cnt += 1
                 self.nqsos2 += 1;
                 self.calls.append(call)
             except:
@@ -174,36 +201,94 @@ class CQP_SCORING(CONTEST_SCORING):
 
         line='QSO: %5d %2s %10s %4s %-10s %4s %-4s %-10s %4s %-4s' % \
             (freq_khz,mode,date_off,time_off,
-             my_call,num_out,qth_out,
-             call,num_in,qth_in)
+             my_call,str(num_out),qth_out,
+             call,str(num_in),qth_in)
         
         return line
                         
     # Summary & final tally
     def summary(self):
 
-        print('\nNo. raw QSOS (nqsos1)    =\t',self.nqsos1)
-        print(  'No. unique QSOS (nqsos2) =\t',self.nqsos2)
+        print('\nStates & Provinces:')
         mults=0
         for i in range(len(self.sec_cnt)):
-            print(i,'\t',CQP_MULTS[i],'\t',int(self.sec_cnt[i]))
             if self.sec_cnt[i]>0:
                 mults += 1
-        print('Multipiers    =\t',mults)
-        print('Claimed Score =\t',3*mults*self.nqsos2)
+                tag=''
+            else:
+                tag='*****'
+            print(i,'\t',CQP_MULTS[i],'\t',int(self.sec_cnt[i]),'\t',tag)
+
+        print('\nCA Counties:')
+        for i in range(len(self.county_cnt)):
+            if self.county_cnt[i]>0:
+                tag=''
+            else:
+                tag='*****'
+            print(i,'\t',CA_COUNTIES[i],'\t',int(self.county_cnt[i]),'\t',tag)
+
+        print('\nRaw QSOs by Band:')
+        for i in range(len(self.band_cnt)):
+            print(i,'\t',self.BANDS[i],'\t',int(self.band_cnt[i]) )
 
         uniques = np.unique( self.calls )
         uniques.sort()
         print('\nThere were',len(uniques),'unique calls:\n',uniques)
 
-        print('\nThe SEQUOIA Challenge:')
-        for ch in ['S','E','Q','U','O','I','A']:
-            print(ch,':\t',end=' ')
-            for w in ['K','N','W']:
-                call2=w+'6'+ch
-                if call2 in uniques:
-                    print(call2,'\t',end=' ')
-                else:
-                    print('\t',end=' ')
-            print(' ')
+        print('\nNo. raw QSOS (nqsos1)    =\t',self.nqsos1)
+        print(  'No. unique QSOS (nqsos2) =\t',self.nqsos2)
+        print('Multipiers    =\t',mults)
+        print('Claimed Score =\t',3*mults*self.nqsos2)
+
+        # They did this in 2020
+        if False:
+            print('\nThe SEQUOIA Challenge:')
+            for ch in ['S','E','Q','U','O','I','A']:
+                print(ch,':\t',end=' ')
+                for w in ['K','N','W']:
+                    call2=w+'6'+ch
+                    if call2 in uniques:
+                        print(call2,'\t',end=' ')
+                    else:
+                        print('\t',end=' ')
+                print(' ')
             
+
+
+    # Routine to sift through station we had multiple contacts with to identify any discrepancies
+    def check_multis(self,qsos):
+
+        print('There were multiple qsos with the following stations:')
+        qsos2=qsos.copy()
+        qsos2.sort(key=lambda x: x['call'])
+        calls=[]
+        for rec in qsos2:
+            calls.append(rec['call'])
+        #print(calls)
+        uniques = list(set(calls))
+        uniques.sort()
+        #print(uniques)
+
+        for call in uniques:
+            #print(call,calls.count(call))
+            if calls.count(call)>1:
+                num_last=0
+                qth_last=''
+                for rec in qsos:
+                    if rec['call']==call:
+                        mode = rec["mode"]
+                        band = rec["band"]
+                        qth  = rec["qth"].upper()
+                        rx   = rec["srx_string"].strip().upper()
+                        a    = rx.split(',') 
+                        num_in = int( self.reverse_cut_numbers( a[0] ) )
+                        print(call,'\t',band,'\t',mode,'\t',num_in,'\t',qth)
+                        if num_last>=num_in or (len(qth_last)>0 and qth_last!=qth):
+                            print('$$$$$$$$$$$$ POTENTIAL ERROR $$$$$$$$$$$$$$')
+                            print('Serials not increasing &/or different QTH')
+                        num_last=num_in
+                        qth_last=qth
+                print(' ')
+                        
+        #sys.exit(0)
+    

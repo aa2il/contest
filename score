@@ -32,7 +32,7 @@
 set CONTEST=""
 
 #set CONTEST="cwops"
-set CONTEST="cwopen"
+#set CONTEST="cwopen"
 #set CONTEST="sst"
 #set CONTEST="cqww"
 #set CONTEST="ss"

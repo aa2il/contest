@@ -180,7 +180,7 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         return line
 
 
-    # Routine to sift thorugh station we had multiple contacts with to identify any discrepancies
+    # Routine to sift through station we had multiple contacts with to identify any discrepancies
     def check_multis(self,qsos):
 
         print('There were multiple qsos with the following stations:')

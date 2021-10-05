@@ -482,7 +482,7 @@ def open_output_file(P,outfile):
     if contest!='FT8-RU':
         fp.write('CATEGORY-MODE: %s\n' % MY_MODE);
     
-    fp.write('CLAIMED-SCORE: \n',);
+    #fp.write('CLAIMED-SCORE: \n',);
     fp.write('OPERATORS: %s\n' % MY_CALL);
     fp.write('CLUB: \n',);
     fp.write('NAME: Joseph B. Attili\n');
@@ -611,6 +611,11 @@ for rec in qsos2:
     if date_off>=date0 and date_off<=date1:
         rec["time_stamp"]=date_off
         qsos.append(rec)
+    elif date_off>date1:
+        print('\n***********************************************************************')
+        print('************ WARNING *** Extra QSO(s) found after contest end *********')
+        print('***********************************************************************\n')
+        
 qsos.sort(key=lambda x: x['time_stamp'])
 
 # Other qso fix-ups to make things easier later on
