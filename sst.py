@@ -66,7 +66,7 @@ class SST_SCORING(CONTEST_SCORING):
         fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
                     
     # Scoring routine for Slow Speed Mini Tests
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print 'rec=',rec
         keys=list(HIST.keys())
 

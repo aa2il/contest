@@ -86,9 +86,10 @@ arg_proc.add_argument('-iaru', action='store_true',help='IARU HF')
 arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
 arg_proc.add_argument("-i", help="Input ADIF file",
                               type=str,default=None)
-#                              type=str,default='naqp_aug2018.adif')
 arg_proc.add_argument("-o", help="Output Cabrillo file",
                               type=str,default='AA2IL.txt')
+arg_proc.add_argument("-hist", help="History File",
+                              type=str,default='')
 args = arg_proc.parse_args()
 fname = args.i
 output_file = args.o
@@ -100,6 +101,7 @@ sc=None
 category_band='ALL'
 
 P=CONFIG_PARAMS('.keyerrc')
+HIST2=None
 
 #######################################################################################
 
@@ -322,6 +324,8 @@ elif args.cqp:
     date1=sc.date1
     history = sc.history
 
+    HIST2=sc.read_hist2(args.hist)
+    
     fname = 'AA2IL_6.adif'
     DIR_NAME = '../pyKeyer'
     fnames = [DIR_NAME+'/'+fname]
@@ -377,6 +381,7 @@ elif args.cwopen:
 elif args.cols13:
     sc=THIRTEEN_COLONIES(P)
     contest=sc.contest
+    MY_MODE=sc.my_mode
     date0=sc.date0
     date1=sc.date1
     history = ''
@@ -441,10 +446,12 @@ def open_output_file(P,outfile):
     fp.write('CONTEST: %s\n' % contest)
 
     try:
-        sc.output_header(fp)
+        skip_header=sc.output_header(fp)
+        if skip_header:
+            return fp
     except:
         # Need to add a routine to each contest - copy from sst.py, etc.
-        print('OPEN_OUTPUT_FILE - Needs some easy work!')
+        print('OPEN_OUTPUT_FILE - Needs some easy work!  See CABRILLO.PY for how to dow this')
         sys.exit(0)
 
     """
@@ -572,7 +579,6 @@ for f in input_files:
 
     if ext=='.LOG':
         qsos1 = parse_simple_log(fname,args)
-        #write_adif_log(qsos1,fname,contest)         # Don't need this anymore since pyKeyer does it now
     else:
         qsos1 = parse_adif(fname)
     #print qsos1
@@ -590,6 +596,7 @@ for f in input_files:
 # Sort list of QSOs by date/time - needed if we merge multiple logs (e.g. for ARRL RTTY w/ FT8
 qsos=[]
 nqsos=0
+first_time=True
 for rec in qsos2:
     nqsos+=1
     keys = list(rec.keys())
@@ -612,9 +619,11 @@ for rec in qsos2:
         rec["time_stamp"]=date_off
         qsos.append(rec)
     elif date_off>date1:
-        print('\n***********************************************************************')
-        print('************ WARNING *** Extra QSO(s) found after contest end *********')
-        print('***********************************************************************\n')
+        if first_time:
+            print('\n***********************************************************************')
+            print('************ WARNING *** Extra QSO(s) found after contest end *********')
+            print('***********************************************************************\n')
+            first_time=False
         
 qsos.sort(key=lambda x: x['time_stamp'])
 
@@ -699,7 +708,8 @@ for i in range(len(qsos)):
 
         else:
             # This is how things should be for all contests
-            line = sc.qso_scoring(rec,dupe,qsos,HIST,MY_MODE)
+            # Added arg HIST for CQP
+            line = sc.qso_scoring(rec,dupe,qsos,HIST,MY_MODE,HIST2)
             
         #print(line)
         dupe=False

@@ -25,11 +25,14 @@ from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
+from fileio import parse_adif
 
 ############################################################################################
 
 CQP_MULTS  = STATES + ['MR', 'QC', 'ON', 'MB', 'SK', 'AB', 'BC', 'NT']
-CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','DX']
+#CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','DX']
+CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR']
+COUNTRIES=['United States','Canada','Alaska','Hawaii'] 
 
 # Scoring class for CQP - Inherits the base contest scoring class
 class CQP_SCORING(CONTEST_SCORING):
@@ -78,9 +81,10 @@ class CQP_SCORING(CONTEST_SCORING):
         fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
 
     # Scoring routine for CQP
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print('rec=',rec)
         keys=list(HIST.keys())
+        keys2=list(HIST2.keys())
         #sys.exit(0)
 
         # Pull out relavent entries
@@ -121,6 +125,8 @@ class CQP_SCORING(CONTEST_SCORING):
             print('Invalid mode',MY_MODE)
             sys.exit(1)
 
+        dx_station = Station(call)
+        country    = dx_station.country
         if False:
             print('rec=',rec)
             pprint(vars(dx_station))
@@ -162,15 +168,27 @@ class CQP_SCORING(CONTEST_SCORING):
                 sys.exit(0)
         
         # Error checking
-        if qth_in not in CQP_STATES:
+        if( not country in COUNTRIES and qth_in!='DX') or \
+          (country in COUNTRIES and qth_in not in CQP_STATES):
+            pprint(vars(dx_station))
             print('rec=',rec)
             print('call=',call)
             print('Received qth '+qth_in+' not recognized - srx=',rx)
             print('History=',HIST[call])
+            print('Country=',country)
+            print('QTH in=',qth_in)
             sys.exit(0)
 
         # Compare to history
-        if call in keys:
+        if call in keys2:
+            if qth_in!=HIST2[call]:
+                print('\n$$$$$$$$$$ Difference from history2 $$$$$$$$$$$')
+                print(call,':  Current:',qth_in,' - History:',HIST2[call])
+                print(' ')
+                if not call in ['W6COW','W6TCP','W6TED','KL7SB']:
+                    sys.exit(0)
+            
+        elif call in keys:
             if qth=='CA':
                 state=HIST[call]['county']
             else:
@@ -178,7 +196,7 @@ class CQP_SCORING(CONTEST_SCORING):
             #print call,qth,state
             if qth_in!=state:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
-                print(call,':  Current:',qth,' - History:',state)
+                print(call,':  Current:',qth_in,' - History:',state)
                 print('History=',call,HIST[call])
                 self.list_all_qsos(call,qsos)
                 print(' ')
@@ -291,4 +309,69 @@ class CQP_SCORING(CONTEST_SCORING):
                 print(' ')
                         
         #sys.exit(0)
+
+        
+    def read_hist2(self,fname):
+
+        print('READ_HIST2 - fname=',fname)
+        #HIST2=[]
+        HIST2 = OrderedDict()
+        if len(fname)>0:
+            print('Well, we have a histroy file ...',fname)
+            qsos = parse_adif(fname)
+            print(len(qsos))
+            print(qsos[0])
+
+            for qso in qsos:
+                #print(qso)
+                call=qso['call']
+                dxcc=int( qso['dxcc'] )
+                if dxcc in [1,110,291]:        # Canada, HI, USA, need AK also
+                    state=qso['state']
+                    if state=='CA':
+                        try:
+                            county=qso['cnty'].split(',')
+                            a=county[1]
+                            b=a.split(' ')
+                            if len(b)==1:
+                                qth=a[0:4]
+                            elif b[0]=='EL':
+                                qth=b[0]+b[1][0:2]
+                            else:
+                                if b[0][0:3] in ['LOS','SAN']:
+                                    qth=b[0][0]+b[1][0:3]
+                                else:
+                                    qth=a
+                                
+                        except:
+                            #qth='*******************'
+                            qth=''
+                    else:
+                        qth=state
+                        if qth in ['NB','NL','NS','PE']:
+                            qth='MR'
+                else:
+                    qth='DX'
+
+                #rec={'call':call,'qth':qth}
+                #print(rec)
+                #HIST2.append( rec )
+                if call in HIST2.keys():
+                    qth2=HIST2[call]
+                    if qth!=qth2:
+                        print('Houston, there is a turd in the punch bowl')
+                        print(qth,qth2)
+                else:
+                    HIST2[call]=qth
+                        
+            print('HIST2:',len(HIST2))
+            for call in HIST2.keys():
+                print(call,'\t',HIST2[call])
+            #sys.exit(0)
+
+        return HIST2
     
+
+        
+
+        

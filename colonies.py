@@ -60,7 +60,10 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
         self.fp_adif.write('ADIF Export<eoh>\n')
 
 
-        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        return True
+                    
     # Scoring routine for 13 Colonies Special Event
     # Really just spits out a list of QSOs for each SES
     # Not quite same API as regular contests
