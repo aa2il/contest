@@ -43,7 +43,7 @@ def similar(a, b):
 
 # Base contest scorer class
 class CONTEST_SCORING:
-    def __init__(self,contest,mode=None):
+    def __init__(self,P,contest,mode=None):
         #print('Base Class Init')
         
         self.contest = contest
@@ -63,7 +63,16 @@ class CONTEST_SCORING:
         self.total_points_all = 0
         self.warnings    = 0
         self.trap_errors = True
+        self.num_prev    = 0
+        self.rec_prev    = []
 
+        self.MY_CALL     = P.SETTINGS['MY_CALL']
+        self.MY_NAME     = P.SETTINGS['MY_NAME']
+        self.MY_STATE    = P.SETTINGS['MY_STATE']
+        self.MY_SECTION  = P.SETTINGS['MY_SEC']
+        self.MY_PREC     = P.SETTINGS['MY_PREC']
+        self.MY_CHECK    = int( P.SETTINGS['MY_CHECK'] )
+        
     # Routine to replace cut numbers with their numerical equivalents
     def reverse_cut_numbers(self,x,n=0):
         x=x.upper()
@@ -216,8 +225,22 @@ class CONTEST_SCORING:
 
         print('There were multiple qsos with the following stations:')
         print('NEED SOME CODE FOR THIS CONTEST - see vhf.py for an example')
-        
 
+    #######################################################################################
+
+    # Routien to check consistency of serial out
+    def check_serial_out(self,serial_out,rec,TRAP_ERRORS):
+        
+        if serial_out-self.num_prev!=1:
+            print('\nCHECK_SERIAL_OUT: Hmmmm - we seem to have failure to communicate here!')
+            print(serial_out,self.num_prev)
+            if TRAP_ERRORS:
+                print(self.rec_prev)
+                print(rec)
+                sys.exit(0)
+        self.num_prev = serial_out
+        self.rec_prev = rec
+                    
     #######################################################################################
 
     # Scoring routine for WW Digi- PRObaBLY OBSOLETE 

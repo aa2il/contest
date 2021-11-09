@@ -212,17 +212,17 @@ elif args.wwdigi:
     output_file = 'AA2IL.LOG'
 
 elif args.cwss:
-    contest='ARRL-SS-CW'
-    MY_MODE='CW'
-    #date0 = datetime.datetime.strptime( "20171104 2100" , "%Y%m%d %H%M")  # Start of contest
-    #history = '../history/data/2017_SS_call history.txt'
+    sc = ARRL_SS_SCORING(P)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
     
-    date0 = datetime.datetime.strptime( "20201107 2100" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=30)
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
-    history = '../history/data/SSCW.txt'
-    output_file = 'AA2IL_CWSS_2020.LOG'
+    #history = '../history/data/SSCW.txt'
+    history = '../history/data/SSCW-2021-LAST-2.txt'
+    output_file = 'AA2IL_CWSS_2021.LOG'
 
 elif args.naqprtty:
     contest='NAQP-RTTY'
@@ -449,13 +449,14 @@ def open_output_file(P,outfile):
         skip_header=sc.output_header(fp)
         if skip_header:
             return fp
-    except:
+    except Exception as e: 
         # Need to add a routine to each contest - copy from sst.py, etc.
+        print( str(e) )
         print('OPEN_OUTPUT_FILE - Needs some easy work!  See CABRILLO.PY for how to dow this')
         sys.exit(0)
 
     """
-    if contest=='ARRL-SS-CW' or contest[:6]=='CQ-WPX' or contest=='IARU-HF' or \
+    if contest[:6]=='CQ-WPX' or contest=='IARU-HF' or \
        contest=='WW-DIGI' or contest=='ARRL-FD' :
         fp.write('LOCATION: %s\n' % MY_SECTION)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
@@ -547,8 +548,8 @@ istart  = -1
 cum_gap = 0
 if contest=='ARRL-FD':
     sc = ARRL_FD_SCORING(contest)
-elif contest=='ARRL-SS-CW':
-    sc = ARRL_SS_SCORING(contest)
+#elif contest=='ARRL-SS-CW':
+#    sc = ARRL_SS_SCORING(P,contest)
 #elif contest=='CW Ops Mini-Test':
     # This is all done above now - model for rest of code eventually
     #    sc = CWOPS_SCORING(contest)

@@ -31,17 +31,12 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 class SST_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,'Slow Speed Mini-Test',mode='CW')
+        CONTEST_SCORING.__init__(self,P,'Slow Speed Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros(len(self.BANDS),np.int32)
         self.sec_cnt = np.zeros(len(SST_SECS))
 
-        self.MY_CALL     = P.SETTINGS['MY_CALL']
-        self.MY_NAME     = P.SETTINGS['MY_NAME']
-        self.MY_STATE    = P.SETTINGS['MY_STATE']
-        self.MY_SECTION = P.SETTINGS['MY_SEC']
-        
         # Determine contest time - assumes this is dones wihtin a few hours of the contest
         now = datetime.datetime.utcnow()
         if now.strftime('%A') == 'Friday':
@@ -73,8 +68,6 @@ class SST_SCORING(CONTEST_SCORING):
         # Pull out relavent entries
         call = rec["call"].upper()
         qth  = rec["qth"].upper()
-        if len(qth)>2:
-            qth = self.reverse_cut_numbers(qth)
         name = rec["name"].upper()
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
 

@@ -1,4 +1,24 @@
 # Routines for scoring ARRL Sweepstakes
+############################################################################################
+#
+# arrl_ss.py - Rev 1.0
+# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+#
+# Routines for scoring ARRL CW Sweepstakes contest.
+#
+############################################################################################
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+############################################################################################
 
 import sys
 import datetime
@@ -8,16 +28,41 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 
 #######################################################################################
     
-# Scoring class for CWops mini tests - Inherits the base contest scoring class
+TRAP_ERRORS = False
+#TRAP_ERRORS = True
+
+############################################################################################
+    
+# Scoring class for ARRL CW Sweepstakes - Inherits the base contest scoring class
 class ARRL_SS_SCORING(CONTEST_SCORING):
  
-    def __init__(self,contest):
-        CONTEST_SCORING.__init__(self,contest)
+    def __init__(self,P):
+        CONTEST_SCORING.__init__(self,P,'ARRL-SS-CW',mode='CW')
         
         self.sec_cnt = np.zeros(len(ARRL_SECS))
 
+        # Contest occurs on 1st full weekend of November
+        now = datetime.datetime.utcnow()
+        day1=datetime.date(now.year,11,1).weekday()                    # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat2=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                       # No. days until 1st Saturday (day 5) + 7 more days 
+        self.date0=datetime.datetime(now.year,now.month,sat2,21)       # Contest starts at 2100 UTC on Saturday ...
+        self.date1 = self.date0 + datetime.timedelta(hours=30)         # ... and ends at 0300 UTC on Sunday
+        print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+        #sys.exit(0)
+
+        if False:
+            # Manual override
+            self.date0 = datetime.datetime.strptime( "20201107 2100" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=30)
+        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
+                    
     # Scoring routine for ARRL CW Sweepstakes
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print rec
 
         keys=list(HIST.keys())
@@ -30,14 +75,25 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
         if 'srx_string' in rec:
-            if False:
-                rexch  = rec["srx_string"].strip().upper().split(' ')
-                serial = rexch[0]
-                prec   = rexch[1]
-                call2  = rexch[2]
-                check  = rexch[3]
-                sec    = rexch[4]
+            if True:
+                # Things should be properly formatted by pyKeyer
+                try:
+                    rexch  = rec["srx_string"].strip().upper().split(',')
+                    #serial = rexch[0]
+                    serial = int( self.reverse_cut_numbers( rexch[0] ) )
+                    prec   = rexch[1]
+                    call2  = rexch[2]
+                    check  = int( rexch[3] )
+                    sec    = rexch[4]
+                except Exception as e: 
+                    print( str(e) )
+                    print('Problem unpacking rx exchange')
+                    print(rec)
+                    if TRAP_ERRORS:
+                        sys.exit(0)
+
             else:
+                # Old way
                 rexch  = rec["srx_string"].strip().upper()
                 #print rexch
 
@@ -74,6 +130,9 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 except:
                     print('BAD serial',s)
                     serial=0
+                    if TRAP_ERRORS:
+                        print(rec)
+                        sys.exit(0)
 
                 # Find prec
                 #print(rexch[i:])
@@ -105,6 +164,9 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 except:
                     print('BAD Check',s)
                     check=-1
+                    if TRAP_ERRORS:
+                        print(rec)
+                        sys.exit(0)
 
                 # Find section
                 sec=''
@@ -119,12 +181,6 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                     sec='PE'
                 #print 'sec=',sec,i
 
-            try:
-                idx = ARRL_SECS.index(sec)
-                self.sec_cnt[idx] += 1
-            except:
-                print('Well that didnt work - sec=',sec)
-
             if not dupe:
                 self.nqsos2 += 1;
 
@@ -136,14 +192,46 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
 
         # Construct sent data
         try:
-            serial_out = int( rec["stx"] )
+            #serial_out = int( rec["stx"] )
+            serial_out = int( self.reverse_cut_numbers( rec["stx"] ) )
         except:
             print('BAD Serial Out:',rec["stx"] )
             serial_out = -1
-            
-        #exch_out = '%3.3d %c %s %2s %3s' % (serial_out,MY_PREC,MY_CALL,MY_CHECK,MY_SECTION)
-        #print exch_out
-        #sys.exit(0)
+            if TRAP_ERRORS:
+                print(rec)
+                sys.exit(0)
+
+        if False:
+            exch_in = '%3.3d %c %s %2d %3s' % (serial,prec,call2,check,sec)
+            print('exch_in=',exch_in)
+            exch_out = '%3.3d %c %s %2d %3s' % \
+                (serial_out,self.MY_PREC,self.MY_CALL,self.MY_CHECK,self.MY_SECTION)
+            print('exch_out=',exch_out)
+            sys.exit(0)
+
+        # Some simple error checking
+        if not prec in ['Q','A','B','U','M','S']:
+            print('\n*** ERROR - Bad PREC:',prec,'\tcall=',call)
+            print(rec)
+            if TRAP_ERRORS:
+                sys,exit(0)
+
+        if call!=call2:
+            print('\n*** ERROR - Bad CALL:',call,'\tcall2=',call2)
+            print(rec)
+            if TRAP_ERRORS:
+                sys,exit(0)
+                        
+        try:
+            idx = ARRL_SECS.index(sec)
+            self.sec_cnt[idx] += 1
+        except:
+            print('Well that didnt work - BAD sec=',sec)
+            print(rec)
+            if TRAP_ERRORS:
+                sys,exit(0)
+
+        self.check_serial_out(serial_out,rec,TRAP_ERRORS)
             
 #                              --------info sent------- -------info rcvd--------
 #QSO: freq  mo date       time call       nr   p ck sec call       nr   p ck sec
@@ -152,9 +240,10 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
 #0000000001111111111222222222233333333334444444444555555555566666666667777777777
 #1234567890123456789012345678901234567890123456789012345678901234567890123456789
 
-        #exch_in = '%3.3d %c %s %2d %3s' % (serial,prec,call2,check,sec)
         line='QSO: %5d CW %10s %4s %-10s %4d %1s %2s %-3s %-10s %4d %1s %2d %-3s' % \
-            (freq_khz,date_off,time_off,MY_CALL,serial_out,MY_PREC,MY_CHECK,MY_SECTION,call,serial,prec,check,sec)
+            (freq_khz,date_off,time_off,self.MY_CALL,serial_out,\
+             self.MY_PREC,self.MY_CHECK,self.MY_SECTION, \
+             call,serial,prec,check,sec)
 
         # Check against history
         if call in keys:
@@ -168,9 +257,11 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 print(HIST[call])
                 #sys,exit(0)
                 
-        
-        #print line
-        #sys,exit(0)
+        if '?' in line:
+            print('Something is fishy here:')
+            print(line)
+            if TRAP_ERRORS:
+                sys,exit(0)
         
         return line
 

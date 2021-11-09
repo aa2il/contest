@@ -47,8 +47,6 @@ class CQP_SCORING(CONTEST_SCORING):
         self.calls       = []
         self.county_cnt  = np.zeros(len(CA_COUNTIES))
         self.band_cnt    = np.zeros(len(self.BANDS))
-        self.num_prev    = 0
-        self.rec_prev    = []
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
@@ -106,15 +104,8 @@ class CQP_SCORING(CONTEST_SCORING):
         num_out = int( self.reverse_cut_numbers( b[0] ) )
         qth_out = b[1]
 
-        if num_out-self.num_prev!=1:
-            print('\nHmmmm - we seem to have failure to communicate here!')
-            print(num_out,self.num_prev)
-            #print(self.rec_prev)
-            #print(rec)
-            #sys.exit(0)
-        self.num_prev = num_out
-        self.rec_prev = rec
-
+        self.check_serial_out(num_out_out,rec,TRAP_ERRORS)
+        
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')

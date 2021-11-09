@@ -73,7 +73,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
                     
 
     # Scoring routine for CW Ops Mini Tests
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2=None):
         #print 'rec=',rec
         keys=list(HIST.keys())
 

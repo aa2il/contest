@@ -35,7 +35,7 @@ set CONTEST=""
 #set CONTEST="cwopen"
 #set CONTEST="sst"
 #set CONTEST="cqww"
-#set CONTEST="ss"
+set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"               # Field Day  - worked in 2020
 #set CONTEST="cqp"
@@ -46,7 +46,7 @@ set CONTEST=""
 #set CONTEST="arrl_10m"
 #set CONTEST="vhf"
 #set CONTEST="iaru"
-set CONTEST="cols13"            # 13 colonies special event - worked in 2021
+#set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
 
 set d=`date`
@@ -58,6 +58,7 @@ endif
 
 ################################################################################
 
+echo cabrillo.py -$CONTEST
 cabrillo.py -$CONTEST
 
 # cabrillo.py -cqp -hist lotwreport.adi
