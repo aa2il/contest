@@ -25,17 +25,23 @@ from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 
-# Need this for Makrothen and WW-DIGI - it was broke but looking up error helped to fix it
-#from pyhamtools.locator import calculate_distance
+############################################################################################
+    
+TRAP_ERRORS = False
+TRAP_ERRORS = True
 
 ############################################################################################
     
 # Scoring class for ARRL RTTY RU - Inherits the base contest scoring class
 class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
  
-    def __init__(self,contest):
-        CONTEST_SCORING.__init__(self,contest)
-        print('RTTY RU Scoring Init')
+    def __init__(self,P,contest):
+        #print('contest=',contest)
+        #print('Settings=',P.SETTINGS)
+        
+        CONTEST_SCORING.__init__(self,P,contest)
+
+        print('RTTY RU Scoring Init...')
 
         self.ft8ru    = contest=='FT8-RU'
         self.ten_m    = contest=='ARRL-10'
@@ -45,10 +51,44 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             self.secs = RU_SECS
         self.sec_cnt  = np.zeros(len(self.secs))
         self.band_cnt = np.zeros(len(CONTEST_BANDS))
-        #self.trap_errors = False                   # Make more forgiving so will run during a contest
 
-    # Check validity of RST
-    def check_rst(self,rst):
+        # Determine contest dates
+        now = datetime.datetime.utcnow()
+        if self.ft8ru:
+
+            # Contest occurs on 1st full weekend of December
+            day1=datetime.date(now.year,12,1).weekday()                    # Day of week of 1st of month 0=Monday, 6=Sunday
+            sat2=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                           # No. days until 1st Saturday (day 5) + 7 more days 
+            self.date0=datetime.datetime(now.year,now.month,sat2,18)       # Contest starts at 1800 UTC on Saturday ...
+            self.date1 = self.date0 + datetime.timedelta(hours=30)         # ... and ends at 0000 UTC on Sunday
+            print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+
+        else:
+
+            print('RTTYRU Init - need date calcs for this contest')
+            sys.exit(0)
+            
+        if False:
+            # Manual override
+            #self.date0 = datetime.datetime.strptime( "20181201 1800" , "%Y%m%d %H%M")  # Start of contest - FT RU
+            self.date0 = datetime.datetime.strptime( "20201205 1800" , "%Y%m%d %H%M")  # Start of contest - FT RU
+            self.date1 = self.date0 + datetime.timedelta(hours=30)
+
+        # Name of output file
+        #self.output_file = self.MY_CALL+'_FTRU_'+str(self.date0.year)+'.LOG'
+        self.output_file = self.MY_CALL+'_'+contest+'_'+str(self.date0.year)+'.LOG'
+
+        #sys.exit(0)
+
+        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
+
+    # Convert RST to 5x9 format since some ops don't set contest mode correctly
+    def convert_rst(self,rst):
         # WSJT RST mapping:  (emperically determined from ALL.TXT - only partially determined)
         # 18 --> 599
         # 13 16 --> 589
@@ -57,7 +97,29 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         # -2 ... -6   ---> 559
         # -8 ... -15  ---> 549
         # -16  ---> 539
+
+        print('CONVERT_RST:',rst)
+        rst=int(rst)
+        if rst>=18:
+            return '599'
+        elif rst>=13 and rst<=16:
+            return '589'
+        elif rst>=9 and rst<=11:
+            return '579'
+        elif rst>=0 and rst<=5:
+            return '569'
+        elif rst>=-6 and rst<=-2:
+            return '559'
+        elif rst>=-15 and rst<=-8:
+            return '549'
+        elif rst>=-16:
+            return '539'
+        else:
+            print('CONVERT_RST: Dont know ow to map this value',rst)
+            sys.exit(0)
         
+    # Check validity of RST
+    def check_rst(self,rst):
         if len(rst)!=3:
             return False
         elif rst[0]!='5' or  rst[2]!='9':
@@ -66,7 +128,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             return True
 
     # Scoring routine for ARRL RTTY Round Up
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print 'RU_SECS=',RU_SECS
         #sys.exit(0)
         #print rec
@@ -84,8 +146,10 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             try:
                 qth = rec["srx"]
             except:
-                print('No STATE or SRX field for call',call,band,mode,' - cant determine QTH.')
-                if self.trap_errors:
+                print('\nNo STATE or SRX field for call',call,band,mode, \
+                      ' - cant determine QTH.')
+                print('rec=',rec)
+                if TRAP_ERRORS:
                     sys.exit(0)
                 else:
                     return 
@@ -126,7 +190,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             if country=='United States' or country=='Canada' or (self.ten_m and country=='Mexico'):
                 print('\nrec=',rec)
                 print('qth=',qth,' not found in list of RU sections - call=',call,country)
-                sys.exit(0)
+                if TRAP_ERRORS:
+                    sys.exit(0)
             else:
                 self.countries.add(country)
                 dx=True
@@ -141,23 +206,29 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         # Check RST
         RST_OUT = rec["rst_sent"]
         if not self.check_rst(RST_OUT):
-            print('Invalid RST_OUT field for call',call,band,mode,RST_OUT)
-            if self.trap_errors:
+            print('\nInvalid RST_OUT field for call',call,band,mode,RST_OUT)
+            print('rec=',rec)
+            if TRAP_ERRORS:
                 sys.exit(0)
         
         RST_IN  = rec["rst_rcvd"]
         if not self.check_rst(RST_IN):
-            print('Invalid RST_IN field for call',call,band,mode,RST_IN)
+            print('\nInvalid RST_IN field for call',call,band,mode,RST_IN)
+            print('rec=',rec)
+            RST_IN2=self.convert_rst(RST_IN)
+            print('Recorded RST=',RST_IN,'\tConverted RST=',RST_IN2)
             if not self.ft8ru and not self.ten_m and dx:
                 RST_IN='599'
-            elif self.trap_errors:
-                sys.exit(0)
+            elif TRAP_ERRORS:
+                RST_IN=RST_IN2
+                #sys.exit(0)
                 
         if False:
             if RST_IN=='':
                 RST_IN = '599'
                 print(call,'\t*** WARNING - Bad RST IN')
-                #sys.exit(0)
+                if TRAP_ERRORS:
+                    sys.exit(0)
             if dx and RST_IN==qth:
                 RST_IN='599'
             if RST_IN!='599' and False:
@@ -174,7 +245,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         #line='QSO: %5d %2s %10s %4s %-13s %3s %-6s %-13s %3s %-6s' % \
         #    (freq_khz,mode,date_off,time_off,MY_CALL,'599',MY_STATE,call,RST_IN,qth)
         line='QSO: %5d %2s %10s %4s %-12s %3s %-9s %-12s %3s %-9s' % \
-            (freq_khz,mode,date_off,time_off,MY_CALL,RST_OUT,MY_STATE,call,RST_IN,qth)
+            (freq_khz,mode,date_off,time_off, \
+             self.MY_CALL,RST_OUT,self.MY_STATE,call,RST_IN,qth)
 
         # Check against history
         if call in keys:

@@ -35,7 +35,7 @@ set CONTEST=""
 #set CONTEST="cwopen"
 #set CONTEST="sst"
 #set CONTEST="cqww"
-set CONTEST="cwss"              # Sweepstakes
+#set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"               # Field Day  - worked in 2020
 #set CONTEST="cqp"
@@ -48,6 +48,7 @@ set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="iaru"
 #set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
+set CONTEST="ft8ru"
 
 set d=`date`
 if( X$CONTEST == "X" && ($d[1] == "Wed" || $d[1] == "Thu") )then

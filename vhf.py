@@ -28,6 +28,11 @@ from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 
 ############################################################################################
     
+TRAP_ERRORS = False
+#TRAP_ERRORS = True
+
+############################################################################################
+    
 # Scoring class for ARRL VHF contest - Inherits the base contest scoring class
 class ARRL_VHF_SCORING(CONTEST_SCORING):
 
@@ -108,7 +113,8 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             grid = rec["srx_string"].upper()
         else:
             print('\nUnable to determine grid',rec)
-            sys.exit(0)
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         if ',' in grid:
             a=grid.split(',')
@@ -120,7 +126,8 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         valid = len(grid)==4 and grid[0:2].isalpha() and grid[2:4].isdigit()
         if not valid:
             print('\nVHF SCORING: Not a valid grid: call=',call,'\tgrid=',grid)
-            sys.exit(0)
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         #print('call=',call)
         
@@ -136,7 +143,8 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             mode='PH'
         else:
             print('Unknown mode:',rec["mode"])
-            sys.exit(0)
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         self.nqsos+=1
         if not dupe:
@@ -251,6 +259,7 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
 
         if not same:
             print('&*&*&*&*&*&*&*& QTH MISMATCH *&*&*&*&*&*&*&&*&')
-            #sys.exit(0)
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         

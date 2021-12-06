@@ -126,21 +126,21 @@ elif args.rttyru:
     fname1='aa2il_2021.adif'
     fnames = [DIR_NAME+'/'+fname1]
 
-    DIR_NAME = '/home/joea/.local/share/WSJT-X - CONTEST'
+    DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
     #fname2 = '2019_rtty_ru.adi'
     fname2 = 'wsjtx_log.adi'
     fnames.append( DIR_NAME+'/'+fname2 )
     
 elif args.ft8ru:
-    contest='FT8-RU'
-    MY_MODE='FT8'
-    #date0 = datetime.datetime.strptime( "20181201 1800" , "%Y%m%d %H%M")  # Start of contest
-    date0 = datetime.datetime.strptime( "20201205 1800" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=30)
-    DIR_NAME = '/home/joea/.local/share/WSJT-X - CONTEST'
-    #fname = 'ft8ru_2018.adi'
+    sc = ARRL_RTTY_RU_SCORING(P,'FT8-RU')
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+    
     fname = 'wsjtx_log.adi'
-    output_file = 'AA2IL_FTRU_2020.LOG'
+    DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
+    output_file = sc.output_file
     
 elif args.ten:
     contest='ARRL 10'
@@ -208,7 +208,7 @@ elif args.wwdigi:
         date1 = date0 + datetime.timedelta(hours=24)
 
     fname = '2019_rtty_ru.adi'
-    DIR_NAME = '/home/joea/.local/share/WSJT-X - CONTEST'
+    DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
     output_file = 'AA2IL.LOG'
 
 elif args.cwss:
@@ -237,7 +237,7 @@ elif args.naqprtty:
     date1 = date0 + datetime.timedelta(hours=12)
     history = '../history/data/master.csv'
     fname = 'naqp.adif'
-    DIR_NAME = '/home/joea/.fllog/'
+    DIR_NAME = '~/.fllog/'
     
 elif args.naqpcw:
     sc = NAQP_SCORING(P,'CW')
@@ -397,7 +397,7 @@ elif args.cols13:
         DIR_NAME = '../pyKeyer'
         fnames = [DIR_NAME+'/'+fname]
         fname = 'wsjtx_log.adi'
-        DIR_NAME = '/home/joea/.local/share/WSJT-X'
+        DIR_NAME = '~/.local/share/WSJT-X'
         fnames.append( DIR_NAME+'/'+fname )
     else:
         fnames=[fname]
@@ -415,7 +415,7 @@ elif args.sats:
     DIR_NAME = '../pyKeyer'
     fnames = [DIR_NAME+'/'+fname]
     fname = 'vhf.adif'
-    DIR_NAME = '/home/joea/logs'
+    DIR_NAME = '~/logs'
     fnames.append( DIR_NAME+'/'+fname )
 
 else:
@@ -559,7 +559,7 @@ elif contest=='MAKROTHEN-RTTY':
     sc = MAKROTHEN_SCORING(contest)
 elif contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW':
     sc = CQ_WW_SCORING(contest)
-elif contest=='ARRL-RTTY' or contest=='FT8-RU' or contest=='ARRL 10': \
+elif contest=='ARRL-RTTY' or contest=='ARRL 10': \
     sc = ARRL_RTTY_RU_SCORING(contest)
 elif not sc:
     #sc = contest_scoring(contest)
@@ -672,9 +672,13 @@ for i in range(len(qsos)):
             rate_window = datetime.timedelta(minutes=mins)
 
             # Actual start time
-            gap_min = (date_off - date0).total_seconds() / 60.0
-            cum_gap = gap_min
-            print('Start time gap:',gap_min,'minutes')
+            gap_min0 = (date_off - date0).total_seconds() / 60.0
+            cum_gap = gap_min0
+            print('Start time gap:',gap_min0,'minutes')
+            if False:
+                print('Date off=',date_off)
+                print('Date 0  =',date0)
+                sys.exit(0)
             
         else:
             while date_off2<date_off - rate_window:
@@ -709,7 +713,7 @@ for i in range(len(qsos)):
 
         else:
             # This is how things should be for all contests
-            # Added arg HIST for CQP
+            # Added arg HIST2 for CQP
             line = sc.qso_scoring(rec,dupe,qsos,HIST,MY_MODE,HIST2)
             
         #print(line)
@@ -754,8 +758,8 @@ else:
 print(" ")
 
 # Actual stop time & average qso rate
+print('Start time gap:\t\t%8.1f minutes\t=%8.1f hours' % (gap_min0,gap_min0/60.) )
 gap_min = (date1 - date_off).total_seconds() / 60.0
-print('Start time gap:\t\t%8.1f minutes' % cum_gap)
 cum_gap += gap_min
 print('Stop time gap:\t\t%8.1f minutes' % gap_min)
 print('Total time off:\t\t%8.1f minutes\t=%8.1f hours' % (cum_gap, cum_gap/60.) )
