@@ -38,31 +38,55 @@ TRAP_ERRORS = True
 class IARU_HF_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,'IARU-HF',mode='CW')
+        CONTEST_SCORING.__init__(self,P,'IARU-HF',mode='CW')
         print('IARU HF Scoring Init')
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
-        self.MY_ITU_ZONE = P.SETTINGS['MY_ITU_ZONE']
+        self.MY_ITU_ZONE = int( P.SETTINGS['MY_ITU_ZONE'] )
 
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.NQSOS = OrderedDict()
+        self.POINTS = OrderedDict()
         zones = []
         for b in self.BANDS:
             zones.append((b,set([])))
             self.NQSOS[b]=0
+            self.POINTS[b]=0
         self.ZONES = OrderedDict(zones)
         self.nqsos=0
 
         # Determine contest time - assumes this is dones wihtin a few hours of the contest
+        if False:
+            now = datetime.datetime.utcnow()
+            #print(now)
+            #date0 = datetime.datetime.strptime( "20210710 1200" , "%Y%m%d %H%M")  # Start of contest
+            day=10
+            self.date0=datetime.datetime(now.year,now.month,day,12)
+            self.date1 = self.date0 + datetime.timedelta(hours=24)
+
+        # Contest occurs on 2nd full weekend of July
         now = datetime.datetime.utcnow()
-        #print(now)
-        #date0 = datetime.datetime.strptime( "20210710 1200" , "%Y%m%d %H%M")  # Start of contest
-        day=10
-        self.date0=datetime.datetime(now.year,now.month,day,12)
-        self.date1 = self.date0 + datetime.timedelta(hours=24)
+        day1=datetime.date(now.year,7,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                       # No. days until 1st Saturday (day 5) + 7 more days 
+        self.date0=datetime.datetime(now.year,7,sat2,12)       # Contest starts at 1200 UTC on Saturday ...
+        self.date1 = self.date0 + datetime.timedelta(hours=24)         # ... and ends at 1200 UTC on Sunday
+        print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+        #sys.exit(0)
+
+        if False:
+            # Manual override - not accurate for this contest, be careful!
+            self.date0 = datetime.datetime.strptime( "20200707 1200" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=24)
         
+        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
+                    
     # Scoring routine for IARU HF
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print('rec=',rec)
         keys=list(HIST.keys())
         #print(keys)
@@ -137,9 +161,12 @@ class IARU_HF_SCORING(CONTEST_SCORING):
                 pprint(vars(dx_station))
                 sys.exit(0)
             
+            print(call,zone,self.MY_ITU_ZONE,qso_points)
             self.ZONES[band].add(num_in)
+            self.NQSOS[band]+=1
             self.nqsos2 += 1;
             self.total_points += qso_points
+            self.POINTS[band] += qso_points
 
 #                              --------info sent------- -------info rcvd--------
 #QSO: freq  mo date       time call          rst exch   call          rst exch  
@@ -156,7 +183,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         # Check against history
         if call in keys:
             #print('hist=',HIST[call])
-            ITUz=HIST[call]['ITUz']
+            ITUz=HIST[call]['ituz']
             #if int(ITUz)!=zone:
             if not ITUz in [str(zone),num_in]:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
@@ -186,7 +213,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             zones = list( self.ZONES[b] )
             zones.sort()
             print('\n',b,'Zones:',zones)
-            print(' No. QSOs,Mults:',self.NQSOS[b],len(zones))
+            print(b,' No. QSOs:',self.NQSOS[b],'\tMults:',len(zones),'\tPoints:',self.POINTS[b])
             mults+=len(zones)
 
         print('\nNo. QSOs      =',self.nqsos)
