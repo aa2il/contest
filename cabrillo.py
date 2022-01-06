@@ -114,23 +114,22 @@ if args.mak:
     fname = 'mak_rtty_2019.adif'
 
 elif args.rttyru:
-    contest='ARRL-RTTY'
-    MY_MODE='RTTY'
-    date0 = datetime.datetime.strptime( "20190105 1800" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=30)
-    history = '../history/data/master.csv'
-
-    # In 2019, they allowed FT8 as well - this required merging the logs from fldigi & wsjtx
-    #fname = 'rttyru_2019_combined.adi'
+    sc = ARRL_RTTY_RU_SCORING(P,'ARRL-RTTY')
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+    history = sc.history
+    
     #fname1='aa2il_2019.adif'
-    fname1='aa2il_2021.adif'
+    fname1='aa2il_2022.adif'
     fnames = [DIR_NAME+'/'+fname1]
 
     DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
     #fname2 = '2019_rtty_ru.adi'
     fname2 = 'wsjtx_log.adi'
     fnames.append( DIR_NAME+'/'+fname2 )
-    
+
 elif args.ft8ru:
     sc = ARRL_RTTY_RU_SCORING(P,'FT8-RU')
     contest=sc.contest
@@ -548,8 +547,6 @@ istart  = -1
 cum_gap = 0
 if contest=='ARRL-FD':
     sc = ARRL_FD_SCORING(contest)
-#elif contest=='ARRL-SS-CW':
-#    sc = ARRL_SS_SCORING(P,contest)
 #elif contest=='CW Ops Mini-Test':
     # This is all done above now - model for rest of code eventually
     #    sc = CWOPS_SCORING(contest)
@@ -559,7 +556,7 @@ elif contest=='MAKROTHEN-RTTY':
     sc = MAKROTHEN_SCORING(contest)
 elif contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW':
     sc = CQ_WW_SCORING(contest)
-elif contest=='ARRL-RTTY' or contest=='ARRL 10': \
+elif contest=='ARRL 10': \
     sc = ARRL_RTTY_RU_SCORING(contest)
 elif not sc:
     #sc = contest_scoring(contest)

@@ -161,7 +161,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
                 pprint(vars(dx_station))
                 sys.exit(0)
             
-            print(call,zone,self.MY_ITU_ZONE,qso_points)
+            #print(call,zone,self.MY_ITU_ZONE,qso_points)
             self.ZONES[band].add(num_in)
             self.NQSOS[band]+=1
             self.nqsos2 += 1;

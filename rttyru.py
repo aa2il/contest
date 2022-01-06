@@ -52,6 +52,9 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         self.sec_cnt  = np.zeros(len(self.secs))
         self.band_cnt = np.zeros(len(CONTEST_BANDS))
 
+        # History file
+        self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
+        
         # Determine contest dates
         now = datetime.datetime.utcnow()
         if self.ft8ru:
@@ -64,17 +67,30 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             self.date1 = self.date0 + datetime.timedelta(hours=30)         # ... and ends at 0000 UTC on Sunday
             print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
 
-        else:
-
+        elif self.ten_m:
+            
             print('RTTYRU Init - need date calcs for this contest')
             sys.exit(0)
             
+        else:
+
+            # Contest occurs on 2nd full weekend of January
+            day1=datetime.date(now.year,1,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
+            sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 2nd Saturday = 1 since day1 is the 1st of the month
+                                                                           # No. days until 1st Saturday (day 5) + 7 more days 
+            self.date0=datetime.datetime(now.year,now.month,sat2,18)       # Contest starts at 1800 UTC on Saturday ...
+            self.date1 = self.date0 + datetime.timedelta(hours=30)         # ... and ends at 0000 UTC on Sunday
+            print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+
         if False:
             # Manual override
             #self.date0 = datetime.datetime.strptime( "20181201 1800" , "%Y%m%d %H%M")  # Start of contest - FT RU
             self.date0 = datetime.datetime.strptime( "20201205 1800" , "%Y%m%d %H%M")  # Start of contest - FT RU
             self.date1 = self.date0 + datetime.timedelta(hours=30)
 
+            self.date0 = datetime.datetime.strptime( "20190105 1800" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=30)
+            
         # Name of output file
         #self.output_file = self.MY_CALL+'_FTRU_'+str(self.date0.year)+'.LOG'
         self.output_file = self.MY_CALL+'_'+contest+'_'+str(self.date0.year)+'.LOG'

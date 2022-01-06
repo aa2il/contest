@@ -45,10 +45,11 @@ set CONTEST=""
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
 #set CONTEST="vhf"
-set CONTEST="iaru"
+#set CONTEST="iaru"
 #set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
 #set CONTEST="ft8ru"
+set CONTEST="rttyru"             # ARRL RTTY Round-up
 
 set d=`date`
 if( X$CONTEST == "X" && ($d[1] == "Wed" || $d[1] == "Thu") )then
@@ -67,22 +68,8 @@ cabrillo.py -$CONTEST
 
 # Need to bring the rest of these into this if-then-else structure
 
-# ARRL CW SS - works in 2020
-#cabrillo.py -cwss -i aa2il_2017.adif
-#cabrillo.py -cwss
-
-# ARRL RTTY RU - works in 2020
-#cabrillo.py -rttyru
-
 # ARRL 10 meter
 #cabrillo.py -ten
-
-# FT8 RU - works in 2020
-#cabrillo.py -ft8ru
-
-# RTTY RU  - Code still needs to be converted 
-#### cabrillo.py -rttyru -i aa2il_2019.adif
-#cabrillo.py -rttyru -i rttyru_2019_combined.adif
 
 # NAQP - CW wasn't tested but should work, RTTY was tested
 #cabrillo.py -naqpcw 
