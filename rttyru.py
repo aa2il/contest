@@ -43,14 +43,25 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
 
         print('RTTY RU Scoring Init...')
 
+        self.rttyru   = contest=='ARRL-RTTY'
         self.ft8ru    = contest=='FT8-RU'
         self.ten_m    = contest=='ARRL-10'
-        if self.ten_m:
+        if not self.rttyru and not self.ft8ru and not self.ten_m:
+            print('*** UNKNOWN CONTEST ***',contest)
+            sys.exit(0)        
+        elif self.ten_m:
             self.secs = TEN_METER_SECS
         else:
             self.secs = RU_SECS
         self.sec_cnt  = np.zeros(len(self.secs))
         self.band_cnt = np.zeros(len(CONTEST_BANDS))
+        
+        if self.rttyru:
+            self.my_mode = 'MIXED'
+
+        self.rtty_qsos = 0
+        self.ft4_qsos  = 0
+        self.ft8_qsos  = 0
 
         # History file
         self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
@@ -74,10 +85,12 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             
         else:
 
-            # Contest occurs on 2nd full weekend of January
+            # Contest occurs on 1st full weekend of January except if Jan. 1
             day1=datetime.date(now.year,1,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
-            sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 2nd Saturday = 1 since day1 is the 1st of the month
-                                                                           # No. days until 1st Saturday (day 5) + 7 more days 
+            sat2=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                           # No. days until 1st Saturday (day 5) + 7 more days
+            if sat2==1:
+                sat2+=7                                                    # If New Years (as in 2022), its the following weekend
             self.date0=datetime.datetime(now.year,now.month,sat2,18)       # Contest starts at 1800 UTC on Saturday ...
             self.date1 = self.date0 + datetime.timedelta(hours=30)         # ... and ends at 0000 UTC on Sunday
             print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
@@ -147,7 +160,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print 'RU_SECS=',RU_SECS
         #sys.exit(0)
-        #print rec
+        #print(rec)
 
         keys=list(HIST.keys())
 
@@ -156,7 +169,28 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         freq_khz = int( 1000*float(rec["freq"]) + 0.0 )
         band = rec["band"]
         mode = rec["mode"]
-        if 'state' in rec :
+        RST_OUT = rec["rst_sent"]
+        RST_IN  = rec["rst_rcvd"]
+
+        if 'country' in rec :
+            country = rec["country"]
+        else:
+            dx_station = Station(call)
+            country = dx_station.country
+        #print(country)
+
+        if country in ['USA','United States','Canada']:
+            try:
+                qth = rec["state"]
+            except:
+                print('\n',call,"*** EXPECTING STATE/PROVINCE ***")
+                if TRAP_ERRORS:
+                    print(rec)
+                    sys.exit(0)
+                else:
+                    return
+                
+        elif 'state' in rec :
             qth = rec["state"]
         elif self.ft8ru:
             try:
@@ -175,26 +209,41 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             qth = rec["name"]
         elif 'srx' in rec :
             qth = rec["srx"]
+        elif int(RST_IN)<111:
+            print('\n',call,"*** EXPECTING 5xx RST ***")
+            if TRAP_ERRORS:
+                print(rec)
+                sys.exit(0)
+            else:
+                return 
+            
         else:
-            print(call,"*** CAN'T DETERMIINE QTH ***")
-            sys.exit(0)
+            print('\n',call,"*** CAN'T DETERMIINE QTH ***")
+            if TRAP_ERRORS:
+                print(rec)
+                sys.exit(0)
+            else:
+                return 
+        
         qth=qth.upper() 
 
-        if mode=='FT8' or mode=='FT4'  or mode=='MFSK':
+        #if mode=='FT8' or mode=='FT4' or mode=='MFSK':
+        if mode=='FT8':
             mode='DG'
-
-        # Need to check this for RTTY RU
-        #else:
-        #    mode='RY'
-            #print('Ugh',mode)
-            #sys.exit(0)
-            
-        if 'country' in rec :
-            country = rec["country"]
+            if not dupe:
+                self.ft8_qsos += 1
+        elif mode=='FT4' or mode=='MFSK':
+            mode='DG'
+            if not dupe:
+                self.ft4_qsos += 1
+        elif mode=='RTTY':
+            mode='RY'
+            if not dupe:
+                self.rtty_qsos += 1
         else:
-            dx_station = Station(call)
-            country = dx_station.country
-
+            print('RTTYRU SCORING: Unknow mode',mode)
+            sys.exit(0)
+            
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
@@ -219,15 +268,13 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
 
         #sys.exit(0)
 
-        # Check RST
-        RST_OUT = rec["rst_sent"]
+        # Check RSTs
         if not self.check_rst(RST_OUT):
             print('\nInvalid RST_OUT field for call',call,band,mode,RST_OUT)
             print('rec=',rec)
             if TRAP_ERRORS:
                 sys.exit(0)
         
-        RST_IN  = rec["rst_rcvd"]
         if not self.check_rst(RST_IN):
             print('\nInvalid RST_IN field for call',call,band,mode,RST_IN)
             print('rec=',rec)
@@ -237,7 +284,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 RST_IN='599'
             elif TRAP_ERRORS:
                 RST_IN=RST_IN2
-                #sys.exit(0)
+                if RST_IN=='?':
+                    sys.exit(0)
                 
         if False:
             if RST_IN=='':
@@ -288,6 +336,47 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         
         return line
 
+    # Routine to sift through station we had multiple contacts with to identify any discrepancies
+    def check_multis(self,qsos):
+
+        print('There were multiple qsos with the following stations:')
+        qsos2=qsos.copy()
+        qsos2.sort(key=lambda x: x['call'])
+        calls=[]
+        for rec in qsos2:
+            calls.append(rec['call'])
+        #print(calls)
+        uniques = list(set(calls))
+        uniques.sort()
+        #print('uniques=',uniques)
+
+        for call in uniques:
+            #print(call,calls.count(call))
+            qth_old=''
+            if calls.count(call)>1:
+                for rec in qsos:
+                    if rec['call']==call:
+                        mode = rec["mode"]
+                        band = rec["band"]
+                        if 'state' in rec:
+                            qth  = rec["state"].upper()
+                        else:
+                            try:
+                                qth  = rec["srx"]
+                            except:
+                                print(rec)
+                                sys.exit(0)
+
+                        flag=''
+                        if qth_old=='':
+                            qth_old=qth
+                        elif qth_old!=qth:
+                            flag='******************'
+                            
+                        print(call,'\t',band,'\t',mode,'\t',qth,'\t',flag)
+                print(' ')
+                        
+
     # Summary & final tally
     def summary(self):
 
@@ -312,6 +401,9 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
     
         print('\nNo. QSOs        =\t',self.nqsos1)
         print('No. Unique QSOs =\t',self.nqsos2)
+        print('No. RTTY QSOs   =\t',self.rtty_qsos)
+        print('No. FT8 QSOs    =\t',self.ft8_qsos)
+        print('No. FT4 QSOs    =\t',self.ft4_qsos)
         print('Multipliers     =\t',mults)
         print('Claimed Score   =\t',self.nqsos2*mults)
 

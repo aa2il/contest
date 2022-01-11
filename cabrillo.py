@@ -116,7 +116,7 @@ if args.mak:
 elif args.rttyru:
     sc = ARRL_RTTY_RU_SCORING(P,'ARRL-RTTY')
     contest=sc.contest
-    MY_MODE=sc.my_mode
+    MY_MODE='MIXED'          # sc.my_mode
     date0=sc.date0
     date1=sc.date1
     history = sc.history
@@ -129,6 +129,7 @@ elif args.rttyru:
     #fname2 = '2019_rtty_ru.adi'
     fname2 = 'wsjtx_log.adi'
     fnames.append( DIR_NAME+'/'+fname2 )
+    output_file = sc.output_file
 
 elif args.ft8ru:
     sc = ARRL_RTTY_RU_SCORING(P,'FT8-RU')
@@ -477,7 +478,7 @@ def open_output_file(P,outfile):
     fp.write('CATEGORY-TRANSMITTER: ONE\n');
     fp.write('CATEGORY-POWER: %s\n' % MY_POWER);
     
-    if contest=='FT8-RU':
+    if contest=='FT8-RU' or contest=='ARRL-RTTY':
         fp.write('CATEGORY-ASSISTED: ASSISTED\n');
     else:
         fp.write('CATEGORY-ASSISTED: NON-ASSISTED\n');
