@@ -9,7 +9,7 @@
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #
 # NOTE:
-#     Most up-to-date contest module is the VHF CONTEST.
+#     Most up-to-date contest module is the RTTY CONTEST.
 #     Use it as model for subsequent contests
 #
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -159,12 +159,13 @@ elif args.vhf:
     date0=sc.date0
     date1=sc.date1
     history = sc.history
+    output_file = sc.output_file
 
     # Need to merge FT8 and CW/Phone logs
     fnames=[]
     #DIR_NAME='.'
-    #for fname in ['AA2IL.adif','wsjtx_log.adi']:
-    for fname in ['AA2IL_VHF_Sep2021.adif','wsjtx_VHF_Sep2021.adi']:
+    for fname in ['AA2IL.adif','wsjtx_log.adi']:
+    #for fname in ['AA2IL_VHF_Sep2021.adif','wsjtx_VHF_Sep2021.adi']:
         f=os.path.expanduser( DIR_NAME+'/'+fname )
         fnames.append(f)
 

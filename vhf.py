@@ -29,7 +29,7 @@ from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 ############################################################################################
     
 TRAP_ERRORS = False
-#TRAP_ERRORS = True
+TRAP_ERRORS = True
 
 ############################################################################################
     
@@ -41,10 +41,10 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         # Determine contest based on month
         now = datetime.datetime.utcnow()
         month = now.strftime('%b').upper()
-        print(month)
+        print('month=',month)
 
         # Init base class
-        CONTEST_SCORING.__init__(self,'ARRL-VHF-'+month,mode='MIXED')
+        CONTEST_SCORING.__init__(self,P,'ARRL-VHF-'+month,mode='MIXED')
 
         # Init special items for this class
         self.MY_CALL = P.SETTINGS['MY_CALL']
@@ -61,17 +61,25 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         self.nqsos=0
         self.category_band='VHF-3-BAND'
 
+        self.MODES=['CW','DG','PH']
+        self.Nmode = OrderedDict()
+        for m in self.MODES:
+            self.Nmode[m]=0
+
         # History file
         self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
         
-        # Contest occurs on 2nd full weekend of June and Sept (not sure about Jan??)
-        #day1=datetime.date(now.year,now.month,1).isoweekday() % 7      # Day of week of 1st of month 0=Sunday, 6=Saturday
-        #sat2=14-day1                                                   # Day no. for 2nd Saturday
+        # Contest occurs on 2nd full weekend of June and Sept. For Jan, either 3rd or 4th
         day1=datetime.date(now.year,now.month,1).weekday()             # Day of week of 1st of month 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 2nd Saturday = 1 since day1 is the 1st of the month
                                                                        #    no. days until 1st Saturday (day 5) + 7 more days 
-        self.date0=datetime.datetime(now.year,now.month,sat2,18)       # Contest starts at 1800 UTC on Saturday ...
-        self.date1 = self.date0 + datetime.timedelta(hours=33)         # ... and ends at 0300 UTC on Monday
+        if month=='JAN':
+            sat2+=7                                                    # 3rd Saturday
+            start=19                                                   # Jan starts at 1900 UTC on Saturday ...
+        else:
+            start=18                                                   # June & Sept start at 1800 UTC on Saturday ...
+        self.date0=datetime.datetime(now.year,now.month,sat2,start) 
+        self.date1 = self.date0 + datetime.timedelta(hours=33)         # ... and ends at 0300/0400 UTC on Monday
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
         #sys.exit(0)
 
@@ -81,6 +89,8 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             self.date0 = datetime.datetime.strptime( "20210911 1800" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = date0 + datetime.timedelta(hours=33)
       
+        # Name of output file
+        self.output_file = self.MY_CALL+'_'+month+'_VHF_'+str(self.date0.year)+'.LOG'
         
     # Contest-dependent header stuff
     def output_header(self,fp):
@@ -88,7 +98,7 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         fp.write('ARRL-SECTION: %s\n' % self.MY_SEC)
                     
     # Scoring routine for ARRL VHF contest for a single qso
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         keys=list(HIST.keys())
         if False:
             #print('\nrec=',rec)
@@ -120,7 +130,6 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             a=grid.split(',')
             grid=a[0]
             print(call,a,grid)
-        self.grids[band].add(grid)
 
         # Check for valid grid
         valid = len(grid)==4 and grid[0:2].isalpha() and grid[2:4].isdigit()
@@ -129,6 +138,10 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             if TRAP_ERRORS:
                 sys.exit(0)
 
+        # Add to list of grids for each band
+        if valid:
+            self.grids[band].add(grid)
+        
         #print('call=',call)
         
         dx_station = Station(call)
@@ -156,7 +169,8 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             self.nqsos2 += 1;
             self.total_points += qso_points
 
-            self.NQSOS[band] +=1
+            self.NQSOS[band] += 1
+            self.Nmode[mode] += 1
 
 #                              --------info sent------- -------info rcvd--------
 #QSO: freq  mo date       time call              grid   call              grid 
@@ -229,6 +243,9 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             print(' No. QSOs,Mults:',self.NQSOS[b],len(grids))
             mults+=len(grids)
 
+        print('\nBy Mode:')
+        for m in self.MODES:
+            print('\t',m,':\t',self.Nmode[m])
         print('\nNo. QSOs      =',self.nqsos)
         print('No. Uniques   =',self.nqsos2)
         print('QSO points    =',self.total_points)
@@ -259,7 +276,10 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
 
         if not same:
             print('&*&*&*&*&*&*&*& QTH MISMATCH *&*&*&*&*&*&*&&*&')
-            if TRAP_ERRORS:
+            print(call,'/R' in call2)
+            if '/R' in call2:
+                print('??? Move over ROVER ???')
+            elif TRAP_ERRORS:
                 sys.exit(0)
 
         

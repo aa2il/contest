@@ -44,12 +44,12 @@ set CONTEST=""
 #set CONTEST="wwdigi"
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
-#set CONTEST="vhf"
+set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
 #set CONTEST="iaru"
 #set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
 #set CONTEST="ft8ru"
-set CONTEST="rttyru"             # ARRL RTTY Round-up
+#set CONTEST="rttyru"             # ARRL RTTY Round-up
 
 set d=`date`
 if( X$CONTEST == "X" && ($d[1] == "Wed" || $d[1] == "Thu") )then
