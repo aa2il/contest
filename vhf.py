@@ -47,9 +47,9 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,P,'ARRL-VHF-'+month,mode='MIXED')
 
         # Init special items for this class
-        self.MY_CALL = P.SETTINGS['MY_CALL']
-        self.MY_GRID = P.SETTINGS['MY_GRID']
-        self.MY_SEC  = P.SETTINGS['MY_SEC']
+        #self.MY_CALL = P.SETTINGS['MY_CALL']
+        #self.MY_GRID = P.SETTINGS['MY_GRID']
+        #self.MY_SEC  = P.SETTINGS['MY_SEC']
 
         self.BANDS = ['6m','2m','70cm']
         self.NQSOS = OrderedDict()
@@ -67,7 +67,7 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             self.Nmode[m]=0
 
         # History file
-        self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
+        #self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
         
         # Contest occurs on 2nd full weekend of June and Sept. For Jan, either 3rd or 4th
         day1=datetime.date(now.year,now.month,1).weekday()             # Day of week of 1st of month 0=Monday, 6=Sunday

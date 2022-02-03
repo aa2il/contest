@@ -66,12 +66,17 @@ class CONTEST_SCORING:
         self.num_prev    = 0
         self.rec_prev    = []
 
+        # History file
+        self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
+        
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
         self.MY_STATE    = P.SETTINGS['MY_STATE']
         self.MY_SECTION  = P.SETTINGS['MY_SEC']
+        self.MY_SEC      = self.MY_SECTION
         self.MY_PREC     = P.SETTINGS['MY_PREC']
         self.MY_CHECK    = int( P.SETTINGS['MY_CHECK'] )
+        self.MY_GRID     = P.SETTINGS['MY_GRID']
         
     # Routine to replace cut numbers with their numerical equivalents
     def reverse_cut_numbers(self,x,n=0):

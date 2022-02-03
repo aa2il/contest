@@ -292,13 +292,24 @@ elif args.wwrtty:
     fname = 'cqww_rtty_2019.adif'
 
 elif args.wpx:
-    contest='CQ-WPX-CW'
-    MY_MODE='CW'
-    #date0 = datetime.datetime.strptime( "20190525 0000" , "%Y%m%d %H%M")  # Start of contest
-    date0 = datetime.datetime.strptime( "20210529 0000" , "%Y%m%d %H%M")  # Start of contest
-    date1 = date0 + datetime.timedelta(hours=48)
-    fname = 'AA2IL.adif'
-    DIR_NAME = '../pyKeyer/'
+    MODE='CW'
+    MODE='RTTY'
+    sc = CQ_WPX_SCORING(P,MODE)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    category_band=sc.category_band
+    date0=sc.date0
+    date1=sc.date1
+    history = sc.history
+    output_file = sc.output_file
+
+    if MY_MODE=='CW':
+        DIR_NAME = '../pyKeyer/'
+        fname = 'AA2IL.adif'
+    else:
+        DIR_NAME = '../../logs/fllog/'
+        fname = 'cq_wpx_rtty_2019.adif'
+        fname = 'cq_wpx_rtty_2022.adif'
 
 elif args.iaru:
     sc = IARU_HF_SCORING(P)
@@ -457,7 +468,7 @@ def open_output_file(P,outfile):
         sys.exit(0)
 
     """
-    if contest[:6]=='CQ-WPX' or contest=='IARU-HF' or \
+    if contest=='IARU-HF' or \
        contest=='WW-DIGI' or contest=='ARRL-FD' :
         fp.write('LOCATION: %s\n' % MY_SECTION)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
@@ -552,8 +563,6 @@ if contest=='ARRL-FD':
 #elif contest=='CW Ops Mini-Test':
     # This is all done above now - model for rest of code eventually
     #    sc = CWOPS_SCORING(contest)
-elif contest[:6]=='CQ-WPX':
-    sc = CQ_WPX_SCORING(P)
 elif contest=='MAKROTHEN-RTTY':
     sc = MAKROTHEN_SCORING(contest)
 elif contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW':
