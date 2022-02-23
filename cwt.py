@@ -1,6 +1,6 @@
 ############################################################################################
 #
-# cwops.py - Rev 1.0
+# cwt.py - Rev 1.0
 # Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring CWops mini tests.
@@ -32,7 +32,7 @@ from pprint import pprint
 class CWOPS_SCORING(CONTEST_SCORING):
 
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,'CW Ops Mini-Test',mode='CW')
+        CONTEST_SCORING.__init__(self,P,'CW Ops Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.sec_cnt = np.zeros((len(self.BANDS)))

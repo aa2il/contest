@@ -40,7 +40,7 @@ from scoring import *
 from fd import *
 from arrl_ss import *
 from vhf import *
-from cwops import *
+from cwt import *
 from cwopen import *
 from sst import *
 from naqp import *
