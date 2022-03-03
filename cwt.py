@@ -43,28 +43,33 @@ class CWOPS_SCORING(CONTEST_SCORING):
         self.MY_STATE    = P.SETTINGS['MY_STATE']
         self.MY_SECTION = P.SETTINGS['MY_SEC']
         
-        # Determine contest time - assumes this is dones wihtin a few hours of the contest
+        # Determine contest time - assumes this is done within a few hours of the contest
         now = datetime.datetime.utcnow()
         day=now.day
+        hour=now.hour
         today = now.strftime('%A')
-        #if today=='Wednesday':
-        if today=='Thursday':
+        
+        if today=='Thursday' and hour<3:
+            # Must be looking at previous session
+            start_time=19
             day-=1
-        if now.hour>=19 and now.hour<24:
-            self.date0=datetime.datetime(now.year,now.month,now.day,19)
-        elif now.hour>=0 and now.hour<19:
-            self.date0=datetime.datetime(now.year,now.month,now.day,3)
+        elif hour>=19 and hour<24:
+            start_time=19
+        elif hour>=0 and hour<19:
+            start_time=3
         else:
             print('CWOPS_SCORING_INIT: Unable to determine contest time')
             sys.exit(0)
+        self.date0=datetime.datetime(now.year,now.month,day,start_time)
             
         self.date1 = self.date0 + datetime.timedelta(hours=1+30/3600.)
-        if False:
-            print(now)
-            print(now.hour)
-            print(now.weekday())
-            print(now.strftime('%A'))
-            sys.exit(0)
+        if True:
+            print('now=',now)
+            print('today=',today)
+            print('hour=',hour)
+            print('date0=',self.date0)
+            print('date1=',self.date1)
+            #sys.exit(0)
     
     # Contest-dependent header stuff
     def output_header(self,fp):
