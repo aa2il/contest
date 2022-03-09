@@ -25,7 +25,7 @@ set CONTEST=""
 
 #set CONTEST="cwops"
 #set CONTEST="cwopen"
-#set CONTEST="sst"
+set CONTEST="sst"
 #set CONTEST="cqww"
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"

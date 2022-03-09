@@ -37,9 +37,20 @@ class SST_SCORING(CONTEST_SCORING):
         self.band_cnt = np.zeros(len(self.BANDS),np.int32)
         self.sec_cnt = np.zeros(len(SST_SECS))
 
-        # Determine contest time - assumes this is dones wihtin a few hours of the contest
+        # Determine contest time - assumes this is dones within a few hours of the contest
+        # Working on relaxing this restriction because I'm lazy sometimes!
         now = datetime.datetime.utcnow()
-        if now.strftime('%A') == 'Friday':
+        weekday = now.weekday()
+        if weekday in [1,2,3]:
+            # If we finally getting around to running this on Tuesday, Weds or Thurs, roll back date to Monday
+            now = now - datetime.timedelta(hours=24*weekday)
+        elif weekday in [5,6]:
+            # If we finally getting around to running this on Saturday or Sunday, roll back date to Friday
+            now = now - datetime.timedelta(hours=24*(weekday-4))
+
+        weekday = now.weekday()
+        today = now.strftime('%A')
+        if today == 'Friday':
             start_time=20
         else:
             start_time=0
@@ -47,13 +58,13 @@ class SST_SCORING(CONTEST_SCORING):
         self.date1 = self.date0 + datetime.timedelta(hours=1+1./60.)
 
         # Playing with dates
-        if False:
+        if True:
             print(now)
-            print(now.weekday())
-            print(now.strftime('%A'))
+            print(now.day,now.weekday())
+            print(today)
             print(self.date0)
             print(self.date1)
-            sys.exit(0)
+            #sys.exit(0)
 
     # Contest-dependent header stuff
     def output_header(self,fp):
