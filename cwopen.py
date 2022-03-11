@@ -25,6 +25,7 @@ from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station
 from pprint import pprint
+from utilities import reverse_cut_numbers
 
 ############################################################################################
 
@@ -85,7 +86,7 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         try:
             num_in = str( int( a[0] ) )
         except:
-            num_in = self.reverse_cut_numbers( a[0] )
+            num_in = reverse_cut_numbers( a[0] )
             print('Hmmmmmmmmmmm:',call,a[0],num_in)
         name_in = a[1]
         #name = rec["name"].upper()
@@ -96,7 +97,7 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         
         tx   = rec["stx_string"].strip().upper()
         b    = tx.split(',')
-        num_out  = int( self.reverse_cut_numbers( b[0] ) )
+        num_out  = int( reverse_cut_numbers( b[0] ) )
         name_out = b[1]
         my_call = rec["station_callsign"].strip().upper()
                 

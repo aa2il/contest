@@ -74,7 +74,9 @@ arg_proc.add_argument('-ten', action='store_true',help='ARRL 10 Meter')
 arg_proc.add_argument('-vhf', action='store_true',help='ARRL VHF')
 arg_proc.add_argument('-fd', action='store_true',help='ARRL Field Day')
 arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
-arg_proc.add_argument('-cwops', action='store_true',help='CW Ops Mini-Test')
+#arg_proc.add_argument('-cwops', action='store_true',help='CW Ops Mini-Test')
+arg_proc.add_argument('-cwt',help='CW Ops Mini-Test',
+                      nargs='*',type=int,default=None)
 arg_proc.add_argument('-cwopen', action='store_true',help='CW Ops CW Open')
 arg_proc.add_argument('-sst', action='store_true',help='Slow Speed Mini-Test')
 arg_proc.add_argument('-cols13', action='store_true',help='13 Colonies Special Event')
@@ -361,8 +363,14 @@ elif args.sst:
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
 
-elif args.cwops:
-    sc = CWOPS_SCORING(P)
+elif args.cwt!=None:
+    print('cwt=',args.cwt)
+    if len(args.cwt)>0:
+        session=args.cwt[0]
+    else:
+        session=None
+        
+    sc = CWOPS_SCORING(P,session)
     contest=sc.contest
     MY_MODE=sc.my_mode
     date0=sc.date0

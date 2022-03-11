@@ -25,6 +25,7 @@ from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
+from utilities import reverse_cut_numbers
 
 ############################################################################################
 
@@ -108,11 +109,11 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
         a    = rx.split(',')
         #a    = rx.split(' ')                    # Note - there was a bug in 2019 - this should be a comma
         if len(a)>1:
-            rst_in = self.reverse_cut_numbers( a[0] )
-            num_in = self.reverse_cut_numbers( a[1] )
+            rst_in = reverse_cut_numbers( a[0] )
+            num_in = reverse_cut_numbers( a[1] )
         else:
             rst_in = rec["rst_rcvd"].strip().upper()
-            num_in = self.reverse_cut_numbers( a[0] )
+            num_in = reverse_cut_numbers( a[0] )
 
         if 'stx_string' in rec:
             tx   = rec["stx_string"].strip().upper()
@@ -127,11 +128,11 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
                 tx='0'
         b    = tx.split(',')
         if len(b)>1:
-            rst_out = self.reverse_cut_numbers( b[0] )
-            num_out = self.reverse_cut_numbers( b[1] )
+            rst_out = reverse_cut_numbers( b[0] )
+            num_out = reverse_cut_numbers( b[1] )
         else:
             rst_out = rec["rst_sent"].strip().upper()
-            num_out = self.reverse_cut_numbers( b[0] )
+            num_out = reverse_cut_numbers( b[0] )
             
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]

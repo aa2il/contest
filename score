@@ -23,9 +23,9 @@
 # Select a contest
 set CONTEST=""
 
-#set CONTEST="cwops"
+#set CONTEST="cwt"
 #set CONTEST="cwopen"
-set CONTEST="sst"
+#set CONTEST="sst"
 #set CONTEST="cqww"
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
@@ -43,12 +43,16 @@ set CONTEST="sst"
 #set CONTEST="ft8ru"
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
 
+echo " "
 set d=`date`
-if( X$CONTEST == "X" && ($d[1] == "Wed" || $d[1] == "Thu") )then
-    set CONTEST="cwops"
+echo d=$d
+echo d1=$d[1]
+if( X$CONTEST == "X" && (($d[1] == "Wed") || ($d[1] == "Thu")) )then
+    set CONTEST="cwt"
 else if( X$CONTEST == "X" )then
     set CONTEST="sst"
 endif
+echo $CONTEST
 
 ################################################################################
 

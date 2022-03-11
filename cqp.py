@@ -26,6 +26,7 @@ from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
 from fileio import parse_adif
+from utilities import reverse_cut_numbers
 
 ############################################################################################
 
@@ -90,7 +91,7 @@ class CQP_SCORING(CONTEST_SCORING):
         rx   = rec["srx_string"].strip().upper()
         a    = rx.split(',') 
         try:
-            num_in = int( self.reverse_cut_numbers( a[0] ) )
+            num_in = int( reverse_cut_numbers( a[0] ) )
         except:
             print('rec=',rec)
             print('Problem with serial:',a)
@@ -101,7 +102,7 @@ class CQP_SCORING(CONTEST_SCORING):
 
         tx   = rec["stx_string"].strip().upper()
         b    = tx.split(',')
-        num_out = int( self.reverse_cut_numbers( b[0] ) )
+        num_out = int( reverse_cut_numbers( b[0] ) )
         qth_out = b[1]
 
         self.check_serial_out(num_out_out,rec,TRAP_ERRORS)

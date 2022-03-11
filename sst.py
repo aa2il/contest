@@ -149,8 +149,6 @@ class SST_SCORING(CONTEST_SCORING):
         # Pull out relavent entries
         call = rec["call"].upper()
         qth  = rec["qth"].upper()
-        if len(qth)>2:
-            qth = self.reverse_cut_numbers(qth)
         name = rec["name"].upper()
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]

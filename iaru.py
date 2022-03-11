@@ -25,6 +25,7 @@ from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
+from utilities import reverse_cut_numbers
 
 ############################################################################################
 
@@ -96,9 +97,9 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         call = rec["call"].upper()
         rx   = rec["srx_string"].strip().upper()
         a    = rx.split(',')
-        rst_in = self.reverse_cut_numbers( a[0] )
+        rst_in = reverse_cut_numbers( a[0] )
         if len(a[1])<=2:
-            num_in = self.reverse_cut_numbers( a[1] , 2)
+            num_in = reverse_cut_numbers( a[1] , 2)
         else:
             num_in = a[1]
         if num_in.isdigit():
@@ -108,8 +109,8 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             
         tx   = rec["stx_string"].strip().upper()
         b    = tx.split(',')
-        rst_out = self.reverse_cut_numbers( b[0] )
-        num_out = self.reverse_cut_numbers( b[1] )
+        rst_out = reverse_cut_numbers( b[0] )
+        num_out = reverse_cut_numbers( b[1] )
         
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]

@@ -78,26 +78,6 @@ class CONTEST_SCORING:
         self.MY_CHECK    = int( P.SETTINGS['MY_CHECK'] )
         self.MY_GRID     = P.SETTINGS['MY_GRID']
         
-    # Routine to replace cut numbers with their numerical equivalents
-    def reverse_cut_numbers(self,x,n=0):
-        x=x.upper()
-        x=x.replace('T','0')
-        x=x.replace('O','0')
-        x=x.replace('A','1')
-        x=x.replace('N','9')
-
-        # Strip leading 0's
-        #print(n,int(x),str(int(x)).zfill(n))
-        try:
-            if n:
-                out = str(int(x)).zfill(n)
-            else:
-                out = str(int(x))
-        except:
-            out = x
-
-        return out
-
     # Routine to group modes according to cw, digi or phone
     def group_modes(self,mode):
         if mode=='FM':

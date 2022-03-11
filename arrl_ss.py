@@ -25,6 +25,7 @@ import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
+from utilities import reverse_cut_numbers
 
 #######################################################################################
     
@@ -80,7 +81,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 try:
                     rexch  = rec["srx_string"].strip().upper().split(',')
                     #serial = rexch[0]
-                    serial = int( self.reverse_cut_numbers( rexch[0] ) )
+                    serial = int( reverse_cut_numbers( rexch[0] ) )
                     prec   = rexch[1]
                     call2  = rexch[2]
                     check  = int( rexch[3] )
@@ -193,7 +194,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         # Construct sent data
         try:
             #serial_out = int( rec["stx"] )
-            serial_out = int( self.reverse_cut_numbers( rec["stx"] ) )
+            serial_out = int( reverse_cut_numbers( rec["stx"] ) )
         except:
             print('BAD Serial Out:',rec["stx"] )
             serial_out = -1

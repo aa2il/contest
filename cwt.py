@@ -25,13 +25,14 @@ from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station
 from pprint import pprint
+from utilities import reverse_cut_numbers
 
 ############################################################################################
     
 # Scoring class for CWops mini tests - Inherits the base contest scoring class
 class CWOPS_SCORING(CONTEST_SCORING):
 
-    def __init__(self,P):
+    def __init__(self,P,session=None):
         CONTEST_SCORING.__init__(self,P,'CW Ops Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
@@ -43,13 +44,25 @@ class CWOPS_SCORING(CONTEST_SCORING):
         self.MY_STATE    = P.SETTINGS['MY_STATE']
         self.MY_SECTION = P.SETTINGS['MY_SEC']
         
-        # Determine contest time - assumes this is done within a few hours of the contest
+        # Determine contest time - assumes this is dones within a few hours of the contest
+        # Working on relaxing this restriction because I'm lazy sometimes!
         now = datetime.datetime.utcnow()
-        day=now.day
-        hour=now.hour
+        weekday = now.weekday()
+        if weekday!=2:
+            # If we finally getting around to running this on any day but Weds, roll back date to Weds
+            if weekday<2:
+                weekday+=7
+            if session==3:
+                weekday-=1
+            now = now - datetime.timedelta(hours=24*(weekday-2))
+
+        day   = now.day
+        hour  = now.hour
         today = now.strftime('%A')
-        
-        if today=='Thursday' and hour<3:
+
+        if session!=None:
+          start_time=session
+        elif today=='Thursday' and hour<3:
             # Must be looking at previous session
             start_time=19
             day-=1
@@ -64,6 +77,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
             
         self.date1 = self.date0 + datetime.timedelta(hours=1+30/3600.)
         if True:
+            print('session=',session)
             print('now=',now)
             print('today=',today)
             print('hour=',hour)
@@ -86,7 +100,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
         call = rec["call"].upper()
         qth  = rec["qth"].upper()
         if len(qth)>2:
-            qth = self.reverse_cut_numbers(qth)
+            qth = reverse_cut_numbers(qth)
         name = rec["name"].upper()
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]
