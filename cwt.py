@@ -48,7 +48,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
         # Working on relaxing this restriction because I'm lazy sometimes!
         now = datetime.datetime.utcnow()
         weekday = now.weekday()
-        if weekday!=2:
+        if weekday<2 or weekday>3:
             # If we finally getting around to running this on any day but Weds, roll back date to Weds
             if weekday<2:
                 weekday+=7
@@ -80,6 +80,7 @@ class CWOPS_SCORING(CONTEST_SCORING):
             print('session=',session)
             print('now=',now)
             print('today=',today)
+            print('weekday=',weekday)
             print('hour=',hour)
             print('date0=',self.date0)
             print('date1=',self.date1)
