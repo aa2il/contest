@@ -47,10 +47,17 @@ echo " "
 set d=`date`
 echo d=$d
 echo d1=$d[1]
-if( X$CONTEST == "X" && (($d[1] == "Wed") || ($d[1] == "Thu")) )then
+if( X$CONTEST == "X" && $d[1] == "Mon" )then
+    set CONTEST="mst"
+else if( X$CONTEST == "X" && $d[1] == "Wed" )then
     set CONTEST="cwt"
-else if( X$CONTEST == "X" )then
+else if( X$CONTEST == "X" && ($d[1] == "Fri" || $d[1] == "Sun"))then
     set CONTEST="sst"
+else
+    echo " "
+    echo "--- Can't figure out contest ---"
+    echo " "
+    exit
 endif
 echo $CONTEST
 

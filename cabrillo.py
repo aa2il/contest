@@ -43,6 +43,7 @@ from vhf import *
 from cwt import *
 from cwopen import *
 from sst import *
+from mst import *
 from naqp import *
 from wpx import *
 from iaru import *
@@ -78,6 +79,8 @@ arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
 arg_proc.add_argument('-cwt',help='CW Ops Mini-Test',
                       nargs='*',type=int,default=None)
 arg_proc.add_argument('-cwopen', action='store_true',help='CW Ops CW Open')
+arg_proc.add_argument('-mst',help='Medium  Speed Mini-Test',
+                      nargs='*',type=int,default=None)
 arg_proc.add_argument('-sst', action='store_true',help='Slow Speed Mini-Test')
 arg_proc.add_argument('-cols13', action='store_true',help='13 Colonies Special Event')
 arg_proc.add_argument('-sats', action='store_true',help='Satellites Worked')
@@ -89,12 +92,11 @@ arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
 arg_proc.add_argument("-i", help="Input ADIF file",
                               type=str,default=None)
 arg_proc.add_argument("-o", help="Output Cabrillo file",
-                              type=str,default='AA2IL.txt')
+                              type=str,default='MY_CALL.txt')
 arg_proc.add_argument("-hist", help="History File",
                               type=str,default='')
 args = arg_proc.parse_args()
 fname = args.i
-output_file = args.o
 fnames=''
 
 history = ''
@@ -104,6 +106,10 @@ category_band='ALL'
 
 P=CONFIG_PARAMS('.keyerrc')
 HIST2=None
+
+MY_CALL = P.SETTINGS['MY_CALL']
+HIST_DIR = os.path.expanduser('~/'+MY_CALL+'/')
+output_file = args.o.replace('MY_CALL',MY_CALL)
 
 #######################################################################################
 
@@ -123,7 +129,6 @@ elif args.rttyru:
     date1=sc.date1
     history = sc.history
     
-    #fname1='aa2il_2019.adif'
     fname1='aa2il_2022.adif'
     fnames = [DIR_NAME+'/'+fname1]
 
@@ -176,7 +181,7 @@ elif args.fd:
     MY_MODE='MIXED'
     date0 = datetime.datetime.strptime( "20200627 1800" , "%Y%m%d %H%M")  # Start of contest
     date1 = date0 + datetime.timedelta(hours=27)
-    history = '../history/data/master.csv'
+    history = 'HIST_DIR/master.csv'
     output_file = 'AA2IL_FD_2020.LOG'
 
     # Need to merge FT8 and CW logs
@@ -223,8 +228,8 @@ elif args.cwss:
     
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
-    #history = '../history/data/SSCW.txt'
-    history = '../history/data/SSCW-2021-LAST-2.txt'
+    #history = 'HIST_DIR/SSCW.txt'
+    history = 'HIST_DIR/SSCW-2021-LAST-2.txt'
     output_file = 'AA2IL_CWSS_2021.LOG'
 
 elif args.naqprtty:
@@ -238,7 +243,7 @@ elif args.naqprtty:
 
     date0 = datetime.datetime.strptime( "20190223 1800" , "%Y%m%d %H%M")  # Start of contest
     date1 = date0 + datetime.timedelta(hours=12)
-    history = '../history/data/master.csv'
+    history = 'HIST_DIR/master.csv'
     fname = 'naqp.adif'
     DIR_NAME = '~/.fllog/'
     
@@ -261,13 +266,13 @@ elif args.naqpcw:
 
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
-    history = '../history/data/master.csv'
+    history = 'HIST_DIR/master.csv'
 
     """
     #history = '../data/NAQPCW.txt'
     #history = '../data/NAQP_CallHistory_AOCC072717.txt'
     history = 'data/NAQP_Call_History_Aug2018.txt'
-    history = '../history/data/master.csv'
+    history = 'HIST_DIR/master.csv'
     #DIR_NAME = './'
     #fname = 'AA2IL.LOG'
     DIR_NAME = '../pyKeyer/'
@@ -282,7 +287,7 @@ elif args.wwcw:
     date0 = datetime.datetime.strptime( "20201128 0000" , "%Y%m%d %H%M")  # Start of contest
     date1 = date0 + datetime.timedelta(hours=48)
 
-    history = '../history/data/master.csv'
+    history = 'HIST_DIR/master.csv'
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
     
@@ -327,7 +332,7 @@ elif args.iaru:
         
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
-    history = '../history/data/master.csv'
+    history = 'HIST_DIR/master.csv'
 
 elif args.cqp:
     print('P=',P)
@@ -359,9 +364,9 @@ elif args.sst:
         date0 = datetime.datetime.strptime( "20210301 0000" , "%Y%m%d %H%M")  # Start of contest - 5PM local
         date1 = date0 + datetime.timedelta(hours=1+1./60.)
         
-    history = '../history/data/master.csv'
-    fname = 'AA2IL.adif'
-    DIR_NAME = '../pyKeyer/'
+    history = HIST_DIR+'master.csv'
+    fname = MY_CALL+'.adif'
+    DIR_NAME = '~/'+MY_CALL+'/'
 
 elif args.cwt!=None:
     print('cwt=',args.cwt)
@@ -370,7 +375,7 @@ elif args.cwt!=None:
     else:
         session=None
         
-    sc = CWOPS_SCORING(P,session)
+    sc = CWT_SCORING(P,session)
     contest=sc.contest
     MY_MODE=sc.my_mode
     date0=sc.date0
@@ -382,9 +387,9 @@ elif args.cwt!=None:
         #date0 = datetime.datetime.strptime( "20210429 0300" , "%Y%m%d %H%M")  # Start of contest - 7PM/8PM local
         date1 = date0 + datetime.timedelta(hours=1+30/3600.)
         
-    history = '../history/data/master.csv'
-    fname = 'AA2IL.adif'
-    DIR_NAME = '../pyKeyer/'
+    history = HIST_DIR+'master.csv'
+    fname = MY_CALL+'.adif'
+    DIR_NAME = '~/'+MY_CALL+'/'
 
 elif args.cwopen:
     sc = CWOPEN_SCORING(P)
@@ -397,6 +402,23 @@ elif args.cwopen:
 
     fname = 'AA2IL.adif'
     DIR_NAME = '../pyKeyer/'
+
+elif args.mst!=None:
+    print('mst=',args.mst)
+    if len(args.mst)>0:
+        session=args.mst[0]
+    else:
+        session=None
+        
+    sc = MST_SCORING(P,session)
+    contest=sc.contest
+    MY_MODE=sc.my_mode
+    date0=sc.date0
+    date1=sc.date1
+
+    history = HIST_DIR+'master.csv'
+    fname = MY_CALL+'.adif'
+    DIR_NAME = '~/'+MY_CALL+'/'
 
 elif args.cols13:
     sc=THIRTEEN_COLONIES(P)
@@ -568,9 +590,6 @@ istart  = -1
 cum_gap = 0
 if contest=='ARRL-FD':
     sc = ARRL_FD_SCORING(contest)
-#elif contest=='CW Ops Mini-Test':
-    # This is all done above now - model for rest of code eventually
-    #    sc = CWOPS_SCORING(contest)
 elif contest=='MAKROTHEN-RTTY':
     sc = MAKROTHEN_SCORING(contest)
 elif contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW':

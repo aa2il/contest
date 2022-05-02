@@ -38,7 +38,7 @@ TRAP_ERRORS = True
 class CWOPEN_SCORING(CONTEST_SCORING):
 
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,'CW-OPEN',mode='CW')
+        CONTEST_SCORING.__init__(self,P,'CW-OPEN',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.sec_cnt = np.zeros((len(self.BANDS)))
