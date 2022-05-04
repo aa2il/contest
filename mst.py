@@ -134,7 +134,7 @@ class MST_SCORING(CONTEST_SCORING):
 
         if TRAP_ERRORS and num_out-self.last_num_out!=1:
             print('Jump in serial out???',self.last_num_out,num_out)
-            sys.exit(0)
+            #sys.exit(0)
         else:
             self.last_num_out = num_out
 
@@ -178,12 +178,12 @@ class MST_SCORING(CONTEST_SCORING):
             if name_in!=name9:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
                 print(call,':  Current:',name_in,' - History:',name9)
-                self.list_all_qsos(call,qsos)
+                #self.list_all_qsos(call,qsos)
                 print(' ')
 
         else:
             print('\n++++++++++++ Warning - no history for call:',call)
-            self.list_all_qsos(call,qsos)
+            #self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
 
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
