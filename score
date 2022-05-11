@@ -24,8 +24,9 @@
 set CONTEST=""
 
 #set CONTEST="cwt"
-#set CONTEST="cwopen"
 #set CONTEST="sst"
+#set CONTEST="mst"
+#set CONTEST="cwopen"
 #set CONTEST="cqww"
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
@@ -47,7 +48,9 @@ echo " "
 set d=`date`
 echo d=$d
 echo d1=$d[1]
-if( X$CONTEST == "X" && $d[1] == "Mon" )then
+if( X$CONTEST != "X" )then
+    echo CONTEST=$CONTEST
+else if( X$CONTEST == "X" && $d[1] == "Mon" )then
     set CONTEST="mst"
 else if( X$CONTEST == "X" && $d[1] == "Wed" )then
     set CONTEST="cwt"
@@ -55,7 +58,7 @@ else if( X$CONTEST == "X" && ($d[1] == "Fri" || $d[1] == "Sun"))then
     set CONTEST="sst"
 else
     echo " "
-    echo "--- Can't figure out contest ---"
+    echo "--- Can't figure out which contest ---"
     echo " "
     exit
 endif

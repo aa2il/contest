@@ -64,7 +64,7 @@ class MST_SCORING(CONTEST_SCORING):
                 weekday+=7
             if session==3:
                 weekday-=1
-            now = now - datetime.timedelta(hours=24*(weekday-2))
+            now = now - datetime.timedelta(hours=24*(weekday-1))
 
         day   = now.day
         hour  = now.hour
@@ -133,8 +133,9 @@ class MST_SCORING(CONTEST_SCORING):
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
         if TRAP_ERRORS and num_out-self.last_num_out!=1:
-            print('Jump in serial out???',self.last_num_out,num_out)
-            #sys.exit(0)
+            print('\nJump in serial out???',self.last_num_out,num_out)
+            print('\nTrapped error - exiting')
+            sys.exit(0)
         else:
             self.last_num_out = num_out
 
