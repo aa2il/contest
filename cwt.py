@@ -48,6 +48,7 @@ class CWT_SCORING(CONTEST_SCORING):
         # Working on relaxing this restriction because I'm lazy sometimes!
         now = datetime.datetime.utcnow()
         weekday = now.weekday()
+        print('now=',now,'\tweekday=',weekday)
         if weekday<2 or weekday>3:
             # If we finally getting around to running this on any day but Weds, roll back date to Weds
             if weekday<2:
@@ -61,7 +62,7 @@ class CWT_SCORING(CONTEST_SCORING):
         today = now.strftime('%A')
 
         if session!=None:
-          start_time=session
+            start_time=session
         elif today=='Thursday' and hour<3:
             # Must be looking at previous session
             start_time=19
@@ -166,9 +167,10 @@ class CWT_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
+        print('\nqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
         print('band count =',self.sec_cnt)
         print('calls =',self.calls)
         mults = len(self.calls)
         print('mults=',mults)
-        print('total score=',mults*self.nqsos2)
+        print('total score=',mults*self.nqsos2,'\t(',mults*self.nqsos1,')')

@@ -20,10 +20,12 @@
 #
 ################################################################################
 
+pushd ~/Python/contest
+
 # Select a contest
 set CONTEST=""
 
-#set CONTEST="cwt"
+set CONTEST="cwt"
 #set CONTEST="sst"
 #set CONTEST="mst"
 #set CONTEST="cwopen"
@@ -43,6 +45,9 @@ set CONTEST=""
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
 #set CONTEST="ft8ru"
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
+
+set SESSION=""
+set SESSION="3"
 
 echo " "
 set d=`date`
@@ -66,8 +71,10 @@ echo $CONTEST
 
 ################################################################################
 
-echo cabrillo.py -$CONTEST
-cabrillo.py -$CONTEST
+echo cabrillo.py -$CONTEST $SESSION
+cabrillo.py -$CONTEST $SESSION
+
+popd
 
 # cabrillo.py -cqp -hist lotwreport.adi
 

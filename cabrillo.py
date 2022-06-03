@@ -705,6 +705,8 @@ for i in range(len(qsos)):
             date_off2 = date_off
             mins = 10
             rate_window = datetime.timedelta(minutes=mins)
+            t0 = date_off
+            print('t0=',t0,'\t\tcall=',rec['call'])
 
             # Actual start time
             gap_min0 = (date_off - date0).total_seconds() / 60.0
@@ -721,7 +723,11 @@ for i in range(len(qsos)):
                 date_off2 = qsos[j]['time_stamp']
             qrate = (i-j+1) / (mins/60.)
             df = float(rec['freq']) - float(qsos[i-1]['freq'])
-            print('rate = ',qrate,' per hour\t\t',rec['mode'],rec['band'],df==0)
+            t1 = rec['time_stamp']
+            #print('t1=',t1)
+            dt=(t1-t0).total_seconds() / 60.0
+            print('dt=',int(dt+.5),'\t\trate = ',qrate,' per hour\t\t',
+                  rec['call'],rec['mode'],rec['band'],df==0)
             if j==i:
                 gap_min = (date_off - qsos[i-1]['time_stamp']).total_seconds() / 60.0
                 print('Time gap:',gap_min,'minutes')

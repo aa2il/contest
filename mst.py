@@ -71,8 +71,11 @@ class MST_SCORING(CONTEST_SCORING):
         today = now.strftime('%A')
 
         if session!=None:
-          start_time=session
-        elif today=='Thursday' and hour<3:
+            start_time=session
+            if today=='Tuesday' and session>3:
+                # Must be looking at Monday's session
+                day-=1
+        elif today=='Tuesday' and hour<3:
             # Must be looking at previous session
             start_time=19
             day-=1
@@ -114,11 +117,12 @@ class MST_SCORING(CONTEST_SCORING):
             num_in = str( int( a[0] ) )
         except:
             num_in = reverse_cut_numbers( a[0] )
-            print('Hmmmmmmmmmmm:',call,a[1],num_in)
+            print('\nHmmmmmmmmmmm - problem with number in:',call,a[1],num_in)
         name_in = a[1]
 
         if TRAP_ERRORS and '?' in str(num_in)+name_in:
             print(rec)
+            print('\nTrapped error - exiting')
             sys.exit(0)
         
         tx   = rec["stx_string"].strip().upper()
@@ -132,8 +136,9 @@ class MST_SCORING(CONTEST_SCORING):
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
-        if TRAP_ERRORS and num_out-self.last_num_out!=1:
-            print('\nJump in serial out???',self.last_num_out,num_out)
+        if TRAP_ERRORS and num_out-self.last_num_out!=1 and self.last_num_out>0:
+            print('\n???????? Jump in serial out ???????',self.last_num_out,num_out)
+            print(rec)
             print('\nTrapped error - exiting')
             sys.exit(0)
         else:
@@ -147,7 +152,7 @@ class MST_SCORING(CONTEST_SCORING):
 
         self.calls.add(call)
 
-        if True:
+        if False:
             print('call   =',call)
             print('serial =',num_in)
             print('name   =',name_in)
