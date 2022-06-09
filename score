@@ -25,7 +25,7 @@ pushd ~/Python/contest
 # Select a contest
 set CONTEST=""
 
-set CONTEST="cwt"
+#set CONTEST="cwt"
 #set CONTEST="sst"
 #set CONTEST="mst"
 #set CONTEST="cwopen"
@@ -47,7 +47,7 @@ set CONTEST="cwt"
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
 
 set SESSION=""
-set SESSION="3"
+#set SESSION="3"
 
 echo " "
 set d=`date`

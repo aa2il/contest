@@ -136,7 +136,7 @@ class MST_SCORING(CONTEST_SCORING):
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
-        if TRAP_ERRORS and num_out-self.last_num_out!=1 and self.last_num_out>0:
+        if TRAP_ERRORS and num_out-self.last_num_out!=1 and self.last_num_out>0: # and self.last_num_out!=10:
             print('\n???????? Jump in serial out ???????',self.last_num_out,num_out)
             print(rec)
             print('\nTrapped error - exiting')
@@ -209,6 +209,7 @@ class MST_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
+        print('\nqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
         print('band count =',self.sec_cnt)
         print('calls =',self.calls)
