@@ -167,7 +167,7 @@ class CWT_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
-        print('\nqsos1=',self.nqsos1)
+        print('\nnqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
         print('band count =',self.sec_cnt)
         print('calls =',self.calls)

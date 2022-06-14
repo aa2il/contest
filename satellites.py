@@ -32,7 +32,7 @@ from fileio import write_adif_record
 class SATCOM(CONTEST_SCORING):
  
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,'Satellites Worked',mode='MIXED')
+        CONTEST_SCORING.__init__(self,P,'Satellites Worked',mode='MIXED')
 
         # Init
         self.P=P
