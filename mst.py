@@ -30,7 +30,7 @@ from utilities import reverse_cut_numbers
 ############################################################################################
 
 TRAP_ERRORS = False
-TRAP_ERRORS = True
+#TRAP_ERRORS = True
 
 ############################################################################################
     
@@ -44,6 +44,7 @@ class MST_SCORING(CONTEST_SCORING):
         self.sec_cnt = np.zeros((len(self.BANDS)))
         self.calls=set([])
         self.last_num_out=0
+        self.prev_rec=None
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
@@ -75,10 +76,13 @@ class MST_SCORING(CONTEST_SCORING):
             if today=='Tuesday' and session>3:
                 # Must be looking at Monday's session
                 day-=1
-        elif today=='Tuesday' and hour<3:
+        elif today=='Tuesday':
             # Must be looking at previous session
-            start_time=19
-            day-=1
+            if hour<3:
+                day-=1
+                start_time=19
+            else:
+                start_time=3
         elif hour>=19 and hour<24:
             start_time=19
         elif hour>=0 and hour<19:
@@ -136,13 +140,16 @@ class MST_SCORING(CONTEST_SCORING):
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
-        if TRAP_ERRORS and num_out-self.last_num_out!=1 and self.last_num_out>0: # and self.last_num_out!=10:
-            print('\n???????? Jump in serial out ???????',self.last_num_out,num_out)
+        if num_out-self.last_num_out!=1 and self.last_num_out>0: 
+            print('\n???????? Jump in serial out ???????',self.last_num_out,'to',num_out)
+            print(self.prev_rec)
             print(rec)
-            print('\nTrapped error - exiting')
-            sys.exit(0)
-        else:
-            self.last_num_out = num_out
+            if TRAP_ERRORS:
+                print('\nTrapped error - exiting')
+                sys.exit(0)
+            
+        self.last_num_out = num_out
+        self.prev_rec=rec
 
         if MY_MODE=='CW':
             mode='CW'

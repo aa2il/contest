@@ -32,7 +32,7 @@ set CONTEST=""
 #set CONTEST="cqww"
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
-#set CONTEST="fd"               # Field Day  - worked in 2020
+set CONTEST="fd"               # Field Day  - worked in 2020
 #set CONTEST="cqp"
 #set CONTEST="naqpcw"
 #set CONTEST="naqprtty"
@@ -55,7 +55,7 @@ echo d=$d
 echo d1=$d[1]
 if( X$CONTEST != "X" )then
     echo CONTEST=$CONTEST
-else if( X$CONTEST == "X" && $d[1] == "Mon" )then
+else if( X$CONTEST == "X" && ( $d[1] == "Mon" || $d[1] == "Tue" ) )then
     set CONTEST="mst"
 else if( X$CONTEST == "X" && $d[1] == "Wed" )then
     set CONTEST="cwt"

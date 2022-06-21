@@ -29,8 +29,8 @@ from scoring import CONTEST_SCORING
 # Scoring class for ARRL Field Day - Inherits the base contest scoring class
 class ARRL_FD_SCORING(CONTEST_SCORING):
  
-    def __init__(self,contest):
-        CONTEST_SCORING.__init__(self,contest)
+    def __init__(self,P):
+        CONTEST_SCORING.__init__(self,P,'ARRL-FD',mode='MIXED')
         print('FD Scoring Init')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m','6m','2m']
@@ -43,9 +43,36 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
                 tmp.append((b+' '+m,[]))
         self.CALLS = OrderedDict(tmp)
 
+        self.MY_CALL    = P.SETTINGS['MY_CALL']
+        self.MY_CAT     = P.SETTINGS['MY_CAT']
+        self.MY_SECTION = P.SETTINGS['MY_SEC']
+        
+        # Determine contest time - assumes this is done within a few hours of the contest
+        # Contest occurs on 4th full weekend of June
+        now = datetime.datetime.utcnow()
+        year=now.year
+        #year=2020                                                     # Test from last time I did FD
+        day1=datetime.date(year,6,1).weekday()                         # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat4=1 + ((5-day1) % 7) + 21                                   # Day no. for 4th Saturday = 1 since day1 is the 1st of the month
+                                                                       #    no. days until 1st Saturday (day 5) + 7 more days
+        self.date0=datetime.datetime(year,6,sat4,18) 
+        self.date1 = self.date0 + datetime.timedelta(hours=33)         # ... and ends at 0300/0400 UTC on Monday
+        print('day1=',day1,'\tsat4=',sat4,'\tdate0=',self.date0)
+        #sys.exit(0)
+        
+        # Manual override
+        if False:
+            self.date0 = datetime.datetime.strptime( "20200627 1800" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=27)
 
+
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
+        
     # Scoring routine for ARRL Field Day for a single qso
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
 
         #print('\n',rec)
 
@@ -65,8 +92,8 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         #b    = tx.split(',')
         #cat_out = b[0] 
         #sec_out = b[1] 
-        cat_out = MY_CAT
-        sec_out = MY_SEC
+        cat_out = self.MY_CAT
+        sec_out = self.MY_SECTION
         
         freq=float(rec["freq"])
         band     = rec["band"]
@@ -136,7 +163,7 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         #QSO:  14042 CW 1999-09-05 0000 AA2IL      2E  SDG    N6TR       1A  SV 
     
         line='QSO: %5d %2s %10s %4s %-10s %-3s %-3s    %-10s %-3s %-3s' % \
-            (freq_khz,mode,date_off,time_off,MY_CALL,MY_CAT,MY_SEC,call,cat_in,sec_in)
+            (freq_khz,mode,date_off,time_off,self.MY_CALL,self.MY_CAT,self.MY_SEC,call,cat_in,sec_in)
         #print(line)
         #sys.exit(0)
         return line

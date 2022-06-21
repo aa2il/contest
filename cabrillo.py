@@ -65,8 +65,7 @@ def open_output_file(P,outfile):
         sys.exit(0)
 
     """
-    if contest=='IARU-HF' or \
-       contest=='WW-DIGI' or contest=='ARRL-FD' :
+    if contest=='IARU-HF' or contest=='WW-DIGI':
         fp.write('LOCATION: %s\n' % MY_SECTION)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
     elif contest=='MAKROTHEN-RTTY' or contest=='ARRL-RTTY' or contest=='NAQP-CW' or \
@@ -159,9 +158,7 @@ P.contest_name=P.sc.contest
 # Init
 istart  = -1
 cum_gap = 0
-if P.sc.contest=='ARRL-FD':
-    sc = ARRL_FD_SCORING(contest)
-elif P.sc.contest=='MAKROTHEN-RTTY':
+if P.sc.contest=='MAKROTHEN-RTTY':
     sc = MAKROTHEN_SCORING(contest)
 elif P.sc.contest=='CQ-WW-RTTY' or P.sc.contest=='CQ-WW-CW':
     sc = CQ_WW_SCORING(contest)

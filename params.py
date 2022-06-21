@@ -47,7 +47,7 @@ from call import *
 ################################################################################
 
 # User params
-DIR_NAME = '~/.fldigi/logs/'
+#DIR_NAME = '~/.fldigi/logs/'
 
 ################################################################################
 
@@ -157,17 +157,14 @@ class PARAMS:
             output_file = 'AA2IL_10m_2020.LOG'
     
         elif args.vhf:
+
+            # ARRL VHF+ Contests
             sc = ARRL_VHF_SCORING(P)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            category_band=sc.category_band
-            date0=sc.date0
-            date1=sc.date1
-            history = sc.history
-            output_file = sc.output_file
-            
+            self.sc=sc
+
             # Need to merge FT8 and CW/Phone logs
             fnames=[]
+            DIR_NAME = '~/.fldigi/logs/'
             #DIR_NAME='.'
             for fname in ['AA2IL.adif','wsjtx_log.adi']:
                 #for fname in ['AA2IL_VHF_Sep2021.adif','wsjtx_VHF_Sep2021.adi']:
@@ -175,12 +172,18 @@ class PARAMS:
                 fnames.append(f)
 
         elif args.fd:
-            contest='ARRL-FD'
-            MY_MODE='MIXED'
-            date0 = datetime.datetime.strptime( "20200627 1800" , "%Y%m%d %H%M")  # Start of contest
-            date1 = date0 + datetime.timedelta(hours=27)
-            history = 'HIST_DIR/master.csv'
-            output_file = 'AA2IL_FD_2020.LOG'
+
+            # ARRL Field Day
+            sc = ARRL_FD_SCORING(P)
+            self.sc=sc
+            
+            #contest='ARRL-FD'
+            #MY_MODE='MIXED'
+            #date0 = datetime.datetime.strptime( "20200627 1800" , "%Y%m%d %H%M")  # Start of contest
+            #date1 = date0 + datetime.timedelta(hours=27)
+
+            self.history = HIST_DIR+'master.csv'
+            #output_file = 'AA2IL_FD_2020.LOG'
             
             # Need to merge FT8 and CW logs
             fnames=[]

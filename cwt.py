@@ -44,7 +44,7 @@ class CWT_SCORING(CONTEST_SCORING):
         self.MY_STATE    = P.SETTINGS['MY_STATE']
         self.MY_SECTION = P.SETTINGS['MY_SEC']
         
-        # Determine contest time - assumes this is dones within a few hours of the contest
+        # Determine contest time - assumes this is done within a few hours of the contest
         # Working on relaxing this restriction because I'm lazy sometimes!
         now = datetime.datetime.utcnow()
         weekday = now.weekday()
