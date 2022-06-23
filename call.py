@@ -55,8 +55,9 @@ class SPECIFIC_CALL(CONTEST_SCORING):
         #print('rec=',rec)
         #print('nqsos=',self.nqsos1)
 
+        fmt = '%4s   %-10s %6s   %4s   %-10s   %-4s    %-10s'
         if self.nqsos1==1:
-            hdr='   Call        Freq  Mode  Date   Time'
+            hdr=fmt % ('','Call','Freq ','Mode','Date','Time','Contest')
             print('\n',hdr)
 
         # Pull out relavent entries
@@ -68,10 +69,14 @@ class SPECIFIC_CALL(CONTEST_SCORING):
             mode     = rec["mode"].upper()
             date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
             time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
-            
-            line='QSO: %-10s %5d %2s %10s %4s' %\
-                (call,freq_khz,mode,date_off,time_off)
+            if 'contest_id' in rec.keys():
+                contest_id=rec['contest_id']
+            else:
+                contest_id=''
+                
+            line=fmt % ('QSO:',call,str(freq_khz),mode,date_off,time_off,contest_id)
             print(line)
+            #print(rec)
             return line
             
     # Routine to check for dupes
