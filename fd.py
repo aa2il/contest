@@ -33,7 +33,7 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,P,'ARRL-FD',mode='MIXED')
         print('FD Scoring Init')
         
-        self.BANDS = ['160m','80m','40m','20m','15m','10m','6m','2m']
+        self.BANDS = ['160m','80m','40m','20m','15m','10m','6m','2m','70cm']
         self.MODES = ['CW','DG','PH']
         self.sec_cnt = np.zeros((len(FD_SECS),len(self.MODES),len(self.BANDS)))
         self.band_mode_cnt = np.zeros((len(self.MODES),len(self.BANDS)))
@@ -65,6 +65,9 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             self.date0 = datetime.datetime.strptime( "20200627 1800" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = self.date0 + datetime.timedelta(hours=27)
 
+        # Name of output file
+        self.output_file = self.MY_CALL+'_FIELD_DAY_'+str(self.date0.year)+'.LOG'
+        
 
     # Contest-dependent header stuff
     def output_header(self,fp):
@@ -83,15 +86,19 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             cat_in = rec["class"].upper()
             sec_in = rec["arrl_sect"].upper()
             rx=cat_in+' '+sec_in
-        else:
+        elif "srx_string" in keys:
             rx   = rec["srx_string"].strip().upper()
             a    = rx.split(',')   
             cat_in = a[0]
             sec_in = a[1]
-        #tx   = rec["stx_string"].strip().upper()
-        #b    = tx.split(',')
-        #cat_out = b[0] 
-        #sec_out = b[1] 
+        else:
+            print('\nQSO-SCORING - Whoops!  Cant figure out contest exchange')
+            print('rec=',rec)
+            cmd = 'fgrep "'+self.MY_CALL+' '+call+'" $HOME/logs/ALL_ft8_contest.TXT'
+            #print('cmd=',cmd)
+            os.system(cmd)
+            sys.exit(0)
+            
         cat_out = self.MY_CAT
         sec_out = self.MY_SECTION
         
@@ -205,7 +212,16 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         print('No. dupes                     =',self.ndupes)
         print('No. unique QSOS (nqsos2)      =',self.nqsos2)
         mults = 2
-        print('power mult=',mults)
-        print('total score=',self.total_points*mults)
+        print('Power Mult                    =',mults)
+        print('QSO Score (sans bonus)        =',self.total_points*mults)
+        
+        bonus = 0
+        bonus += 100*2          # Emergency power x2 transmitters
+        bonus += 100            # Solar power
+        bonus += 100            # Copied W1AW bulletin
+        bonus += 50             # Web entry
+        
+        print('Bonus Points                  =',bonus)
+        print('Total Claimed Score           =',self.total_points*mults + bonus)
 
     

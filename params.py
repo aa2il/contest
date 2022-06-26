@@ -145,7 +145,6 @@ class PARAMS:
             
             fname = 'wsjtx_log.adi'
             DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
-            output_file = sc.output_file
     
         elif args.ten:
             contest='ARRL 10'
@@ -177,22 +176,15 @@ class PARAMS:
             sc = ARRL_FD_SCORING(P)
             self.sc=sc
             
-            #contest='ARRL-FD'
-            #MY_MODE='MIXED'
-            #date0 = datetime.datetime.strptime( "20200627 1800" , "%Y%m%d %H%M")  # Start of contest
-            #date1 = date0 + datetime.timedelta(hours=27)
-
             self.history = HIST_DIR+'master.csv'
-            #output_file = 'AA2IL_FD_2020.LOG'
             
             # Need to merge FT8 and CW logs
             fnames=[]
-            #DIR_NAME = '~/logs/field_day_2020/'
-            DIR_NAME = '~/AA2IL/Contesting/Field_Day/field_day_2020/'
+            DIR_NAME = '~/logs/'
+            #DIR_NAME = '~/AA2IL/Contesting/Field_Day/field_day_2022/'
             fnames=[]
-            for fname in ['AA2IL.adif','ft8_contest.adi','pi2_ft8_contest.adi']:
-                #for fname in ['ft8_contest.adi']:
-                #for fname in ['pi2_ft8_contest.adi']:
+            #for fname in ['AA2IL.adif','ft8_contest.adi','pi2_ft8_contest.adi']:
+            for fname in ['AA2IL.adif','ft8_contest.adi','rpi_fd_2022.adi']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
                 fnames.append(f)
     
@@ -471,5 +463,6 @@ class PARAMS:
             self.input_files  = fnames
         else:
             self.input_files  = [DIR_NAME + '/' + fname]
-        #sys.exit(0)
 
+        self.output_file = sc.output_file
+        #sys.exit(0)

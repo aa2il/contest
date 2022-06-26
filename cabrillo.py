@@ -238,6 +238,7 @@ if P.sc.contest=='NAQP-CW' or P.sc.contest=='NAQP-RTTY':
             rec["qth"]  = rec["srx_string"].upper()
 
 # Open output file
+print('Output File=',P.output_file)
 fp=open_output_file(P,P.output_file)
 
 # Load history file

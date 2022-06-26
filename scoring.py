@@ -80,7 +80,7 @@ class CONTEST_SCORING:
         
     # Routine to group modes according to cw, digi or phone
     def group_modes(self,mode):
-        if mode=='FM':
+        if mode in ['FM','SSB','USB','LSB']:
             mode2='PH'
         elif mode=='FT8' or mode=='MFSK':
             mode2='DG'
@@ -99,7 +99,7 @@ class CONTEST_SCORING:
             freq_khz = 50
         elif band=='2m':
             freq_khz = 144
-        elif band=='70m':
+        elif band=='70cm':
             freq_khz = 432
         else:
             print('CONVERT_FREQ - Need more code!!',freq)
