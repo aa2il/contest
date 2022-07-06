@@ -93,7 +93,7 @@ class MST_SCORING(CONTEST_SCORING):
         self.date0=datetime.datetime(now.year,now.month,day,start_time)
             
         self.date1 = self.date0 + datetime.timedelta(hours=1+30/3600.)
-        if True:
+        if False:
             print('session=',session)
             print('now=',now)
             print('today=',today)
@@ -102,6 +102,9 @@ class MST_SCORING(CONTEST_SCORING):
             print('date0=',self.date0)
             print('date1=',self.date1)
             #sys.exit(0)
+
+        # Name of output file
+        self.output_file = self.MY_CALL+'.LOG'
     
     # Contest-dependent header stuff
     def output_header(self,fp):

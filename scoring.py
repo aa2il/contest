@@ -208,8 +208,9 @@ class CONTEST_SCORING:
     # Routine to sift through stations we had multiple contacts with to identify any discrepancies
     def check_multis(self,qsos):
 
-        print('There were multiple qsos with the following stations:')
-        print('NEED SOME CODE FOR THIS CONTEST - see vhf.py for an example')
+        print('\nThere were multiple qsos with the following stations:')
+        print('NEED SOME CODE FOR THIS CONTEST - see vhf.py for an example\n')
+        print('There might be a generic fix to this already in FD.PY - try it on next contest')
 
     #######################################################################################
 

@@ -37,7 +37,8 @@ from load_history import *
 from fileio import *
 
 from params import *
-#from settings import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 #######################################################################################
 
@@ -248,6 +249,12 @@ HIST = load_history(P.history)
 # Loop over all qsos
 j=-1
 lines=[]
+times=[0]
+rates=[0]
+time_cw=[0]
+dts=[10*60]
+times5=[0]
+tlast=P.sc.date0
 for i in range(len(qsos)):
     rec=qsos[i]
     #print('\n',i,rec)
@@ -303,7 +310,14 @@ for i in range(len(qsos)):
             dt=(t1-t0).total_seconds() / 60.0
             if P.sc.contest!='Specific Call':
                 print('dt=',int(dt+.5),'\t\trate = ',qrate,' per hour\t\t',
-                      rec['call'],rec['mode'],rec['band'],df==0)
+                      rec['call'],'\t',rec['mode'],'\t',rec['band'],'\t',df==0)
+                times.append(dt/60.)
+                rates.append(qrate)
+                if rec['mode']=='CW':
+                    time_cw.append(dt/60.)
+                else:
+                    time_cw.append(np.nan)
+                    
             if j==i:
                 gap_min = (date_off - qsos[i-1]['time_stamp']).total_seconds() / 60.0
                 if P.sc.contest!='Specific Call':
@@ -317,6 +331,14 @@ for i in range(len(qsos)):
             P.sc.nskipped+=1
             continue
 
+        # Keep track of instantaneous rate as weel
+        if not rapid:
+            dt1=(date_off-P.sc.date0).total_seconds() / 3600.
+            times5.append(dt1)
+            dt2 = (date_off-tlast).total_seconds()
+            dts.append(dt2)
+            tlast = date_off
+                    
         if P.sc.contest=='13 Colonies Special Event':
             # This one has a different API - leaving it like this for now
             # but would be nice to be consistent!
@@ -388,9 +410,67 @@ op_time=duration-cum_gap
 print('Operating time:\t\t%8.1f minutes \t=%8.1f hours' % (op_time,op_time/60.) )
 ave_rate = P.sc.nqsos2/(op_time/60.)
 print('Average rate:\t\t%8.1f per hour\n' % ave_rate)
-        
 
-# Not quite sure how to use these yet
-#my_lookuplib = LookupLib(lookuptype="countryfile")
-#cic = Callinfo(my_lookuplib)
-#print cic.get_all("AA2IL")
+
+# Interpolate the rate data
+rate_inst=3600./np.array(dts)
+times2=[]
+rates2=[]
+tend=times[-1]
+print('tend=',tend)
+t=0
+dt=1./60.
+idx=0
+while t<tend:
+    times2.append(t)
+    while times5[idx]<=t:
+        #r=rates[idx]
+        r=rate_inst[idx]
+        idx+=1
+    rates2.append(r)
+    t+=dt
+
+# Smooth out the data    
+if tend>3:
+    N=11
+    tscale=1.
+    lab='Hours'
+else:
+    N=11
+    tscale=60.
+    lab='Minutes'
+h=np.ones(N)/float(N)
+rates5=np.array(rates2)
+rates3=np.convolve(rates5,h,'same')
+
+times=np.array(times)
+time_cw=np.array(time_cw)
+times2=np.array(times2)
+times5=np.array(times5)
+
+#print('rate_inst=',rate_inst,len(rate_inst))
+#print('times =',times, len(times) )
+#print('times2=',times2,len(times2))
+#print('times5=',times5, len(times5) )
+#print('h=',h)
+#print('rates2=',rates2)
+#print('rates3=',rates3,len(rates3))
+#print('dts=',dts,len(dts))
+    
+# Plot qso rate vs time
+fig, ax = plt.subplots()
+ax.plot(tscale*times,rates,color='red',label='All Modes')
+ax.plot(tscale*time_cw,rates,color='blue',label='CW')
+#ax.plot(times2,rates2,color='green',label='Interp')
+ax.plot(tscale*times5,rate_inst,color='cyan',label='Inst')
+ax.plot(tscale*times2,rates3,color='orange',label='Smoothed')
+ax.set_xlabel('Time from Start ('+lab+')')
+ax.set_ylabel('QSO Rate (per hour)')
+#fig.suptitle('QSO RATE')
+fig.suptitle(P.sc.contest)
+#ax.set_title('Starting at '+date1)
+ax.grid(True)    
+plt.xlim(0,tend*tscale)
+plt.ylim(0,200)
+ax.legend(loc='upper left')
+plt.show()

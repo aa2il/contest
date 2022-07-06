@@ -26,6 +26,11 @@ from scoring import CONTEST_SCORING
 
 ############################################################################################
     
+TRAP_ERRORS = False
+TRAP_ERRORS = True
+
+############################################################################################
+    
 # Scoring class for ARRL Field Day - Inherits the base contest scoring class
 class ARRL_FD_SCORING(CONTEST_SCORING):
  
@@ -67,6 +72,10 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
 
         # Name of output file
         self.output_file = self.MY_CALL+'_FIELD_DAY_'+str(self.date0.year)+'.LOG'
+
+
+        # Multi-qsos
+        self.EXCHANGES = OrderedDict()
         
 
     # Contest-dependent header stuff
@@ -158,7 +167,14 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             idx3 = self.BANDS.index(band)
             self.sec_cnt[idx1,idx2,idx3]   = 1
             self.band_mode_cnt[idx2,idx3] += 1
-        
+
+            # Info for multi-qsos
+            exch_in=cat_in+' '+sec_in
+            if call in self.EXCHANGES.keys():
+                self.EXCHANGES[call].append(exch_in)
+            else:
+                self.EXCHANGES[call]=[exch_in]
+            
         else:
             self.ndupes+=1
 
@@ -176,6 +192,25 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         return line
 
 
+    # Routine to sift through station we had multiple contacts with to identify any discrepancies
+    def check_multis(self,qsos):
+
+        problem=False
+        for call in self.EXCHANGES.keys():
+            exchs=self.EXCHANGES[call]
+            mismatch = exchs.count(exchs[0]) != len(exchs)
+            if mismatch:
+                if not problem:
+                    print('There are discrepancies with multiple qsos with the following stations:')
+                print('call=',call,'\texchanges=',exchs)
+                problem=True
+                
+        if not problem:
+            print('There are were no other discrepancies found.')
+        elif TRAP_ERRORS:
+            print('\nCheck Multis - TRAPPED ERROR\n')
+            sys.exit(0)
+    
     # Summary & final tally
     def summary(self):
         

@@ -45,6 +45,9 @@ class SPECIFIC_CALL(CONTEST_SCORING):
         self.date0 = datetime.datetime.strptime( "20000101 0000" , "%Y%m%d %H%M")
         self.date1 = datetime.datetime.strptime( "21000101 0000" , "%Y%m%d %H%M")
 
+        # Name of output file
+        self.output_file = self.MY_CALL+'.LOG'
+        
     # Contest-dependent header stuff
     def output_header(self,fp):
         pass

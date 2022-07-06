@@ -35,8 +35,8 @@ BONUS_STATIONS=['WM3PEN','GB13COL','TM13COL']
 # Scoring class for 13 Colonies - Inherits the base contest scoring class
 class THIRTEEN_COLONIES(CONTEST_SCORING):
  
-    def __init__(self,P,contest='13 Colonies Special Event'):
-        CONTEST_SCORING.__init__(self,contest,mode='MIXED')
+    def __init__(self,P):
+        CONTEST_SCORING.__init__(self,P,'13 Colonies Special Event',mode='MIXED')
 
         # Init
         self.P=P
@@ -59,6 +59,8 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
         #WSJT-X ADIF Export<eoh>
         self.fp_adif.write('ADIF Export<eoh>\n')
 
+        # Name of output file
+        self.output_file = self.MY_CALL+'_13COLONIES_'+str(self.date0.year)+'.LOG'
 
     # Contest-dependent header stuff
     def output_header(self,fp):
@@ -72,7 +74,7 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
 
         # Init - make list of SES stations
         nqsos13=0
-        stations=BONUS_STATIONS
+        stations=BONUS_STATIONS.copy()
         for a in 'ABCDEFGHIJKLM':                       # Z some years also
             stations.append('K2'+a)
         print('Stations=',stations)
@@ -140,7 +142,10 @@ class THIRTEEN_COLONIES(CONTEST_SCORING):
         clean_sweep      = True
         clean_sweep_cw   = True
         clean_sweep_digi = True
+        #print(BONUS_STATIONS,len(BONUS_STATIONS))
+        #print(stations,len(stations))
         for i in range(len(BONUS_STATIONS),len(stations)):
+            print(i,stations[i],worked[i])
             clean_sweep      = clean_sweep      and worked[i]
             clean_sweep_cw   = clean_sweep_cw   and worked_cw[i]
             clean_sweep_digi = clean_sweep_digi and worked_digi[i]

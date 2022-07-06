@@ -398,12 +398,16 @@ class PARAMS:
             DIR_NAME = '~/'+MY_CALL+'/'
 
         elif args.cols13:
+
+            # 13 Colonies special event
             sc=THIRTEEN_COLONIES(P)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            date0=sc.date0
-            date1=sc.date1
-            history = ''
+            self.sc=sc
+
+            #contest=sc.contest
+            #MY_MODE=sc.my_mode
+            #date0=sc.date0
+            #date1=sc.date1
+            #history = ''
             
             if False:
                 # Manual override

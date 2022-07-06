@@ -58,7 +58,7 @@ class SST_SCORING(CONTEST_SCORING):
         self.date1 = self.date0 + datetime.timedelta(hours=1+1./60.)
 
         # Playing with dates
-        if True:
+        if False:
             print(now)
             print(now.day,now.weekday())
             print(today)
@@ -66,6 +66,9 @@ class SST_SCORING(CONTEST_SCORING):
             print(self.date1)
             #sys.exit(0)
 
+        # Name of output file
+        self.output_file = self.MY_CALL+'.LOG'
+            
     # Contest-dependent header stuff
     def output_header(self,fp):
         fp.write('LOCATION: %s\n' % self.MY_STATE)
