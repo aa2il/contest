@@ -312,20 +312,14 @@ class PARAMS:
                 fname = 'cq_wpx_rtty_2022.adif'
 
         elif args.iaru:
+
+            # IARU HF Champs
             sc = IARU_HF_SCORING(P)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            date0=sc.date0
-            date1=sc.date1
+            self.sc=sc
             
-            if False:
-                # Manual override
-                date0 = datetime.datetime.strptime( "20210710 1200" , "%Y%m%d %H%M")  # Start of contest
-                date1 = date0 + datetime.timedelta(hours=24)
-                
-            fname = 'AA2IL.adif'
-            DIR_NAME = '../pyKeyer/'
-            history = 'HIST_DIR/master.csv'
+            self.history = HIST_DIR+'master.csv'
+            fname = MY_CALL+'.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
 
         elif args.cqp:
             print('P=',P)

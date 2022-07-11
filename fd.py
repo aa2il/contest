@@ -74,10 +74,6 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         self.output_file = self.MY_CALL+'_FIELD_DAY_'+str(self.date0.year)+'.LOG'
 
 
-        # Multi-qsos
-        self.EXCHANGES = OrderedDict()
-        
-
     # Contest-dependent header stuff
     def output_header(self,fp):
         fp.write('LOCATION: %s\n' % self.MY_STATE)

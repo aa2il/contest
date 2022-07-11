@@ -40,7 +40,7 @@ set CONTEST=""
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
 #set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
-#set CONTEST="iaru"
+set CONTEST="iaru"
 #set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
 #set CONTEST="ft8ru"
@@ -57,7 +57,7 @@ if( X$CONTEST != "X" )then
     echo CONTEST=$CONTEST
 else if( X$CONTEST == "X" && ( $d[1] == "Mon" || $d[1] == "Tue" ) )then
     set CONTEST="mst"
-else if( X$CONTEST == "X" && $d[1] == "Wed" )then
+else if( X$CONTEST == "X" && ( $d[1] == "Wed" || $d[1] == "Thu" ) )then
     set CONTEST="cwt"
 else if( X$CONTEST == "X" && ($d[1] == "Fri" || $d[1] == "Sun"))then
     set CONTEST="sst"

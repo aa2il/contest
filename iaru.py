@@ -21,15 +21,17 @@
 
 import sys
 import datetime
-from rig_io.ft_tables import *
+from rig_io.ft_tables import SST_SECS
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
 from utilities import reverse_cut_numbers
+from collections import OrderedDict
+import csv
 
 ############################################################################################
 
-TRAP_ERRORS = False
+#TRAP_ERRORS = False
 TRAP_ERRORS = True
 
 ############################################################################################
@@ -76,11 +78,30 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         #sys.exit(0)
 
         if False:
-            # Manual override - not accurate for this contest, be careful!
-            self.date0 = datetime.datetime.strptime( "20200707 1200" , "%Y%m%d %H%M")  # Start of contest
+            # Manual override
+            self.date0 = datetime.datetime.strptime( "20210710 1200" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = self.date0 + datetime.timedelta(hours=24)
-        
-        
+                
+        # Name of output file
+        self.output_file = self.MY_CALL+'_IARU_HF_CHAMPS_'+str(self.date0.year)+'.LOG'
+
+        # Create a list of IARU member societies
+        societies=set([])
+        with open('iaru.txt') as f:
+            rows = csv.reader(f)
+            for row in rows:
+                #print('row=',row)
+                
+                # Skip comments
+                if row[0][0]!='#':
+                    a=row[0].split()
+                    #print(a)
+                    societies.add(a[1])
+                    
+        self.societies=list(societies)
+        print('\nIARU Societies:',self.societies,'\n')
+        #sys.exit(0)
+            
     # Contest-dependent header stuff
     def output_header(self,fp):
         fp.write('LOCATION: %s\n' % self.MY_STATE)
@@ -98,8 +119,19 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         rx   = rec["srx_string"].strip().upper()
         a    = rx.split(',')
         rst_in = reverse_cut_numbers( a[0] )
-        if len(a[1])<=2:
+
+        if '?' in a[0] or '?' in a[1] and TRAP_ERRORS:
+            print('\n$$$$$$$$$$ Need to correct ADIF file $$$$$$$$$$$')
+            print('rec=',rec)
+            sys.exit(0)
+        
+        if len(a[1])<=2 and a[1] not in self.societies+SST_SECS:
             num_in = reverse_cut_numbers( a[1] , 2)
+            if not num_in.isnumeric() and TRAP_ERRORS:
+                print('\n$$$$$$$$$$ Problem interpretting Zone/Society info $$$$$$$$$$$')
+                print('rec=',rec)
+                print('a=',a,'\tnum_in=',num_in)
+                sys.exit(0)
         else:
             num_in = a[1]
         if num_in.isdigit():
@@ -130,7 +162,9 @@ class IARU_HF_SCORING(CONTEST_SCORING):
 
         # Some error checking
         dx_station = Station(call)
-        if len(num_in)==0 or zone>75:
+        #if len(num_in)==0 or zone>75:
+        if len(num_in)==0 or (num_in.isnumeric() and int(num_in)>75) or\
+           (not num_in.isnumeric() and  num_in not in self.societies):
             print('Houston, we have problem - invalid zone')
             print('rec=',rec)
             pprint(vars(dx_station))
@@ -149,13 +183,13 @@ class IARU_HF_SCORING(CONTEST_SCORING):
 
         # Determine multipliers
         self.nqsos+=1
-        SPECIAL_CALLS=['TO5GR']
+        SPECIAL_CALLS=[]                # For 2021: ['TO5GR']
         if not dupe:
             if zone==self.MY_ITU_ZONE or zone==0:
                 qso_points = 1
             elif dx_station.continent=='NA' or call in SPECIAL_CALLS:
                 qso_points = 3
-            elif dx_station.continent in ['SA','EU','OC','AF']:
+            elif dx_station.continent in ['SA','EU','OC','AF','AS']:
                 qso_points = 5
             else:
                 print('\n*** IARU HF: Not Sure what to do with this??!! ***')
@@ -169,6 +203,14 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             self.total_points += qso_points
             self.POINTS[band] += qso_points
 
+            # Info for multi-qsos
+            exch_in=rst_in+' '+num_in
+            if call in self.EXCHANGES.keys():
+                self.EXCHANGES[call].append(exch_in)
+            else:
+                self.EXCHANGES[call]=[exch_in]
+            
+            
 #                              --------info sent------- -------info rcvd--------
 #QSO: freq  mo date       time call          rst exch   call          rst exch  
 #QSO: ***** ** yyyy-mm-dd nnnn ************* nnn ****** ************* nnn ******
@@ -185,43 +227,80 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         if call in keys:
             #print('hist=',HIST[call])
             ITUz=HIST[call]['ituz']
-            #if int(ITUz)!=zone:
             if not ITUz in [str(zone),num_in]:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
+                print('rec=',rec)
                 print(call,':  Current:',num_in,' - History:',ITUz)
                 self.list_all_qsos(call,qsos)
                 print(' ')
-                if not ITUz.isdigit():
-                    sys.exit(0)
+                if not ITUz.isdigit() and TRAP_ERRORS:
+                    #sys.exit(0)
+                    input('Pres <CR> to continue ...')
 
         else:
             print('\n++++++++++++ Warning - no history for call:',call)
+            print('rec=',rec)
             self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
-            if dx_station.ituz!=zone and not call in SPECIAL_CALLS:
+            if dx_station.ituz!=zone and zone>0 and not call in SPECIAL_CALLS and TRAP_ERRORS:
                 print('Zone     =',dx_station.ituz,zone)
                 pprint(vars(dx_station))
                 sys.exit(0)
         
         return line
-                        
+
+    # Routine to sift through station we had multiple contacts with to identify any discrepancies
+    def check_multis(self,qsos):
+
+        problem=False
+        for call in self.EXCHANGES.keys():
+            exchs=self.EXCHANGES[call]
+            mismatch = exchs.count(exchs[0]) != len(exchs)
+            if mismatch:
+                if not problem:
+                    print('There are discrepancies with multiple qsos with the following stations:')
+                print('call=',call,'\texchanges=',exchs)
+                problem=True
+                
+        if not problem:
+            print('There are were no other discrepancies found.')
+        elif TRAP_ERRORS:
+            print('\nCheck Multis - TRAPPED ERROR\n')
+            sys.exit(0)
+    
+    
     # Summary & final tally
     def summary(self):
 
         print('ZONES:',self.ZONES)
-        mults=0
+        nmults=0
+        nzones=0
+        nhq=0
         for b in self.BANDS:
-            zones = list( self.ZONES[b] )
-            zones.sort()
-            print('\n',b,'Zones:',zones)
-            print(b,' No. QSOs:',self.NQSOS[b],'\tMults:',len(zones),'\tPoints:',self.POINTS[b])
-            mults+=len(zones)
+            mults = list( self.ZONES[b] )
+            mults.sort()
+            print('\n',b,'Mults:',mults)
+            hq    = []
+            zones = []
+            for mult in mults:
+                if mult.isnumeric():
+                    zones.append(mult)
+                else:
+                    hq.append(mult)
+            print(b,'Zones:',zones,len(zones))
+            print(b,'HQ   :',hq,len(hq))
+            print(b,' No. QSOs:',self.NQSOS[b],'\tZones:',len(zones),'\tHQ:',len(hq),'\tPoints:',self.POINTS[b])
+            nzones += len(zones)
+            nhq    += len(hq)
+            nmults += len(zones)+len(hq)
 
-        print('\nNo. QSOs      =',self.nqsos)
-        print('No. Uniques   =',self.nqsos2)
-        print('QSO points    =',self.total_points)
-        print('Multipliers   =',mults)
-        print('Claimed Score =',self.total_points*mults)
+        print('\nNo. QSOs        =',self.nqsos)
+        print('No. Uniques     =',self.nqsos2)
+        print('QSO points      =',self.total_points)
+        print('No. Zones       =',nzones)
+        print('No. HQ          =',nhq)
+        print('No. Multipliers =',nmults)
+        print('Claimed Score   =',self.total_points*nmults)
         
 # From log submission        
 #QSOs in Log:	163

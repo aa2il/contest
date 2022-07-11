@@ -77,6 +77,10 @@ class CONTEST_SCORING:
         self.MY_PREC     = P.SETTINGS['MY_PREC']
         self.MY_CHECK    = int( P.SETTINGS['MY_CHECK'] )
         self.MY_GRID     = P.SETTINGS['MY_GRID']
+
+        # Multi-qsos
+        self.EXCHANGES = OrderedDict()
+        
         
     # Routine to group modes according to cw, digi or phone
     def group_modes(self,mode):
@@ -169,7 +173,10 @@ class CONTEST_SCORING:
             if dx>=thresh and dx<1.0:
                 if True:
                     qth  = rec["qth"].upper()
-                    name = rec["name"].upper()
+                    if 'name' in rec:
+                        name = rec["name"].upper()
+                    else:
+                        name=''
                     band = rec["band"]
                     print('call=',call,'\t\tname=',name,'\t\tqth=',qth,'\t\tband=',band,'\t\tdist=',dx)
                 else:
@@ -188,7 +195,10 @@ class CONTEST_SCORING:
             if call==call2:
                 if True:
                     qth  = rec["qth"].upper()
-                    name = rec["name"].upper()
+                    if 'name' in rec:
+                        name = rec["name"].upper()
+                    else:
+                        name=''
                     band = rec["band"]
                     print('call=',call,'\tname=',name,'\tqth=',qth,'\tband=',band)
 

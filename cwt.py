@@ -63,10 +63,17 @@ class CWT_SCORING(CONTEST_SCORING):
 
         if session!=None:
             start_time=session
-        elif today=='Thursday' and hour<3:
-            # Must be looking at previous session
-            start_time=19
-            day-=1
+        elif today=='Thursday':
+            if hour<3:
+                # Must be looking at previous session
+                start_time=19
+                day-=1
+            elif hour>=7:
+                # 0700 Session
+                start_time=7
+            else:
+                # 0300 Session
+                start_time=3
         elif hour>=19 and hour<24:
             start_time=19
         elif hour>=0 and hour<19:
@@ -85,7 +92,7 @@ class CWT_SCORING(CONTEST_SCORING):
             print('hour=',hour)
             print('date0=',self.date0)
             print('date1=',self.date1)
-            #sys.exit(0)
+            sys.exit(0)
 
         # Name of output file
         self.output_file = self.MY_CALL+'.LOG'
