@@ -188,25 +188,6 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         return line
 
 
-    # Routine to sift through station we had multiple contacts with to identify any discrepancies
-    def check_multis(self,qsos):
-
-        problem=False
-        for call in self.EXCHANGES.keys():
-            exchs=self.EXCHANGES[call]
-            mismatch = exchs.count(exchs[0]) != len(exchs)
-            if mismatch:
-                if not problem:
-                    print('There are discrepancies with multiple qsos with the following stations:')
-                print('call=',call,'\texchanges=',exchs)
-                problem=True
-                
-        if not problem:
-            print('There are were no other discrepancies found.')
-        elif TRAP_ERRORS:
-            print('\nCheck Multis - TRAPPED ERROR\n')
-            sys.exit(0)
-    
     # Summary & final tally
     def summary(self):
         

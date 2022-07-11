@@ -219,9 +219,27 @@ class CONTEST_SCORING:
     def check_multis(self,qsos):
 
         print('\nThere were multiple qsos with the following stations:')
-        print('NEED SOME CODE FOR THIS CONTEST - see vhf.py for an example\n')
-        print('There might be a generic fix to this already in FD.PY - try it on next contest')
 
+        problem=False
+        for call in self.EXCHANGES.keys():
+            exchs=self.EXCHANGES[call]
+            if len(exchs)>1:
+                print(call,'\t',len(exchs))
+            mismatch = exchs.count(exchs[0]) != len(exchs)
+            if mismatch:
+                if not problem:
+                    print('There are discrepancies with multiple qsos with the following stations:')
+                print('call=',call,'\texchanges=',exchs)
+                problem=True
+                
+        if not problem:
+            print('There are were no other discrepancies found.\n')
+        elif TRAP_ERRORS:
+            print('\nCheck Multis - TRAPPED ERROR\n')
+            sys.exit(0)
+    
+    
+        
     #######################################################################################
 
     # Routien to check consistency of serial out
