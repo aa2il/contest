@@ -33,6 +33,7 @@ from difflib import SequenceMatcher
 
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
+from scp import *
 
 ############################################################################################
 
@@ -80,7 +81,9 @@ class CONTEST_SCORING:
 
         # Multi-qsos
         self.EXCHANGES = OrderedDict()
-        
+
+        # Init super check partial
+        self.SCP=SUPER_CHECK_PARTIAL()
         
     # Routine to group modes according to cw, digi or phone
     def group_modes(self,mode):

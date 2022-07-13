@@ -239,6 +239,12 @@ class IARU_HF_SCORING(CONTEST_SCORING):
 
         else:
             print('\n++++++++++++ Warning - no history for call:',call)
+            scp=self.SCP.match(call)
+            if len(scp)>0 and call==scp[0]:
+                txt='*** Known Contester - YIPPEE! ***'
+            else:
+                txt='*** Uh oh - call not a known contester :-( :-( :-('
+            print('Calls matching',call,':',scp,'\t',txt)
             print('rec=',rec)
             self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
