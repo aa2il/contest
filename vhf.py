@@ -3,7 +3,7 @@
 # vhf.py - Rev 1.0
 # Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
 #
-# Routines for scoring ARRL VHF contest.
+# Routines for scoring ARRL & CQ VHF contests.
 #
 ############################################################################################
 #
@@ -33,23 +33,28 @@ TRAP_ERRORS = True
 
 ############################################################################################
     
-# Scoring class for ARRL VHF contest - Inherits the base contest scoring class
-class ARRL_VHF_SCORING(CONTEST_SCORING):
+# Scoring class for ARRL & CQ VHF contest - Inherits the base contest scoring class
+class VHF_SCORING(CONTEST_SCORING):
 
-    def __init__(self,P):
+    def __init__(self,P,SPONSER):
 
-        # Determine contest based on month
+        self.SPONSER=SPONSER
+
+        # Determine contest based on sponser and month
         now = datetime.datetime.utcnow()
         month = now.strftime('%b').upper()
         print('month=',month)
 
         # Init base class
-        CONTEST_SCORING.__init__(self,P,'ARRL-VHF-'+month,mode='MIXED')
-
-        # Init special items for this class
-        #self.MY_CALL = P.SETTINGS['MY_CALL']
-        #self.MY_GRID = P.SETTINGS['MY_GRID']
-        #self.MY_SEC  = P.SETTINGS['MY_SEC']
+        dm=0
+        if SPONSER=='ARRL':
+            contest_name=SPONSER+'-VHF-'+month
+            if month=='JUL':
+                month='JUN'
+                dm=1
+        else:
+            contest_name=SPONSER+'-VHF'
+        CONTEST_SCORING.__init__(self,P,contest_name,mode='MIXED')
 
         self.BANDS = ['6m','2m','70cm']
         self.NQSOS = OrderedDict()
@@ -66,20 +71,25 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
         for m in self.MODES:
             self.Nmode[m]=0
 
-        # History file
-        #self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
-        
-        # Contest occurs on 2nd full weekend of June and Sept. For Jan, either 3rd or 4th
-        day1=datetime.date(now.year,now.month,1).weekday()             # Day of week of 1st of month 0=Monday, 6=Sunday
+        # ARRL contest occurs on 2nd full weekend of June and Sept. For Jan, either 3rd or 4th
+        # CQ contest occurs on 3rd full weekend in July ?
+        day1=datetime.date(now.year,now.month-dm,1).weekday()             # Day of week of 1st of month 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 2nd Saturday = 1 since day1 is the 1st of the month
                                                                        #    no. days until 1st Saturday (day 5) + 7 more days 
         if month=='JAN':
             sat2+=7                                                    # 3rd Saturday
             start=19                                                   # Jan starts at 1900 UTC on Saturday ...
+            hrs=33                                                     # ARRl contest is for 33 hours
+        elif SPONSER=='CQ' and month=='JUL':
+            # CQ WW VHF
+            sat2+=7                                                    # 3rd Saturday
+            start=18                                                   # CQ WW starts at 1800 UTC on Saturday ...
+            hrs=27                                                     # CQ contest is for 27 hours
         else:
             start=18                                                   # June & Sept start at 1800 UTC on Saturday ...
-        self.date0=datetime.datetime(now.year,now.month,sat2,start) 
-        self.date1 = self.date0 + datetime.timedelta(hours=33)         # ... and ends at 0300/0400 UTC on Monday
+            hrs=33                                                     # ARRl contest is for 33 hours
+        self.date0=datetime.datetime(now.year,now.month-dm,sat2,start) 
+        self.date1 = self.date0 + datetime.timedelta(hours=hrs)    
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
         #sys.exit(0)
 
@@ -88,14 +98,24 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             self.date0 = datetime.datetime.strptime( "20210612 1800" , "%Y%m%d %H%M")  # Start of contest
             self.date0 = datetime.datetime.strptime( "20210911 1800" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = date0 + datetime.timedelta(hours=33)
-      
+
+        # Playing with dates
+        if False:
+            print('now=',now,now.month-dm,month)
+            print(SPONSER)
+            print('day1=',day1,datetime.date(now.year,now.month-dm,1))
+            print(self.date0)
+            print(self.date1)
+            sys.exit(0)
+            
         # Name of output file
-        self.output_file = self.MY_CALL+'_'+month+'_VHF_'+str(self.date0.year)+'.LOG'
+        self.output_file = self.MY_CALL+'_'+SPONSER+'_'+month+'_VHF_'+str(self.date0.year)+'.LOG'
         
     # Contest-dependent header stuff
     def output_header(self,fp):
         fp.write('LOCATION: %s\n' % self.MY_SEC)
         fp.write('ARRL-SECTION: %s\n' % self.MY_SEC)
+        fp.write('GRID-LOCATOR: %s\n' % self.MY_GRID)
                     
     # Scoring routine for ARRL VHF contest for a single qso
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
@@ -131,15 +151,18 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
             grid=a[0]
             print(call,a,grid)
 
-        # Check for valid grid
+        # Check for valid band and grid 
         valid = len(grid)==4 and grid[0:2].isalpha() and grid[2:4].isdigit()
-        if not valid:
-            print('\nVHF SCORING: Not a valid grid: call=',call,'\tgrid=',grid)
+        valid2 = band in ['6m','2m','70cm']
+        if not valid2:
+            print('Skipping QSO from',band,'band')
+            return
+        elif not valid:
+            print('\nVHF SCORING: Not a valid grid: call=',call,'\tgrid=',grid,'\tband=',band)
             if TRAP_ERRORS:
                 sys.exit(0)
-
-        # Add to list of grids for each band
-        if valid:
+        else:
+            # Add to list of grids for each band
             self.grids[band].add(grid)
         
         #print('call=',call)
@@ -161,7 +184,9 @@ class ARRL_VHF_SCORING(CONTEST_SCORING):
 
         self.nqsos+=1
         if not dupe:
-            if band=='70cm':
+            if self.SPONSER=='CQ' and band=='2m':
+                qso_points=2
+            elif band=='70cm':
                 qso_points=2
             else:
                 qso_points=1

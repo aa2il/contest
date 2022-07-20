@@ -86,7 +86,7 @@ def open_output_file(P,outfile):
     fp.write('CATEGORY-TRANSMITTER: ONE\n');
     fp.write('CATEGORY-POWER: %s\n' % MY_POWER);
     
-    if contest=='FT8-RU' or contest=='ARRL-RTTY':
+    if contest in ['FT8-RU','ARRL-RTTY']:
         fp.write('CATEGORY-ASSISTED: ASSISTED\n');
     else:
         fp.write('CATEGORY-ASSISTED: NON-ASSISTED\n');
@@ -100,7 +100,9 @@ def open_output_file(P,outfile):
     
     #fp.write('CLAIMED-SCORE: \n',);
     fp.write('OPERATORS: %s\n' % MY_CALL);
-    fp.write('CLUB: \n',);
+    MY_CLUB='SCCC'
+    MY_CLUB='SOUTHERN CALIFORNIA CONTEST CLUB'
+    fp.write('CLUB: %s\n' % MY_CLUB);
     fp.write('NAME: Joseph B. Attili\n');
     fp.write('ADDRESS: PO Box 2036\n');
     fp.write('ADDRESS: Ramona, CA 92065\n');
@@ -401,7 +403,7 @@ print(" ")
 print('Start time gap:\t\t%8.1f minutes\t=%8.1f hours' % (gap_min0,gap_min0/60.) )
 gap_min = (P.sc.date1 - date_off).total_seconds() / 60.0
 cum_gap += gap_min
-print('Stop time gap:\t\t%8.1f minutes' % gap_min)
+print('Stop time gap:\t\t%8.1f minutes\t=%8.1f hours'  % (gap_min,gap_min/60.) )
 print('Total time off:\t\t%8.1f minutes\t=%8.1f hours' % (cum_gap, cum_gap/60.) )
 duration = (P.sc.date1 - P.sc.date0).total_seconds() / 60.0
 print('Contest duration:\t%8.1f minutes \t=%8.1f hours' %(duration,duration/60.) )

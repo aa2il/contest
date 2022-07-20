@@ -66,6 +66,7 @@ class PARAMS:
         arg_proc.add_argument('-ft8ru', action='store_true',help='FT8 Round Up')
         arg_proc.add_argument('-ten', action='store_true',help='ARRL 10 Meter')
         arg_proc.add_argument('-vhf', action='store_true',help='ARRL VHF')
+        arg_proc.add_argument('-cqvhf', action='store_true',help='CQ WW VHF')
         arg_proc.add_argument('-fd', action='store_true',help='ARRL Field Day')
         arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
         arg_proc.add_argument('-cwt',help='CW Ops Mini-Test',
@@ -155,10 +156,14 @@ class PARAMS:
             fname = 'AA2IL.adif'
             output_file = 'AA2IL_10m_2020.LOG'
     
-        elif args.vhf:
+        elif args.vhf or args.cqvhf:
 
-            # ARRL VHF+ Contests
-            sc = ARRL_VHF_SCORING(P)
+            # ARRL & CQ WW VHF Contests
+            if args.vhf:
+                org='ARRL'
+            else:
+                org='CQ'
+            sc = VHF_SCORING(P,org)
             self.sc=sc
 
             # Need to merge FT8 and CW/Phone logs
