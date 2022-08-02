@@ -35,7 +35,7 @@ TRAP_ERRORS = True
 class NAQP_SCORING(CONTEST_SCORING):
  
     def __init__(self,P,MODE):
-        CONTEST_SCORING.__init__(self,'NAQP-'+MODE,mode=MODE)
+        CONTEST_SCORING.__init__(self,P,'NAQP-'+MODE,mode=MODE)
         print('NAQP Scoring Init')
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
@@ -45,16 +45,29 @@ class NAQP_SCORING(CONTEST_SCORING):
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)))        
 
-        # Determine contest time - assumes this is dones wihtin a few hours of the contest
+        # Aug CW contest occurs on 1st full weekend of Aug
+        # Need to update this for other events
         now = datetime.datetime.utcnow()
-        day=7
+        year=now.year
+        year=2021                                                   # Override
+        day1=datetime.date(year,8,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat1=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
         start_hour=18
-        self.date0=datetime.datetime(now.year,now.month,day,start_hour)
-        self.date1 = self.date0 + datetime.timedelta(hours=12)
-                
+        self.date0=datetime.datetime(year,8,sat1,start_hour)       # Contest starts at 1800 UTC on Saturday ...
+        self.date1 = self.date0 + datetime.timedelta(hours=12)         # ... and ends at 0600 UTC on Sunday
+        print('day1=',day1,'\tsat1=',sat1,'\tdate0=',self.date0)
+        #sys.exit(0)
+        
+        # Name of output file
+        self.output_file = self.MY_CALL+'_NAQP_'+MODE+'_'+str(self.date0.year)+'.LOG'
 
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_STATE)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
+                            
     # Scoring routine for NAQP CW and RTTY
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print('rec=',rec)
         keys=list(HIST.keys())
 

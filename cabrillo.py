@@ -2,14 +2,14 @@
 ############################################################################################
 #
 # cabrillo.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Program to convert contest log to cabrillo format and compute claimed score.
 #
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #
 # NOTE:
-#     Most up-to-date contest module is the RTTY CONTEST.
+#     Most up-to-date contest module is the IARU CONTEST.
 #     Use it as model for subsequent contests
 #
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -65,12 +65,12 @@ def open_output_file(P,outfile):
         sys.exit(0)
 
     """
-    if contest=='IARU-HF' or contest=='WW-DIGI':
+    if contest=='WW-DIGI':
         fp.write('LOCATION: %s\n' % MY_SECTION)
         fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
-    elif contest=='MAKROTHEN-RTTY' or contest=='ARRL-RTTY' or contest=='NAQP-CW' or \
+    elif contest=='MAKROTHEN-RTTY' or contest=='ARRL-RTTY' or \
          contest=='NAQP-RTTY' or contest=='FT8-RU' or \
-    contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW' or\
+         contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW' or\
          contest=='ARRL 10':
         fp.write('LOCATION: %s\n' % MY_STATE)
     elif contest=='13 Colonies Special Event' or \
@@ -233,12 +233,6 @@ for rec in qsos2:
         
 qsos.sort(key=lambda x: x['time_stamp'])
 
-# Other qso fix-ups to make things easier later on
-if P.sc.contest=='NAQP-CW' or P.sc.contest=='NAQP-RTTY':
-    for rec in qsos:
-        if 'qth' not in rec:
-            rec["qth"]  = rec["srx_string"].upper()
-
 # Open output file
 print('Output File=',P.output_file)
 fp=open_output_file(P,P.output_file)
@@ -400,7 +394,9 @@ else:
 print(" ")
 
 # Actual stop time & average qso rate
-print('Start time gap:\t\t%8.1f minutes\t=%8.1f hours' % (gap_min0,gap_min0/60.) )
+print('Start Date/Time:',P.sc.date0)
+print('End   Date/Time:',P.sc.date1)
+print('\nStart time gap:\t\t%8.1f minutes\t=%8.1f hours' % (gap_min0,gap_min0/60.) )
 gap_min = (P.sc.date1 - date_off).total_seconds() / 60.0
 cum_gap += gap_min
 print('Stop time gap:\t\t%8.1f minutes\t=%8.1f hours'  % (gap_min,gap_min/60.) )

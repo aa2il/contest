@@ -246,15 +246,19 @@ class PARAMS:
             DIR_NAME = '~/.fllog/'
     
         elif args.naqpcw:
+
+            # North American QSO Party CW
             sc = NAQP_SCORING(P,'CW')
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            date0=sc.date0
-            date1=sc.date1
+            self.sc=sc
             
-            print(contest)
-            print(MY_MODE)
-            print(date0)
+            #contest=sc.contest
+            #MY_MODE=sc.my_mode
+            #date0=sc.date0
+            #date1=sc.date1
+            
+            #print(contest)
+            #print(MY_MODE)
+            #print(date0)
             #sys.exit(0)
             
             if False:
@@ -265,19 +269,6 @@ class PARAMS:
             fname = 'AA2IL.adif'
             DIR_NAME = '../pyKeyer/'
             history = 'HIST_DIR/master.csv'
-
-            """
-            #history = '../data/NAQPCW.txt'
-            #history = '../data/NAQP_CallHistory_AOCC072717.txt'
-            history = 'data/NAQP_Call_History_Aug2018.txt'
-            history = 'HIST_DIR/master.csv'
-            #DIR_NAME = './'
-            #fname = 'AA2IL.LOG'
-            DIR_NAME = '../pyKeyer/'
-            fname = 'AA2IL.adif'
-            DIR_NAME = '../../logs/'
-            fname = 'aa2il_2019.adif'
-            """
 
         elif args.wwcw:
             contest='CQ-WW-CW'
