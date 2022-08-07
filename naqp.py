@@ -43,15 +43,18 @@ class NAQP_SCORING(CONTEST_SCORING):
         self.MY_STATE    = P.SETTINGS['MY_STATE']
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
+        self.band_cnt = np.zeros((len(self.BANDS)))
         self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)))        
+        self.time_limit = 10                     # Operating time limit is hours
+        self.TRAP_ERRORS = TRAP_ERRORS
 
         # Aug CW contest occurs on 1st full weekend of Aug
         # Need to update this for other events
         now = datetime.datetime.utcnow()
         year=now.year
-        year=2021                                                   # Override
-        day1=datetime.date(year,8,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
-        sat1=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+        #year=2021                                                   # Override
+        day1=datetime.date(year,8,1).weekday()                      # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat1=1 + ((5-day1) % 7)                                     # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
         start_hour=18
         self.date0=datetime.datetime(year,8,sat1,start_hour)       # Contest starts at 1800 UTC on Saturday ...
         self.date1 = self.date0 + datetime.timedelta(hours=12)         # ... and ends at 0600 UTC on Sunday
@@ -116,21 +119,29 @@ class NAQP_SCORING(CONTEST_SCORING):
         if qth=='PY':
             qth='DX'
 
-        try:
-            idx1 = NAQP_SECS.index(qth)
-            idx2 = self.BANDS.index(band)
-            self.sec_cnt[idx1,idx2] = 1
-        except:
-            print('\n$$$$$$$$$$$$$$$$$$$$$$')
-            print(qth,' not found in list of NAQP sections',len(qth))
-            print(rec)
-            print('$$$$$$$$$$$$$$$$$$$$$$')
-            if TRAP_ERRORS:
-                sys.exit(0)
-    
         if not dupe:
             self.nqsos2 += 1;
 
+            try:
+                idx1 = NAQP_SECS.index(qth)
+                idx2 = self.BANDS.index(band)
+                self.band_cnt[idx2] += 1
+                self.sec_cnt[idx1,idx2] = 1
+            except:
+                print('\n$$$$$$$$$$$$$$$$$$$$$$')
+                print(qth,' not found in list of NAQP sections',len(qth))
+                print(rec)
+                print('$$$$$$$$$$$$$$$$$$$$$$')
+                if TRAP_ERRORS:
+                    sys.exit(0)
+    
+            # Info for multi-qsos
+            exch_in=name+' '+qth
+            if call in self.EXCHANGES.keys():
+                self.EXCHANGES[call].append(exch_in)
+            else:
+                self.EXCHANGES[call]=[exch_in]
+                
 #                              ----------info sent----------- ----------info rcvd----------- 
 #QSO: freq  mo date       time call            ex1        ex2 call            ex1        ex2 t
 #QSO: ***** ** yyyy-mm-dd nnnn **********      aaaaaaaaaa aaa **********      aaaaaaaaaa aaa n
@@ -173,9 +184,13 @@ class NAQP_SCORING(CONTEST_SCORING):
 
         mults1 = np.sum(self.sec_cnt,axis=0)
         mults = [int(i) for i in mults1]
-        print('nqsos2=',self.nqsos2)
-        print('mults=',mults,'  =  ',int(sum(mults)))
-        print('total score=',sum(mults)*self.nqsos2)
+        
+        print('\nNo. QSOs        =',self.nqsos1)
+        print('No. Uniques     =',self.nqsos2)
+        print('No. Skipped     =',self.nskipped)
+        print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
+        print('Mults           =',mults,'  =  ',int(sum(mults)))
+        print('Claimed score=',sum(mults)*self.nqsos2)
         if False:
             for j in range(len(BANDS)):
                 print(BANDS[j])

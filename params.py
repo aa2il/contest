@@ -250,25 +250,10 @@ class PARAMS:
             # North American QSO Party CW
             sc = NAQP_SCORING(P,'CW')
             self.sc=sc
-            
-            #contest=sc.contest
-            #MY_MODE=sc.my_mode
-            #date0=sc.date0
-            #date1=sc.date1
-            
-            #print(contest)
-            #print(MY_MODE)
-            #print(date0)
-            #sys.exit(0)
-            
-            if False:
-                # Manual override
-                date0 = datetime.datetime.strptime( "20190112 1800" , "%Y%m%d %H%M")  # Start of contest
-                date1 = date0 + datetime.timedelta(hours=12)
-                
-            fname = 'AA2IL.adif'
-            DIR_NAME = '../pyKeyer/'
-            history = 'HIST_DIR/master.csv'
+
+            self.history = HIST_DIR+'master.csv'
+            fname = MY_CALL+'.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
 
         elif args.wwcw:
             contest='CQ-WW-CW'

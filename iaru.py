@@ -56,7 +56,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             self.NQSOS[b]=0
             self.POINTS[b]=0
         self.ZONES = OrderedDict(zones)
-        self.nqsos=0
+        #self.nqsos=0
 
         # Determine contest time - assumes this is dones wihtin a few hours of the contest
         if False:
@@ -182,7 +182,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             sys,exit(0)
 
         # Determine multipliers
-        self.nqsos+=1
+        #self.nqsos+=1
         SPECIAL_CALLS=[]                # For 2021: ['TO5GR']
         if not dupe:
             if zone==self.MY_ITU_ZONE or zone==0:
@@ -280,7 +280,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             nhq    += len(hq)
             nmults += len(zones)+len(hq)
 
-        print('\nNo. QSOs        =',self.nqsos)
+        print('\nNo. QSOs        =',self.nqsos1)
         print('No. Uniques     =',self.nqsos2)
         print('QSO points      =',self.total_points)
         print('No. Zones       =',nzones)

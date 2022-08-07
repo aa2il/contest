@@ -250,6 +250,8 @@ time_cw=[0]
 dts=[10*60]
 times5=[0]
 tlast=P.sc.date0
+nqsos=0
+op_time=0
 for i in range(len(qsos)):
     rec=qsos[i]
     #print('\n',i,rec)
@@ -258,6 +260,7 @@ for i in range(len(qsos)):
 
     # Ignore entries outside contest window - this is now done above so can eventually clean this up
     if date_off>=P.sc.date0 and date_off<=P.sc.date1:
+        nqsos+=1
         #print i,rec
 
         if False:
@@ -277,7 +280,7 @@ for i in range(len(qsos)):
             mins = 10
             rate_window = datetime.timedelta(minutes=mins)
             t0 = date_off
-            print('t0=',t0,'\t\tcall=',rec['call'])
+            print('t0=',t0,'\n',nqsos,'\tFirst call=',rec['call'],'\t',rec['band'])
 
             # Actual start time
             gap_min0 = (date_off - P.sc.date0).total_seconds() / 60.0
@@ -301,18 +304,6 @@ for i in range(len(qsos)):
                 print('rec=',rec)
                 sys.exit(0)
                 
-            #print('t1=',t1)
-            dt=(t1-t0).total_seconds() / 60.0
-            if P.sc.contest!='Specific Call':
-                print('dt=',int(dt+.5),'\t\trate = ',qrate,' per hour\t\t',
-                      rec['call'],'\t',rec['mode'],'\t',rec['band'],'\t',df==0)
-                times.append(dt/60.)
-                rates.append(qrate)
-                if rec['mode']=='CW':
-                    time_cw.append(dt/60.)
-                else:
-                    time_cw.append(np.nan)
-                    
             if j==i:
                 gap_min = (date_off - qsos[i-1]['time_stamp']).total_seconds() / 60.0
                 if P.sc.contest!='Specific Call':
@@ -320,20 +311,40 @@ for i in range(len(qsos)):
                 if gap_min>30:
                     cum_gap += gap_min
 
+            #print('t1=',t1)
+            dt=(t1-t0).total_seconds() / 60.0
+            if P.sc.contest!='Specific Call':
+                op_time=( (t1 - P.sc.date0).total_seconds()/60.0 - cum_gap)/60.
+                print(nqsos,'\t',op_time,'\tdt=',int(dt+.5),'\t\trate = ',qrate,' per hour\t\t',
+                      rec['call'],'\t',rec['mode'],'\t',rec['band'],'\t',df==0)
+                times.append(dt/60.)
+                rates.append(qrate)
+                if rec['mode']=='CW':
+                    time_cw.append(dt/60.)
+                else:
+                    time_cw.append(np.nan)
+
+        # Keep track of instantaneous rate as well
+        #if not rapid:
+        dt1=(date_off-P.sc.date0).total_seconds() / 3600.
+        times5.append(dt1)
+        dt2 = (date_off-tlast).total_seconds()
+        dts.append(dt2)
+        tlast = date_off
+                    
+        # Check for operating time limit - NAQP has this (as do others)
+        if op_time>P.sc.time_limit and True:
+            print('<<<<<<<<<<< Op time limit exceeded - skipped >>>>>>>>>>>>>>\n')
+            P.sc.nskipped+=1
+            continue
+
+        # Check for rapid dupes - this often happens with FT4/8
         dupe,rapid = P.sc.check_dupes(rec,qsos,i,istart)
         if rapid and (P.sc.contest!='FT8-RU' or False):
             print('<<<<<<<<<<< RAPID dupe skipped >>>>>>>>>>>>>>\n')
             P.sc.nskipped+=1
             continue
 
-        # Keep track of instantaneous rate as weel
-        if not rapid:
-            dt1=(date_off-P.sc.date0).total_seconds() / 3600.
-            times5.append(dt1)
-            dt2 = (date_off-tlast).total_seconds()
-            dts.append(dt2)
-            tlast = date_off
-                    
         if P.sc.contest=='13 Colonies Special Event':
             # This one has a different API - leaving it like this for now
             # but would be nice to be consistent!

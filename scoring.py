@@ -66,6 +66,8 @@ class CONTEST_SCORING:
         self.trap_errors = True
         self.num_prev    = 0
         self.rec_prev    = []
+        self.time_limit  = 365*24                     # Operating time limit
+        self.TRAP_ERRORS = False
 
         # History file
         self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
@@ -224,20 +226,25 @@ class CONTEST_SCORING:
         print('\nThere were multiple qsos with the following stations:')
 
         problem=False
+        nproblems=0
         for call in self.EXCHANGES.keys():
             exchs=self.EXCHANGES[call]
             if len(exchs)>1:
-                print(call,'\t',len(exchs))
+                print(call,'\t',len(exchs),'\t',exchs[0])
             mismatch = exchs.count(exchs[0]) != len(exchs)
             if mismatch:
                 if not problem:
+                    nproblems+=1
                     print('There are discrepancies with multiple qsos with the following stations:')
                 print('call=',call,'\texchanges=',exchs)
                 problem=True
                 
         if not problem:
-            print('There are were no other discrepancies found.\n')
-        elif TRAP_ERRORS:
+            if nproblems>0:
+                print('There are were no other discrepancies found.\n')
+            else:
+                print('There were no discrepancies found.\n')
+        elif self.TRAP_ERRORS:
             print('\nCheck Multis - TRAPPED ERROR\n')
             sys.exit(0)
     
