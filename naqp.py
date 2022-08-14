@@ -45,7 +45,6 @@ class NAQP_SCORING(CONTEST_SCORING):
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros((len(self.BANDS)))
         self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)))        
-        self.time_limit = 10                     # Operating time limit is hours
         self.TRAP_ERRORS = TRAP_ERRORS
 
         # Aug CW contest occurs on 1st full weekend of Aug
@@ -61,8 +60,8 @@ class NAQP_SCORING(CONTEST_SCORING):
         print('day1=',day1,'\tsat1=',sat1,'\tdate0=',self.date0)
         #sys.exit(0)
         
-        # Name of output file
-        self.output_file = self.MY_CALL+'_NAQP_'+MODE+'_'+str(self.date0.year)+'.LOG'
+        # Name of output file - stupid web uploader doesn't recognize .LOG extenion!
+        self.output_file = self.MY_CALL+'_NAQP_'+MODE+'_'+str(self.date0.year)+'.TXT'
 
     # Contest-dependent header stuff
     def output_header(self,fp):

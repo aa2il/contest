@@ -86,7 +86,7 @@ def open_output_file(P,outfile):
     fp.write('CATEGORY-TRANSMITTER: ONE\n');
     fp.write('CATEGORY-POWER: %s\n' % MY_POWER);
     
-    if contest in ['FT8-RU','ARRL-RTTY']:
+    if P.ASSISTED or contest in ['FT8-RU','ARRL-RTTY']:
         fp.write('CATEGORY-ASSISTED: ASSISTED\n');
     else:
         fp.write('CATEGORY-ASSISTED: NON-ASSISTED\n');
@@ -333,7 +333,8 @@ for i in range(len(qsos)):
         tlast = date_off
                     
         # Check for operating time limit - NAQP has this (as do others)
-        if op_time>P.sc.time_limit and True:
+        #if op_time>P.sc.time_limit and P.TIME_LIMIT:
+        if op_time>P.TIME_LIMIT:
             print('<<<<<<<<<<< Op time limit exceeded - skipped >>>>>>>>>>>>>>\n')
             P.sc.nskipped+=1
             continue

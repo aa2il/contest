@@ -66,7 +66,6 @@ class CONTEST_SCORING:
         self.trap_errors = True
         self.num_prev    = 0
         self.rec_prev    = []
-        self.time_limit  = 365*24                     # Operating time limit
         self.TRAP_ERRORS = False
 
         # History file

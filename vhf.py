@@ -25,6 +25,8 @@ import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
+from pyhamtools.locator import calculate_distance
+from latlon2maiden import distance_maidenhead
 
 ############################################################################################
     
@@ -40,6 +42,9 @@ class VHF_SCORING(CONTEST_SCORING):
 
         self.SPONSER=SPONSER
 
+        self.BANDS = ['6m','2m','1.25m','70cm']
+        self.sec_cnt = np.zeros((len(self.BANDS)))
+        
         # Determine contest based on sponser and month
         now = datetime.datetime.utcnow()
         month = now.strftime('%b').upper()
@@ -52,8 +57,15 @@ class VHF_SCORING(CONTEST_SCORING):
             if month=='JUL':
                 month='JUN'
                 dm=1
-        else:
+        elif SPONSER=='CQ':
             contest_name=SPONSER+'-VHF'
+        elif SPONSER=='SVHFS':
+            contest_name='50MHZ-FALL-SPRINT'
+        elif SPONSER=='NAMSS':
+            contest_name='NA-METEOR-SCATTER-SPRINT'
+        else:
+            print('\n*** ERROR - Invalid sponser ***\n')
+            sys.exit(0)
         CONTEST_SCORING.__init__(self,P,contest_name,mode='MIXED')
 
         self.BANDS = ['6m','2m','70cm']
@@ -85,6 +97,16 @@ class VHF_SCORING(CONTEST_SCORING):
             sat2+=7                                                    # 3rd Saturday
             start=18                                                   # CQ WW starts at 1800 UTC on Saturday ...
             hrs=27                                                     # CQ contest is for 27 hours
+        elif SPONSER=='SVHFS':
+            # SE VHF Soc 50 MHz Fall Sprint - not sure what their scheme is so just hardwire for noe
+            sat2=13
+            start=23
+            hrs=4
+        elif SPONSER=='NAMSS':
+            # NA Meteor Scatter Sprint - not sure what their scheme is so just hardwire for noe
+            sat2=12
+            start=15
+            hrs=48
         else:
             start=18                                                   # June & Sept start at 1800 UTC on Saturday ...
             hrs=33                                                     # ARRl contest is for 33 hours
@@ -171,20 +193,38 @@ class VHF_SCORING(CONTEST_SCORING):
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
-        if rec["mode"]=='FT8':
+        if self.SPONSER=='NAMSS' and rec["mode"] not in ['MSK144']:
+            return
+        elif rec["mode"] in ['FT8','FT4','MSK144']:
             mode='DG'
         elif rec["mode"]=='CW':
             mode='CW'
         elif rec["mode"]=='FM' or  rec["mode"]=='USB':
             mode='PH'
         else:
-            print('Unknown mode:',rec["mode"])
+            print('VHF SCORING: Unknown mode:',rec["mode"])
             if TRAP_ERRORS:
                 sys.exit(0)
 
         self.nqsos+=1
         if not dupe:
-            if self.SPONSER=='CQ' and band=='2m':
+            idx2 = self.BANDS.index(band)
+            self.sec_cnt[idx2] += 1
+
+            if self.SPONSER=='NAMSS':
+                dx_km1 = calculate_distance(grid,self.MY_GRID)
+                dx_km  = distance_maidenhead(self.MY_GRID,grid,False)
+                print('------------ call=',call,'\tgrid=',grid,'\tdx=',dx_km1,dx_km)
+                if dx_km<500 or dx_km>2400:
+                    dx_km=1
+                else:
+                    dx_km=int( dx_km + 0.5 )
+                if band=='2m':
+                    qso_points = dx_km
+                else:
+                    qso_points = 2*dx_km
+                print('------------ pts=',qso_points)
+            elif self.SPONSER=='CQ' and band=='2m':
                 qso_points=2
             elif band=='70cm':
                 qso_points=2
@@ -260,14 +300,21 @@ class VHF_SCORING(CONTEST_SCORING):
     def summary(self):
         
         print('GRIDS:',self.grids)
-        mults=0
-        for b in self.BANDS:
-            grids = list( self.grids[b] )
-            grids.sort()
-            print('\n',b,'Grids:',grids)
-            print(' No. QSOs,Mults:',self.NQSOS[b],len(grids))
-            mults+=len(grids)
+        if self.SPONSER=='NAMSS':
+            mults=1
+        else:
+            mults=0
+            for b in self.BANDS:
+                grids = list( self.grids[b] )
+                grids.sort()
+                print('\n',b,'Grids:',grids)
+                print(' No. QSOs,Mults:',self.NQSOS[b],len(grids))
+                mults+=len(grids)
 
+        print('\nBy Band:')
+        for b in self.BANDS:
+            idx2 = self.BANDS.index(b)
+            print('\t',b,':\t',self.sec_cnt[idx2])
         print('\nBy Mode:')
         for m in self.MODES:
             print('\t',m,':\t',self.Nmode[m])

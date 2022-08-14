@@ -67,6 +67,8 @@ class PARAMS:
         arg_proc.add_argument('-ten', action='store_true',help='ARRL 10 Meter')
         arg_proc.add_argument('-vhf', action='store_true',help='ARRL VHF')
         arg_proc.add_argument('-cqvhf', action='store_true',help='CQ WW VHF')
+        arg_proc.add_argument('-fall50', action='store_true',help='SE VHF Soc. 50 MHz Fall Sprint')
+        arg_proc.add_argument('-namss', action='store_true',help='NA Meteor Scatter Sprint')
         arg_proc.add_argument('-fd', action='store_true',help='ARRL Field Day')
         arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
         arg_proc.add_argument('-cwt',help='CW Ops Mini-Test',
@@ -84,8 +86,12 @@ class PARAMS:
         arg_proc.add_argument('-wpx', action='store_true',help='CQ WPX')
         arg_proc.add_argument('-iaru', action='store_true',help='IARU HF')
         arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
+        arg_proc.add_argument('-assisted', action='store_true',
+                              help='Used assitance (cluster, etc.)')
         arg_proc.add_argument("-i", help="Input ADIF file",
                               type=str,default=None)
+        arg_proc.add_argument("-limit", help="Time Limit (Hours)",
+                              type=int,default=10000)
         arg_proc.add_argument("-o", help="Output Cabrillo file",
         type=str,default='MY_CALL.txt')
         arg_proc.add_argument("-hist", help="History File",
@@ -101,6 +107,8 @@ class PARAMS:
         self.sc=None
 
         self.category_band='ALL'
+        self.TIME_LIMIT = args.limit
+        self.ASSISTED   = args.assisted
 
         P=CONFIG_PARAMS('.keyerrc')
         self.SETTINGS=P.SETTINGS
@@ -156,20 +164,27 @@ class PARAMS:
             fname = 'AA2IL.adif'
             output_file = 'AA2IL_10m_2020.LOG'
     
-        elif args.vhf or args.cqvhf:
+        elif args.vhf or args.cqvhf or args.fall50 or args.namss:
 
             # ARRL & CQ WW VHF Contests
             if args.vhf:
                 org='ARRL'
-            else:
+            elif args.cqvhf:
                 org='CQ'
+            elif args.fall50:
+                org='SVHFS'
+            elif args.namss:
+                org='NAMSS'
+            else:
+                print('\n*** ERROR - Invalid sponser ***\n')
+                sys.exit(0)
+                
             sc = VHF_SCORING(P,org)
             self.sc=sc
 
-            # Need to merge FT8 and CW/Phone logs
+            # Need to merge FT8 and CW/Phone logs from RPi
             fnames=[]
             DIR_NAME = '~/.fldigi/logs/'
-            #DIR_NAME='.'
             for fname in ['AA2IL.adif','wsjtx_log.adi']:
                 #for fname in ['AA2IL_VHF_Sep2021.adif','wsjtx_VHF_Sep2021.adi']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
