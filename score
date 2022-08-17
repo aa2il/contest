@@ -34,13 +34,15 @@ set CONTEST=""
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"                # Field Day
 #set CONTEST="cqp"
-set CONTEST="naqpcw"
+#set CONTEST="naqpcw"
 #set CONTEST="naqprtty"
 #set CONTEST="wwdigi"
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
 #set CONTEST="vhf"               # ARRL VHF - Jan, June & Sept.
 #set CONTEST="cqvhf"             # CQ WW VHF - July
+#set CONTEST="fall50"            # SE VHF Soc -  50 MHz Fall Sprint - August - svhfs.org
+#set CONTEST="namss"              # NA Meteor Scatter Sprint - August
 #set CONTEST="iaru"
 #set CONTEST="cols13"            # 13 colonies special event - worked in 2021
 #set CONTEST="sats"              # Satellites worked  - worked in 2021
@@ -49,6 +51,12 @@ set CONTEST="naqpcw"
 
 set SESSION=""
 #set SESSION="3"
+
+set TIME_LIMIT=""
+#set TIME_LIMIT="-limit 10"        # NAQP
+
+set ASSISTED=""
+set ASSISTED="-assisted"
 
 echo " "
 set d=`date`
@@ -72,8 +80,8 @@ echo $CONTEST
 
 ################################################################################
 
-echo cabrillo.py -$CONTEST $SESSION
-cabrillo.py -$CONTEST $SESSION
+echo cabrillo.py -$CONTEST $SESSION $TIME_LIMIT $ASSISTED
+cabrillo.py -$CONTEST $SESSION  $TIME_LIMIT $ASSISTED
 
 popd
 
@@ -84,10 +92,6 @@ popd
 
 # ARRL 10 meter
 #cabrillo.py -ten
-
-# NAQP - CW wasn't tested but should work, RTTY was tested
-#cabrillo.py -naqpcw 
-#cabrillo.py -naqprtty
 
 # CQ WW RTTY
 #cabrillo.py -wwrtty
