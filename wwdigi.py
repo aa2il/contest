@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # wwdigi.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring World Wide Digi contest.
 #
@@ -32,7 +32,7 @@ from pyhamtools.locator import calculate_distance
 class WWDIGI_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,'WW-DIGI',mode='DIGI')
+        CONTEST_SCORING.__init__(self,P,'WW-DIGI',mode='DIGI')
         print('WW DIGI Scoring Init')
 
         self.MY_CALL = P.SETTINGS['MY_CALL']
@@ -40,6 +40,7 @@ class WWDIGI_SCORING(CONTEST_SCORING):
         #self.MY_STATE    = P.SETTINGS['MY_STATE']
 
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
+        self.band_cnt = np.zeros((len(self.BANDS)))
         self.NQSOS = OrderedDict()
         grids = []
         for b in self.BANDS:
@@ -48,16 +49,44 @@ class WWDIGI_SCORING(CONTEST_SCORING):
         self.grid_fields = OrderedDict(grids)
         self.nqsos=0
 
-        # Determine contest time - assumes this is dones wihtin a few hours of the contest
+        # Determine contest time - last first weekend in August
         now = datetime.datetime.utcnow()
-        day=31
-        start_hour=12
-        self.date0=datetime.datetime(now.year,now.month,day,start_hour)
-        self.date1 = self.date0 + datetime.timedelta(hours=12)
-                
+        year=now.year
+        #year=2019                                                      # Override for testing
+        day1=datetime.date(year,8,1).weekday()                          # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat1=1 + ((5-day1) % 7)                                         # Day no. for 1st Saturday
+        sat2=sat1 + 3*7                                                 # Last Saturday of month
+        if sat2+7<=31:
+            sat2+=7
         
+        start_hour=12
+        self.date0=datetime.datetime(year,8,sat2,start_hour)
+        self.date1 = self.date0 + datetime.timedelta(hours=24)
+
+        if False:
+            # Manual override
+            self.date0 = datetime.datetime.strptime( "20190831 1200" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=24)
+        
+        # Playing with dates
+        if False:
+            print('now=',now)
+            print('day1=',day1)
+            print(self.date0)
+            print(self.date1)
+            sys.exit(0)
+            
+        # Name of output file
+        self.output_file = self.MY_CALL+'_WWDIGI_'+str(self.date0.year)+'.LOG'
+        
+    # Contest-dependent header stuff
+    def output_header(self,fp):
+        fp.write('LOCATION: %s\n' % self.MY_SEC)
+        fp.write('ARRL-SECTION: %s\n' % self.MY_SEC)
+        fp.write('GRID-LOCATOR: %s\n' % self.MY_GRID)
+                    
     # Scoring routine for ARRL VHF contest for a single qso
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print('\nrec=',rec)
 
         # Pull out relavent entries
@@ -95,7 +124,16 @@ class WWDIGI_SCORING(CONTEST_SCORING):
             self.total_points += qso_points
 
             self.NQSOS[band] +=1
+            idx2 = self.BANDS.index(band)
+            self.band_cnt[idx2] += 1
 
+            # Info for multi-qsos
+            exch_in=grid
+            if call in self.EXCHANGES.keys():
+                self.EXCHANGES[call].append(exch_in)
+            else:
+                self.EXCHANGES[call]=[exch_in]
+            
 #                              ------info sent------- ------info rcvd-------
 #QSO: freq  mo date       time call          exch     call          exch        t
 #QSO: ***** ** yyyy-mm-dd nnnn ************* ******** ************* ********    n
@@ -113,18 +151,24 @@ class WWDIGI_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
-        print('GRIDS:',self.grids)
+        avg_dx_km = self.total_km / self.nqsos2
+        print('\nLongest DX:',self.max_km,'km')
+        print(self.longest)
+        print('\nAverage DX:',avg_dx_km,'km\n')
+    
+        #print 'GRID FIELDS:',sc.grid_fields
         mults=0
-        for b in self.BANDS:
-            grids = list( self.grids[b] )
-            grids.sort()
-            print('\n',b,'Grids:',grids)
-            print(' No. QSOs,Mults:',self.NQSOS[b],len(grids))
-            mults+=len(grids)
+        for i in range(len(self.BANDS)):
+            b=self.BANDS[i]
+            fields = list( self.grid_fields[b] )
+            fields.sort()
+            print(b,'\tNo. QSOs:',self.band_cnt[i],'\tNo. Grid Fields:',len(fields),'\tGrid Fields:',fields,len(fields))
+            mults+=len(fields)
 
         print('\nNo. QSOs      =',self.nqsos)
         print('No. Uniques   =',self.nqsos2)
+        print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
         print('QSO points    =',self.total_points)
         print('Multipliers   =',mults)
         print('Claimed Score =',self.total_points*mults)
-    
+

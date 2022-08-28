@@ -65,9 +65,6 @@ def open_output_file(P,outfile):
         sys.exit(0)
 
     """
-    if contest=='WW-DIGI':
-        fp.write('LOCATION: %s\n' % MY_SECTION)
-        fp.write('ARRL-SECTION: %s\n' % MY_SECTION)
     elif contest=='MAKROTHEN-RTTY' or contest=='ARRL-RTTY' or \
          contest=='NAQP-RTTY' or contest=='FT8-RU' or \
          contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW' or\
@@ -378,31 +375,8 @@ fp.write('END-OF-LOG:\n')
 fp.close()
 
 print(" ")
-if P.sc.contest=='WW-DIGI':
-    avg_dx_km = sc.total_km / sc.nqsos2
-    print('\nLongest DX:',sc.max_km,'km')
-    print(sc.longest)
-    print('\nAverage DX:',avg_dx_km,'km')
-    
-    #print 'GRID FIELDS:',sc.grid_fields
-    mults=0
-    for b in sc.BANDS:
-        fields = list( sc.grid_fields[b] )
-        fields.sort()
-        print(b,'Grid Fields:',fields)
-        mults+=len(fields)
-
-    print('\nnqsos         =',sc.nqsos2)
-    print('qso points    =',sc.total_points)
-    print('mults         =',mults)
-    print('Claimed score =',sc.total_points*mults)
-
-    print('\n&&&&&&&&&&&&&&&& Need to update code &&&&&&&&&&&&&&&&&&&&&&&&&&&')
-    
-else:
-    P.sc.check_multis(qsos)
-    P.sc.summary()
-    
+P.sc.check_multis(qsos)
+P.sc.summary()
 print(" ")
 
 # Actual stop time & average qso rate

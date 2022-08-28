@@ -46,11 +46,6 @@ from call import *
 
 ################################################################################
 
-# User params
-#DIR_NAME = '~/.fldigi/logs/'
-
-################################################################################
-
 # Structure to contain processing params
 class PARAMS:
     def __init__(self):
@@ -210,27 +205,11 @@ class PARAMS:
     
         elif args.wwdigi:
             sc = WWDIGI_SCORING(P)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            date0=sc.date0
-            date1=sc.date1
-            
-            #print(contest)
-            #print(MY_MODE)
-            #print(date0)
-            #sys.exit(0)
-            
-            contest='WW-DIGI'
-            MY_MODE='DIGI'
-            
-            if True:
-                # Manual override
-                date0 = datetime.datetime.strptime( "20190831 1200" , "%Y%m%d %H%M")  # Start of contest
-                date1 = date0 + datetime.timedelta(hours=24)
-                
-            fname = '2019_rtty_ru.adi'
+            self.sc=sc
+
             DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
-            output_file = 'AA2IL.LOG'
+            #fname = '2019_rtty_ru.adi'
+            fname = 'wsjtx_log.adi'
 
         elif args.cwss:
             sc = ARRL_SS_SCORING(P)
