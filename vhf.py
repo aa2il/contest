@@ -63,6 +63,9 @@ class VHF_SCORING(CONTEST_SCORING):
             contest_name='50MHZ-FALL-SPRINT'
         elif SPONSER=='NAMSS':
             contest_name='NA-METEOR-SCATTER-SPRINT'
+            if month=='SEP':
+                month='AUG'
+                dm=1
         else:
             print('\n*** ERROR - Invalid sponser ***\n')
             sys.exit(0)
@@ -220,9 +223,9 @@ class VHF_SCORING(CONTEST_SCORING):
                 else:
                     dx_km=int( dx_km + 0.5 )
                 if band=='2m':
-                    qso_points = dx_km
-                else:
                     qso_points = 2*dx_km
+                else:
+                    qso_points = dx_km
                 print('------------ pts=',qso_points)
             elif self.SPONSER=='CQ' and band=='2m':
                 qso_points=2
