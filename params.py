@@ -68,7 +68,8 @@ class PARAMS:
         arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
         arg_proc.add_argument('-cwt',help='CW Ops Mini-Test',
                               nargs='*',type=int,default=None)
-        arg_proc.add_argument('-cwopen', action='store_true',help='CW Ops CW Open')
+        arg_proc.add_argument('-cwopen',help='CW Ops CW Open',
+                              nargs='*',type=int,default=None)
         arg_proc.add_argument('-mst',help='Medium  Speed Mini-Test',
                               nargs='*',type=int,default=None)
         arg_proc.add_argument('-sst', action='store_true',help='Slow Speed Mini-Test')
@@ -340,17 +341,19 @@ class PARAMS:
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
             
-        elif args.cwopen:
-            sc = CWOPEN_SCORING(P)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            category_band=sc.category_band
-            date0=sc.date0
-            date1=sc.date1
-            history = sc.history
-            
-            fname = 'AA2IL.adif'
-            DIR_NAME = '../pyKeyer/'
+        elif args.cwopen!=None:
+
+            # CW Ops CW Open
+            if len(args.cwopen)>0:
+                session=args.cwopen[0]
+            else:
+                session=None
+            sc = CWOPEN_SCORING(P,session)
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+            fname = MY_CALL+'.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
             
         elif args.mst!=None:
             print('mst=',args.mst)

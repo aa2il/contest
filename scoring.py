@@ -176,7 +176,10 @@ class CONTEST_SCORING:
             dx = similar(call,call2)
             if dx>=thresh and dx<1.0:
                 if True:
-                    qth  = rec["qth"].upper()
+                    if 'qth' in rec:
+                        qth  = rec["qth"].upper()
+                    else:
+                        qth = ''
                     if 'name' in rec:
                         name = rec["name"].upper()
                     else:
@@ -192,17 +195,18 @@ class CONTEST_SCORING:
         same=True
         name_old = None
         qth_old = None
-        #for i in range(0,len(qsos)):
-        #    rec=qsos[i]
         for rec in qsos:
             call = rec["call"].upper()
             if call==call2:
                 if True:
-                    qth  = rec["qth"].upper()
+                    if 'qth' in rec:
+                        qth = rec["qth"].upper()
+                    else:
+                        qth = ''
                     if 'name' in rec:
                         name = rec["name"].upper()
                     else:
-                        name=''
+                        name = ''
                     band = rec["band"]
                     print('call=',call,'\tname=',name,'\tqth=',qth,'\tband=',band)
 

@@ -37,7 +37,7 @@ TRAP_ERRORS = True
 # Scoring class for CWops CW Open - Inherits the base contest scoring class
 class CWOPEN_SCORING(CONTEST_SCORING):
 
-    def __init__(self,P):
+    def __init__(self,P,session=None):
         CONTEST_SCORING.__init__(self,P,'CW-OPEN',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
@@ -58,9 +58,30 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         day1=datetime.date(now.year,9,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
                                                                        #    plus no. days until 1st Saturday (day 5)
-        start_time=0                                                   # 1st session is 0000-0400 UTC                           
+        day   = now.day
+        hour  = now.hour
+        today = now.strftime('%A')
+
+        # Determine start time assuming this code is run shortly after the contest
+        if not session:
+            session='ALL'
+            start_time=0                                               # 1st session is 0000-0400 UTC
+            duration=24
+        elif session==1:
+            start_time=0                                               # 1st session is 0000-0400 UTC                           
+            duration=4
+        elif session==2:
+            start_time=12                                              # 2nd session is 1200-1600 UTC                           
+            duration=4
+        elif session==3:
+            start_time=20                                              # 3rd session is 2000-2400 UTC
+            duration=4
+        else:
+            print('\n*** Need to specify a valid session ***\n')
+            sys.exit(0)
+
         self.date0=datetime.datetime(now.year,9,sat2,start_time)       # Need to add more code for other sessions next year
-        self.date1 = self.date0 + datetime.timedelta(hours=4)          # Each session is 4hrs long
+        self.date1 = self.date0 + datetime.timedelta(hours=duration)          # Each session is 4hrs long
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
         #sys.exit(0)
 
@@ -69,13 +90,25 @@ class CWOPEN_SCORING(CONTEST_SCORING):
             self.date0 = datetime.datetime.strptime( "20210904 0000" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = self.date0 + datetime.timedelta(hours=4)
         
+        if True:
+            print('session=',session)
+            print('now=',now)
+            print('today=',today)
+            print('hour=',hour)
+            print('date0=',self.date0)
+            print('date1=',self.date1)
+            #sys.exit(0)
+            
+        # Name of output file
+        self.output_file = 'CWOPEN_'+self.MY_CALL+'_'+str(session)+'.LOG'
+            
     # Contest-dependent header stuff
     def output_header(self,fp):
         fp.write('LOCATION: %s\n' % self.MY_STATE)
         fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
 
     # Scoring routine for CW Ops CW Open
-    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE):
+    def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print 'rec=',rec
         keys=list(HIST.keys())
 
@@ -91,9 +124,10 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         name_in = a[1]
         #name = rec["name"].upper()
 
-        if TRAP_ERRORS and '?' in str(num_in)+name_in:
-            print(rec)
-            sys.exit(0)
+        freq_khz = int( 1000*float(rec["freq"]) +0.5 )
+        band = rec["band"]
+        date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
+        time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
         
         tx   = rec["stx_string"].strip().upper()
         b    = tx.split(',')
@@ -101,16 +135,26 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         name_out = b[1]
         my_call = rec["station_callsign"].strip().upper()
                 
-        freq_khz = int( 1000*float(rec["freq"]) +0.5 )
-        band = rec["band"]
-        date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
-        time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
-
-        if TRAP_ERRORS and num_out-self.last_num_out!=1:
-            print('Jump in serial out???',self.last_num_out,num_out)
-            sys.exit(0)
-        else:
-            self.last_num_out = num_out
+        if '?' in str(num_in)+name_in or not name_in.isalpha() or not num_in.isnumeric():
+            print('\n*** ERROR *** "?" in serial number and/or name and/or name contains numbers or serial is not numeric ***')
+            print('call   =',call)
+            print('serial =',num_in)
+            print('name   =',name_in)
+            print('Time   =',time_off)
+            print('rec=',rec)
+            self.list_all_qsos(call,qsos)
+            if TRAP_ERRORS:
+                sys.exit(0)
+        
+        if num_out-self.last_num_out!=1:
+            print('\n*** ERROR *** Jump in serial out??? ***',self.last_num_out,num_out)
+            print('call   =',call)
+            print('serial =',num_in)
+            print('name   =',name_in)
+            print('Time   =',time_off)
+            if TRAP_ERRORS and False:
+                sys.exit(0)
+        self.last_num_out = num_out
 
         if MY_MODE=='CW':
             mode='CW'
@@ -152,6 +196,8 @@ class CWOPEN_SCORING(CONTEST_SCORING):
             if name_in!=name9:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
                 print(call,':  Current:',name_in,' - History:',name9)
+                print('serial =',num_in)
+                print('Time   =',time_off)
                 self.list_all_qsos(call,qsos)
                 print(' ')
 
@@ -160,6 +206,13 @@ class CWOPEN_SCORING(CONTEST_SCORING):
             self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
 
+        # Info for multi-qsos
+        exch_in=name_in
+        if call in self.EXCHANGES.keys():
+            self.EXCHANGES[call].append(exch_in)
+        else:
+            self.EXCHANGES[call]=[exch_in]
+                
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #                              -----info sent------       -----info rcvd------
@@ -177,6 +230,7 @@ class CWOPEN_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
+        print('\nnqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
         print('band count =',self.sec_cnt)
         print('calls =',self.calls)
