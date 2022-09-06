@@ -28,7 +28,7 @@ set CONTEST=""
 #set CONTEST="cwt"
 #set CONTEST="sst"
 #set CONTEST="mst"
-set CONTEST="cwopen"
+#set CONTEST="cwopen"
 #set CONTEST="cqww"
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
@@ -50,7 +50,7 @@ set CONTEST="cwopen"
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
 
 set SESSION=""
-set SESSION="3"
+#set SESSION="3"
 
 set TIME_LIMIT=""
 #set TIME_LIMIT="-limit 10"        # NAQP
@@ -98,9 +98,6 @@ popd
 
 # CQ WW CW - seems to work in 2020
 #cabrillo.py -wwcw
-
-# WW Digi  - Code still needs to be converted 
-#cabrillo.py -wwdigi
 
 # Makroten
 #cabrillo.py -mak
