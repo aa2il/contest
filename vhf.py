@@ -42,7 +42,7 @@ class VHF_SCORING(CONTEST_SCORING):
 
         self.SPONSER=SPONSER
 
-        self.BANDS = ['6m','2m','1.25m','70cm']
+        self.BANDS = ['6m','2m','1.25m','70cm','33cm','23cm']
         self.sec_cnt = np.zeros((len(self.BANDS)))
         
         # Determine contest based on sponser and month
@@ -71,7 +71,6 @@ class VHF_SCORING(CONTEST_SCORING):
             sys.exit(0)
         CONTEST_SCORING.__init__(self,P,contest_name,mode='MIXED')
 
-        self.BANDS = ['6m','2m','70cm']
         self.NQSOS = OrderedDict()
         grids = []
         for b in self.BANDS:
@@ -153,14 +152,26 @@ class VHF_SCORING(CONTEST_SCORING):
 
         # Pull out relavent entries
         call = rec["call"]
+        if '?' in call:
+            print('Whooops - unknown CALL!',call)
+            sys.exit(0)            
+        
         band = rec["band"]
         if band=='6m':
             freq_mhz=50
         elif band=='2m':
             freq_mhz=144
+        elif band=='1.25m':
+            freq_mhz=222
         elif band=='70cm':
             freq_mhz=432
-        #freq_mhz = int( float(rec["freq"]) )
+        elif band=='33cm':
+            freq_mhz=902
+        elif band=='23cm':
+            freq_mhz=1290
+        else:
+            print('Whooops - unknown Band!',call,band)
+            sys.exit(0)
 
         if 'gridsquare' in rec:
             grid = rec["gridsquare"].upper()
@@ -178,10 +189,13 @@ class VHF_SCORING(CONTEST_SCORING):
 
         # Check for valid band and grid 
         valid = len(grid)==4 and grid[0:2].isalpha() and grid[2:4].isdigit()
-        valid2 = band in ['6m','2m','70cm']
+        valid2 = band in self.BANDS
         if not valid2:
             print('Skipping QSO from',band,'band')
-            return
+            if TRAP_ERRORS:
+                sys.exit(0)
+            else:
+                return
         elif not valid:
             print('\nVHF SCORING: Not a valid grid: call=',call,'\tgrid=',grid,'\tband=',band)
             if TRAP_ERRORS:
@@ -205,8 +219,10 @@ class VHF_SCORING(CONTEST_SCORING):
         elif rec["mode"]=='FM' or  rec["mode"]=='USB':
             mode='PH'
         else:
-            print('VHF SCORING: Unknown mode:',rec["mode"])
+            print('\n******** VHF SCORING: Unknown mode:',rec["mode"])
+            print('\nrec=',rec)
             if TRAP_ERRORS:
+                print(' ')
                 sys.exit(0)
 
         self.nqsos+=1
@@ -229,7 +245,9 @@ class VHF_SCORING(CONTEST_SCORING):
                 print('------------ pts=',qso_points)
             elif self.SPONSER=='CQ' and band=='2m':
                 qso_points=2
-            elif band=='70cm':
+            elif band=='33cm':
+                qso_points=3
+            elif band=='70cm' or band=='1.25m':
                 qso_points=2
             else:
                 qso_points=1
@@ -350,10 +368,10 @@ class VHF_SCORING(CONTEST_SCORING):
                 qth_old = qth
 
         if not same:
-            print('&*&*&*&*&*&*&*& QTH MISMATCH *&*&*&*&*&*&*&&*&')
+            print('\n&*&*&*&*&*&*&*& QTH MISMATCH *&*&*&*&*&*&*&&*&\n')
             print(call,'/R' in call2)
             if '/R' in call2:
-                print('??? Move over ROVER ???')
+                print('??? Move over ROVER ???\n')
             elif TRAP_ERRORS:
                 sys.exit(0)
 

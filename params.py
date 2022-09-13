@@ -181,8 +181,7 @@ class PARAMS:
             # Need to merge FT8 and CW/Phone logs from RPi
             fnames=[]
             DIR_NAME = '~/.fldigi/logs/'
-            for fname in ['AA2IL.adif','wsjtx_log.adi']:
-                #for fname in ['AA2IL_VHF_Sep2021.adif','wsjtx_VHF_Sep2021.adi']:
+            for fname in ['AA2IL_RPi.adif','wsjtx_log_FT991a.adi','wsjtx_log_IC9700.adi']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
                 fnames.append(f)
 
