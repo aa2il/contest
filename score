@@ -87,9 +87,6 @@ popd
 
 # cabrillo.py -cqp -hist lotwreport.adi
 
-
-# Need to bring the rest of these into this if-then-else structure
-
 # ARRL 10 meter
 #cabrillo.py -ten
 
