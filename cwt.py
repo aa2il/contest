@@ -60,9 +60,13 @@ class CWT_SCORING(CONTEST_SCORING):
         day   = now.day
         hour  = now.hour
         today = now.strftime('%A')
+        print('day=',day,'\thour=',hour,'\ttoday=',today)
 
         if session!=None:
             start_time=session
+            if today=='Thursday' and session>3:
+                # Must be looking at Wednesday's session
+                day-=1
         elif today=='Thursday':
             if hour<3:
                 # Must be looking at previous session
@@ -179,7 +183,9 @@ class CWT_SCORING(CONTEST_SCORING):
         
         print('\nnqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
-        print('band count =',self.sec_cnt)
+        #print('band count =',self.sec_cnt)
+        for i in range(len(self.BANDS)):
+            print(self.BANDS[i],'\t',self.sec_cnt[i])
         print('calls =',self.calls)
         mults = len(self.calls)
         print('mults=',mults)

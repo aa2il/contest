@@ -41,7 +41,7 @@ class MST_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,P,'ICWC Medium Speed Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.sec_cnt = np.zeros((len(self.BANDS)))
+        self.sec_cnt = np.zeros((len(self.BANDS)),dtype=int)
         self.calls=set([])
         self.last_num_out=0
         self.prev_rec=None
@@ -59,13 +59,15 @@ class MST_SCORING(CONTEST_SCORING):
         now = datetime.datetime.utcnow()
         weekday = now.weekday()
         print('now=',now,'\t\t','weekday=',weekday)
-        if weekday<0 or weekday>1:
-            # If we finally getting around to running this on any day but Mon, roll back date to Weds
-            if weekday<2:
-                weekday+=7
-            if session==3:
+        if weekday!=0:
+            # If we finally getting around to running this on any day but Mon, roll back date to Mon
+            # Note - Monday is day 0
+            if weekday==1:
                 weekday-=1
-            now = now - datetime.timedelta(hours=24*(weekday-1))
+            elif session==3:
+                weekday-=1
+            now = now - datetime.timedelta(hours=24*(weekday-0))
+        print('now2=',now,'\t\t','weekday=',weekday)
 
         day   = now.day
         hour  = now.hour
@@ -101,7 +103,7 @@ class MST_SCORING(CONTEST_SCORING):
             print('hour=',hour)
             print('date0=',self.date0)
             print('date1=',self.date1)
-            #sys.exit(0)
+            sys.exit(0)
 
         # Name of output file
         self.output_file = self.MY_CALL+'.LOG'
@@ -202,6 +204,13 @@ class MST_SCORING(CONTEST_SCORING):
             #self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
 
+        # Info for multi-qsos
+        exch_in=name_in
+        if call in self.EXCHANGES.keys():
+            self.EXCHANGES[call].append(exch_in)
+        else:
+            self.EXCHANGES[call]=[exch_in]
+                
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #                              -----info sent------       -----info rcvd------
@@ -219,9 +228,11 @@ class MST_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
-        print('\nqsos1=',self.nqsos1)
+        print('\nnqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
-        print('band count =',self.sec_cnt)
+        #print('band count =',self.sec_cnt)
+        for i in range(len(self.BANDS)):
+            print(self.BANDS[i],'\t',self.sec_cnt[i])
         print('calls =',self.calls)
         mults = len(self.calls)
         print('mults=',mults)

@@ -49,8 +49,8 @@ set CONTEST=""
 #set CONTEST="ft8ru"
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
 
-set SESSION=""
-#set SESSION="3"
+set SESSION=""                   
+#set SESSION="19"                 # Session start time
 
 set TIME_LIMIT=""
 #set TIME_LIMIT="-limit 10"        # NAQP
