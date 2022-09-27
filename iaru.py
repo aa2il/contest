@@ -44,7 +44,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,P,'IARU-HF',mode='CW')
         print('IARU HF Scoring Init')
 
-        self.MY_CALL     = P.SETTINGS['MY_CALL']
+        #self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_ITU_ZONE = int( P.SETTINGS['MY_ITU_ZONE'] )
 
         self.BANDS = ['160m','80m','40m','20m','15m','10m']

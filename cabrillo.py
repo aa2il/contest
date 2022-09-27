@@ -159,8 +159,6 @@ istart  = -1
 cum_gap = 0
 if P.sc.contest=='MAKROTHEN-RTTY':
     sc = MAKROTHEN_SCORING(contest)
-elif P.sc.contest=='CQ-WW-RTTY' or P.sc.contest=='CQ-WW-CW':
-    sc = CQ_WW_SCORING(contest)
 elif P.sc.contest=='ARRL 10': \
     sc = ARRL_RTTY_RU_SCORING(contest)
 elif not P.sc:

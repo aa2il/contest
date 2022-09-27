@@ -260,12 +260,15 @@ class PARAMS:
             DIR_NAME = '../pyKeyer/'
     
         elif args.wwrtty:
-            contest='CQ-WW-RTTY'
-            MY_MODE='RTTY'
-            date0 = datetime.datetime.strptime( "20190928 0000" , "%Y%m%d %H%M")  # Start of contest
-            date1 = date0 + datetime.timedelta(hours=48)
-            fname = 'cqww_rtty_2019.adif'
+            sc = CQ_WW_SCORING(P,'RTTY')
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
             
+            DIR_NAME = '~/logs/'
+            #fname = 'cqww_rtty_2019.adif'
+            fname = 'cqwwrtty_2022.adif'
+
         elif args.wpx:
             MODE='CW'
             MODE='RTTY'

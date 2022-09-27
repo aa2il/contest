@@ -30,6 +30,7 @@ set CONTEST=""
 #set CONTEST="mst"
 #set CONTEST="cwopen"
 #set CONTEST="cqww"
+set CONTEST="wwrtty"             # CQ WW RTTY
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"                # Field Day
@@ -89,9 +90,6 @@ popd
 
 # ARRL 10 meter
 #cabrillo.py -ten
-
-# CQ WW RTTY
-#cabrillo.py -wwrtty
 
 # CQ WW CW - seems to work in 2020
 #cabrillo.py -wwcw

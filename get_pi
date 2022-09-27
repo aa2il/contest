@@ -1,0 +1,16 @@
+#! /bin/tcsh
+
+# Script to get log files from raspberry pi
+
+set ROOT="/media/${USER}/marconi"
+
+cp ${ROOT}/AA2IL/AA2IL.adif ~/logs/AA2IL_RPi.adif
+
+#exit
+
+foreach rig (FT991a IC9700)
+    echo $rig
+    #ls -al ${ROOT}/.local/share/WSJT-X\ -\ ${rig}-FLRIG
+    ls -al ${ROOT}/.local/share/WSJT-X\ -\ ${rig}-FLRIG/wsjtx_log.adi 
+    cp ${ROOT}/.local/share/WSJT-X\ -\ ${rig}-FLRIG/wsjtx_log.adi ~/logs/wsjtx_log_${rig}.adi
+end
