@@ -30,11 +30,11 @@ set CONTEST=""
 #set CONTEST="mst"
 #set CONTEST="cwopen"
 #set CONTEST="cqww"
-set CONTEST="wwrtty"             # CQ WW RTTY
+#set CONTEST="wwrtty"             # CQ WW RTTY
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"                # Field Day
-#set CONTEST="cqp"
+set CONTEST="cqp"                # CA QSO party
 #set CONTEST="naqpcw"
 #set CONTEST="naqprtty"
 #set CONTEST="wwdigi"             # CQ WW Digi
@@ -57,7 +57,7 @@ set TIME_LIMIT=""
 #set TIME_LIMIT="-limit 10"        # NAQP
 
 set ASSISTED=""
-set ASSISTED="-assisted"
+#set ASSISTED="-assisted"
 
 echo " "
 set d=`date`

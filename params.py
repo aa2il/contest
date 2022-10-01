@@ -89,7 +89,7 @@ class PARAMS:
         arg_proc.add_argument("-limit", help="Time Limit (Hours)",
                               type=int,default=10000)
         arg_proc.add_argument("-o", help="Output Cabrillo file",
-        type=str,default='MY_CALL.txt')
+                              type=str,default='MY_CALL.txt')
         arg_proc.add_argument("-hist", help="History File",
                               type=str,default='')
         args = arg_proc.parse_args()
@@ -111,7 +111,8 @@ class PARAMS:
         self.HIST2=None
 
         MY_CALL = self.SETTINGS['MY_CALL']
-        HIST_DIR = os.path.expanduser('~/'+MY_CALL+'/')
+        MY_CALL2 = self.SETTINGS['MY_CALL'].split('/')[0]
+        HIST_DIR = os.path.expanduser('~/'+MY_CALL2+'/')
         self.output_file = args.o.replace('MY_CALL',MY_CALL)
 
         #######################################################################################
@@ -300,23 +301,20 @@ class PARAMS:
             DIR_NAME = '~/'+MY_CALL+'/'
 
         elif args.cqp:
-            print('P=',P)
+
+            # California QSO Party
             sc = CQP_SCORING(P)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            date0=sc.date0
-            date1=sc.date1
-            history = sc.history
+            self.sc=sc
             
-            HIST2=sc.read_hist2(args.hist)
+            self.history = HIST_DIR+'master.csv'
+            self.HIST2=sc.read_hist2(args.hist)
             
-            fname = 'AA2IL_6.adif'
-            DIR_NAME = '../pyKeyer'
-            fnames = [DIR_NAME+'/'+fname]
-            #fname = 'AA2IL.adif'                   # In 2020, used both calls
-            #fnames.append( DIR_NAME+'/'+fname )
-            output_file = 'AA2IL_CQP_2021.LOG'
-    
+            MY_CALL1 = self.SETTINGS['MY_CALL'].split('/')[0]
+            MY_CALL2 = self.SETTINGS['MY_CALL'].replace('/','_')
+            DIR_NAME = '~/'+MY_CALL1+'/'
+            fname = MY_CALL2+'.adif'
+            #fname = MY_CALL2+'_2021.adif'    # Testing
+            
         elif args.sst:
 
             # K1USN SST

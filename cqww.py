@@ -98,9 +98,6 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         if False:
             print('now=',now)
             print('day1=',day1,'\tsat2=',sat2)
-            #print('today=',today)
-            #print('weekday=',weekday)
-            #print('hour=',hour)
             print('date0=',self.date0)
             print('date1=',self.date1)
             sys.exit(0)

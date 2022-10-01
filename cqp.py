@@ -35,12 +35,17 @@ CQP_MULTS  = STATES + ['MR', 'QC', 'ON', 'MB', 'SK', 'AB', 'BC', 'NT']
 CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR']
 COUNTRIES=['United States','Canada','Alaska','Hawaii'] 
 
+TRAP_ERRORS = False
+#TRAP_ERRORS = True
+
+############################################################################################
+    
 # Scoring class for CQP - Inherits the base contest scoring class
 class CQP_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,'CA-QSO-PARTY',mode='CW')
-        print('CQP Scoring Init')
+        CONTEST_SCORING.__init__(self,P,'CA-QSO-PARTY',mode='CW')
+        print('CQP Scoring Init ...')
         
         self.BANDS       = ['160m','80m','40m','20m','15m','10m']
         self.sec_cnt     = np.zeros(len(CQP_MULTS))
@@ -55,16 +60,19 @@ class CQP_SCORING(CONTEST_SCORING):
         self.MY_COUNTY   = P.SETTINGS['MY_COUNTY']
 
         # History file
-        self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
+        #self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
                 
         # Determine contest date/time - first Sat in Oct.
         now = datetime.datetime.utcnow()
-        day1=datetime.date(now.year,10,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
-        sat2=1 + ((5-day1) % 7)                                         # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
-                                                                        #    plus no. days until 1st Saturday (day 5)
-        start_time=16                                                   # 1600 UTC                           
-        self.date0=datetime.datetime(now.year,10,sat2,start_time)       # Need to add more code for other sessions next year
-        self.date1 = self.date0 + datetime.timedelta(hours=30)          # Contest is 30-hrs long
+        year=now.year
+        #year=2021               # Last year - testing
+
+        day1=datetime.date(year,10,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat2=1 + ((5-day1) % 7)                                     # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                    #    plus no. days until 1st Saturday (day 5)
+        start_time=16                                               # 1600 UTC
+        self.date0=datetime.datetime(year,10,sat2,start_time)       # Need to add more code for other sessions next year
+        self.date1 = self.date0 + datetime.timedelta(hours=30)      # Contest is 30-hrs long
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
         #sys.exit(0)
 
@@ -72,7 +80,23 @@ class CQP_SCORING(CONTEST_SCORING):
         if False:
             self.date0 = datetime.datetime.strptime( "20201003 1600" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = self.date0 + datetime.timedelta(hours=30)
+        elif False:
+            # Practice session the day b4
+            self.date0 = datetime.datetime.strptime( "20220930 2330" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=1)
 
+        if False:
+            print('now=',now)
+            print('day1=',day1,'\tsat2=',sat2)
+            print('date0=',self.date0)
+            print('date1=',self.date1)
+            #sys.exit(0)
+
+        # Name of output file
+        #MY_CALL2 = self.SETTINGS['MY_CALL'].replace('/','_')
+        MY_CALL2 = self.MY_CALL.split('/')[0]
+        self.output_file = MY_CALL2+'_CQP'+'_'+str(self.date0.year)+'.LOG'
+        
             
     # Contest-dependent header stuff
     def output_header(self,fp):
@@ -82,6 +106,12 @@ class CQP_SCORING(CONTEST_SCORING):
     # Scoring routine for CQP
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print('rec=',rec)
+        if len(HIST2)==0:
+            HIST2=HIST
+            if TRAP_ERRORS:
+                print('**** WARNING **** Dup hist files - check this!!!')
+                sys.exit(0)
+                
         keys=list(HIST.keys())
         keys2=list(HIST2.keys())
         #sys.exit(0)
@@ -93,9 +123,13 @@ class CQP_SCORING(CONTEST_SCORING):
         try:
             num_in = int( reverse_cut_numbers( a[0] ) )
         except:
+            print('Cant find serial number!!!!')
             print('rec=',rec)
             print('Problem with serial:',a)
-            #sys.exit(0)
+            if TRAP_ERRORS:
+                sys.exit(0)
+            else:
+                num_in=0
 
         qth_in = a[1]
         my_call = rec["station_callsign"].strip().upper()
@@ -105,7 +139,7 @@ class CQP_SCORING(CONTEST_SCORING):
         num_out = int( reverse_cut_numbers( b[0] ) )
         qth_out = b[1]
 
-        self.check_serial_out(num_out_out,rec,TRAP_ERRORS)
+        self.check_serial_out(num_out,rec,TRAP_ERRORS)
         
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]
@@ -157,7 +191,8 @@ class CQP_SCORING(CONTEST_SCORING):
                 print(rec)
                 print('History=',call,HIST[call])
                 print('$$$$$$$$$$$$$$$$$$$$$$')
-                sys.exit(0)
+                if TRAP_ERRORS:
+                    sys.exit(0)
         
         # Error checking
         if( not country in COUNTRIES and qth_in!='DX') or \
@@ -169,15 +204,21 @@ class CQP_SCORING(CONTEST_SCORING):
             print('History=',HIST[call])
             print('Country=',country)
             print('QTH in=',qth_in)
-            sys.exit(0)
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         # Compare to history
         if call in keys2:
-            if qth_in!=HIST2[call]:
+            qth2=HIST2[call]['state']
+            if qth2=='CA':
+                qth2=HIST2[call]['county']
+            if qth_in!=qth2:
                 print('\n$$$$$$$$$$ Difference from history2 $$$$$$$$$$$')
-                print(call,':  Current:',qth_in,' - History:',HIST2[call])
+                print(call,':  Current:',qth_in,' - History:',qth2)
+                print(HIST2[call])
                 print(' ')
-                if not call in ['W6COW','W6TCP','W6TED','KL7SB']:
+                #if not call in ['W6COW','W6TCP','W6TED','KL7SB']:
+                if TRAP_ERRORS:
                     sys.exit(0)
             
         elif call in keys:
@@ -291,7 +332,7 @@ class CQP_SCORING(CONTEST_SCORING):
                         qth  = rec["qth"].upper()
                         rx   = rec["srx_string"].strip().upper()
                         a    = rx.split(',') 
-                        num_in = int( self.reverse_cut_numbers( a[0] ) )
+                        num_in = int( reverse_cut_numbers( a[0] ) )
                         print(call,'\t',band,'\t',mode,'\t',num_in,'\t',qth)
                         if num_last>=num_in or (len(qth_last)>0 and qth_last!=qth):
                             print('$$$$$$$$$$$$ POTENTIAL ERROR $$$$$$$$$$$$$$')

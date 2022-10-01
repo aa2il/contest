@@ -259,9 +259,9 @@ class CONTEST_SCORING:
     def check_serial_out(self,serial_out,rec,TRAP_ERRORS):
         
         if serial_out-self.num_prev!=1:
-            print('\nCHECK_SERIAL_OUT: Hmmmm - we seem to have failure to communicate here!')
-            print(serial_out,self.num_prev)
-            if TRAP_ERRORS:
+            print('\nCHECK_SERIAL_OUT: Hmmmm - Unexpected Jump in My Serial Number')
+            print("Current #=",serial_out,"\tPrev #=",self.num_prev)
+            if TRAP_ERRORS and False:
                 print(self.rec_prev)
                 print(rec)
                 sys.exit(0)

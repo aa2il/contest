@@ -46,10 +46,9 @@ def open_output_file(P,outfile):
     fp = open(outfile, 'w')
 
     contest = P.contest_name
-    #MY_SECTION = P.SETTINGS['MY_SEC']
-    #MY_STATE = P.SETTINGS['MY_STATE']
     MY_CALL = P.SETTINGS['MY_CALL']
     MY_POWER='LOW'
+    MY_CLUB = P.SETTINGS['MY_CLUB']
     
     fp.write('START-OF-LOG:3.0\n')
     fp.write('CONTEST: %s\n' % contest)
@@ -67,7 +66,7 @@ def open_output_file(P,outfile):
     """
     elif contest=='MAKROTHEN-RTTY' or contest=='ARRL-RTTY' or \
          contest=='NAQP-RTTY' or contest=='FT8-RU' or \
-         contest=='CQ-WW-RTTY' or contest=='CQ-WW-CW' or\
+         contest=='CQ-WW-CW' or\
          contest=='ARRL 10':
         fp.write('LOCATION: %s\n' % MY_STATE)
     elif contest=='13 Colonies Special Event' or \
@@ -96,9 +95,9 @@ def open_output_file(P,outfile):
         fp.write('CATEGORY-MODE: %s\n' % P.sc.my_mode);
     
     #fp.write('CLAIMED-SCORE: \n',);
-    fp.write('OPERATORS: %s\n' % MY_CALL);
-    MY_CLUB='SCCC'
-    MY_CLUB='SOUTHERN CALIFORNIA CONTEST CLUB'
+    MY_CALL2 = MY_CALL.split('/')[0]
+    fp.write('OPERATORS: %s\n' % MY_CALL2);
+    #MY_CLUB='SOUTHERN CALIFORNIA CONTEST CLUB'
     fp.write('CLUB: %s\n' % MY_CLUB);
     fp.write('NAME: Joseph B. Attili\n');
     fp.write('ADDRESS: PO Box 2036\n');
@@ -234,7 +233,7 @@ fp=open_output_file(P,P.output_file)
 
 # Load history file
 print('History file:',P.history,'\n')
-HIST = load_history(P.history)
+HIST,fname9 = load_history(P.history)
 
 # Loop over all qsos
 j=-1
