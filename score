@@ -58,6 +58,7 @@ set TIME_LIMIT=""
 
 set ASSISTED=""
 #set ASSISTED="-assisted"
+set ASSISTED="-hist ../pyKeyer/CQP/lotwreport.adi"
 
 echo " "
 set d=`date`
@@ -73,7 +74,7 @@ else if( X$CONTEST == "X" && ($d[1] == "Fri" || $d[1] == "Sun"))then
     set CONTEST="sst"
 else
     echo " "
-    echo "--- Can't figure out which contest ---"
+    echo "--- Can't figure out which contest to score ---"
     echo " "
     exit
 endif

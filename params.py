@@ -311,9 +311,13 @@ class PARAMS:
             
             MY_CALL1 = self.SETTINGS['MY_CALL'].split('/')[0]
             MY_CALL2 = self.SETTINGS['MY_CALL'].replace('/','_')
+            #DIR_NAME = '~/'+MY_CALL1+'/'
+            #fname = MY_CALL2+'_2021.adif'    # Testing
             DIR_NAME = '~/'+MY_CALL1+'/'
             fname = MY_CALL2+'.adif'
-            #fname = MY_CALL2+'_2021.adif'    # Testing
+            DIR_NAME = '../pyKeyer/CQP/'
+            fname = 'CQP.csv'
+            #fname = 'CQP.adif'
             
         elif args.sst:
 

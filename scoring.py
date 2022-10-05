@@ -207,8 +207,13 @@ class CONTEST_SCORING:
                         name = rec["name"].upper()
                     else:
                         name = ''
+                    if 'srx_string' in rec:
+                        srx_string = rec["srx_string"].upper()
+                    else:
+                        srx_string = ''
                     band = rec["band"]
-                    print('call=',call,'\tname=',name,'\tqth=',qth,'\tband=',band)
+                    print('call=',call,'\tname=',name,'\tqth=',qth,
+                          '\tsrx=',srx_string,'\tband=',band)
 
                     if name_old:
                         same = same and (name==name_old) and (qth==qth_old)

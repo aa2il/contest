@@ -31,12 +31,11 @@ from utilities import reverse_cut_numbers
 ############################################################################################
 
 CQP_MULTS  = STATES + ['MR', 'QC', 'ON', 'MB', 'SK', 'AB', 'BC', 'NT']
-#CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','DX']
-CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR']
-COUNTRIES=['United States','Canada','Alaska','Hawaii'] 
+CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','NT']
+CQP_COUNTRIES=['United States','Canada','Alaska','Hawaii'] 
 
 TRAP_ERRORS = False
-#TRAP_ERRORS = True
+TRAP_ERRORS = True
 
 ############################################################################################
     
@@ -53,6 +52,7 @@ class CQP_SCORING(CONTEST_SCORING):
         self.calls       = []
         self.county_cnt  = np.zeros(len(CA_COUNTIES))
         self.band_cnt    = np.zeros(len(self.BANDS))
+        self.nq          = 0
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_NAME     = P.SETTINGS['MY_NAME']
@@ -65,7 +65,7 @@ class CQP_SCORING(CONTEST_SCORING):
         # Determine contest date/time - first Sat in Oct.
         now = datetime.datetime.utcnow()
         year=now.year
-        #year=2021               # Last year - testing
+        #year=2021               # Testing
 
         day1=datetime.date(year,10,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7)                                     # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
@@ -106,10 +106,14 @@ class CQP_SCORING(CONTEST_SCORING):
     # Scoring routine for CQP
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print('rec=',rec)
-        if len(HIST2)==0:
+        if len(HIST2)>0 and False:
+            print('We have a 2nd HIST file')
+            print(HIST2)
+            sys.exit(0)
+        if len(HIST2)==0 and False:
             HIST2=HIST
-            if TRAP_ERRORS:
-                print('**** WARNING **** Dup hist files - check this!!!')
+            if TRAP_ERRORS and False:
+                print('\n**** WARNING **** Dup hist files - check this!!! ****\n')
                 sys.exit(0)
                 
         keys=list(HIST.keys())
@@ -119,9 +123,37 @@ class CQP_SCORING(CONTEST_SCORING):
         # Pull out relavent entries
         call = rec["call"].upper()
         rx   = rec["srx_string"].strip().upper()
+        my_call = rec["station_callsign"].strip().upper()
+        tx   = rec["stx_string"].strip().upper()
+
+        freq_khz = int( 1000*float(rec["freq"]) +0.5 )
+        band = rec["band"]
+        date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
+        time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
+        
         a    = rx.split(',') 
+        qth_in = a[1]
+
+        b    = tx.split(',')
+        num_out = int( reverse_cut_numbers( b[0] ) )
+        qth_out = b[1]
+        
+        # Begin error checking process
+        if '?' in rx+call:
+            print('\n$$$$$$$$$$$$$ Questionable RX Entry $$$$$$$$$$$$$$')
+            self.nq+=1
+            print('Call   =',call)
+            print('Serial In =',a[0],'\tSerial Out =',num_out)
+            print('QTH    =',qth_in)
+            print('Date   =',rec["qso_date_off"])
+            print('Time   =',rec["time_off"])
+            print('rec=',rec)
+            self.list_all_qsos(call,qsos)
+            if TRAP_ERRORS:
+                sys.exit(0)
+        
         try:
-            num_in = int( reverse_cut_numbers( a[0] ) )
+            num_in = int( reverse_cut_numbers( a[0].replace('?','') ) )
         except:
             print('Cant find serial number!!!!')
             print('rec=',rec)
@@ -131,20 +163,8 @@ class CQP_SCORING(CONTEST_SCORING):
             else:
                 num_in=0
 
-        qth_in = a[1]
-        my_call = rec["station_callsign"].strip().upper()
-
-        tx   = rec["stx_string"].strip().upper()
-        b    = tx.split(',')
-        num_out = int( reverse_cut_numbers( b[0] ) )
-        qth_out = b[1]
-
         self.check_serial_out(num_out,rec,TRAP_ERRORS)
         
-        freq_khz = int( 1000*float(rec["freq"]) +0.5 )
-        band = rec["band"]
-        date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
-        time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
         if MY_MODE=='CW':
             mode='CW'
         else:
@@ -167,7 +187,10 @@ class CQP_SCORING(CONTEST_SCORING):
             qth='CA'
             idx1 = CA_COUNTIES.index(qth_in)
             self.county_cnt[idx1] += 1
-        elif qth_in in ['NB', 'NL', 'NS', 'PE']:
+        elif qth_in in ['NB', 'NL', 'NS', 'PE','MAR']:
+            print('*** WARNING *** Changing QTH from',qth_in,'to MR')
+            print('call     =',call)
+            print('rec=',rec)
             qth_in='MR'
             qth='MR'
         else:
@@ -177,71 +200,84 @@ class CQP_SCORING(CONTEST_SCORING):
         self.band_cnt[idx1] += 1
             
         if not dupe:
+            self.nqsos2 += 1;
+            self.calls.append(call)
+            
             try:
                 if qth!='DX':
                     idx1 = CQP_MULTS.index(qth)
                     self.sec_cnt[idx1] += 1
                 else:
                     self.dx_cnt += 1
-                self.nqsos2 += 1;
-                self.calls.append(call)
             except:
                 print('\n$$$$$$$$$$$$$$$$$$$$$$',self.nqsos2)
                 print(qth,' not found in list of CQP sections')
                 print(rec)
-                print('History=',call,HIST[call])
-                print('$$$$$$$$$$$$$$$$$$$$$$')
                 if TRAP_ERRORS:
+                    print('History=',call,HIST[call])
                     sys.exit(0)
+                print('$$$$$$$$$$$$$$$$$$$$$$')
         
         # Error checking
-        if( not country in COUNTRIES and qth_in!='DX') or \
-          (country in COUNTRIES and qth_in not in CQP_STATES):
+        if( country not in CQP_COUNTRIES and qth_in!='DX') or \
+          ( country in CQP_COUNTRIES and qth_in not in CQP_STATES):
             pprint(vars(dx_station))
-            print('rec=',rec)
-            print('call=',call)
+            print('rec     =',rec)
+            print('call    =',call)
+            print('Country =',country)
+            print('QTH in  =',qth_in)
             print('Received qth '+qth_in+' not recognized - srx=',rx)
-            print('History=',HIST[call])
-            print('Country=',country)
-            print('QTH in=',qth_in)
+            try:
+                print('History=',HIST[call])
+            except:
+                print('Hmmm - cant show history for this call')
             if TRAP_ERRORS:
                 sys.exit(0)
 
         # Compare to history
-        if call in keys2:
-            qth2=HIST2[call]['state']
-            if qth2=='CA':
-                qth2=HIST2[call]['county']
+        call2  = dx_station.homecall
+        if call2 in keys2 and call2 not in ['WB2RPW','WU6X','N6IE']:
+            qth2=HIST2[call2]
             if qth_in!=qth2:
-                print('\n$$$$$$$$$$ Difference from history2 $$$$$$$$$$$')
+                print('\n$-$-$-$-$-$-$-$-$-$ Difference from history2 $-$-$-$-$-$-$-$-$-$-$')
                 print(call,':  Current:',qth_in,' - History:',qth2)
-                print(HIST2[call])
+                print('HIST2=',HIST2[call2])
+                print('Date   =',rec["qso_date_off"])
+                print('Time   =',rec["time_off"])
+                self.list_all_qsos(call,qsos)
                 print(' ')
-                #if not call in ['W6COW','W6TCP','W6TED','KL7SB']:
                 if TRAP_ERRORS:
                     sys.exit(0)
             
-        elif call in keys:
+        elif call2 in keys:
             if qth=='CA':
-                state=HIST[call]['county']
+                state=HIST[call2]['county']
             else:
-                state=HIST[call]['state']
-            #print call,qth,state
-            if qth_in!=state:
+                state=HIST[call2]['state']
+            if qth_in!=state and qth_in!='DX':
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
                 print(call,':  Current:',qth_in,' - History:',state)
-                print('History=',call,HIST[call])
+                print('History=',call,HIST[call2])
                 self.list_all_qsos(call,qsos)
                 print(' ')
 
-        else:
-            print('\n++++++++++++ Warning - no history for call:',call)
+        elif qth_in!='DX':
+            print('\n++++++++++++ Warning - no history for call:',call,call2)
+            print('Date   =',rec["qso_date_off"])
+            print('Time   =',rec["time_off"])
             self.list_all_qsos(call,qsos)
             #self.list_similar_calls(call,qsos)
 
             #print 'dist=',similar('K5WA','N5WA')
             #sys.exit(0)
         
+        # Info for multi-qsos
+        exch_in=qth_in
+        if call in self.EXCHANGES.keys():
+            self.EXCHANGES[call].append(exch_in)
+        else:
+            self.EXCHANGES[call]=[exch_in]
+                        
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #                              -----info sent------ -----info rcvd------
@@ -253,7 +289,7 @@ class CQP_SCORING(CONTEST_SCORING):
         line='QSO: %5d %2s %10s %4s %-10s %4s %-4s %-10s %4s %-4s' % \
             (freq_khz,mode,date_off,time_off,
              my_call,str(num_out),qth_out,
-             call,str(num_in),qth_in)
+             call,str(num_in),qth_in.replace('?',''))
         
         return line
                         
@@ -287,9 +323,10 @@ class CQP_SCORING(CONTEST_SCORING):
         print('\nThere were',len(uniques),'unique calls:\n',uniques)
 
         print('\nNo. raw QSOS (nqsos1)    =\t',self.nqsos1)
-        print(  'No. unique QSOS (nqsos2) =\t',self.nqsos2)
-        print('Multipiers    =\t',mults)
-        print('Claimed Score =\t',3*mults*self.nqsos2)
+        print('No. unique QSOS (nqsos2) =\t',self.nqsos2)
+        print('Multipiers               =\t',mults)
+        print('Claimed Score            =\t',3*mults*self.nqsos2)
+        print('No. flagged QSOS         =\t',self.nq)
 
         # They did this in 2020
         if False:
@@ -306,44 +343,6 @@ class CQP_SCORING(CONTEST_SCORING):
             
 
 
-    # Routine to sift through station we had multiple contacts with to identify any discrepancies
-    def check_multis(self,qsos):
-
-        print('There were multiple qsos with the following stations:')
-        qsos2=qsos.copy()
-        qsos2.sort(key=lambda x: x['call'])
-        calls=[]
-        for rec in qsos2:
-            calls.append(rec['call'])
-        #print(calls)
-        uniques = list(set(calls))
-        uniques.sort()
-        #print(uniques)
-
-        for call in uniques:
-            #print(call,calls.count(call))
-            if calls.count(call)>1:
-                num_last=0
-                qth_last=''
-                for rec in qsos:
-                    if rec['call']==call:
-                        mode = rec["mode"]
-                        band = rec["band"]
-                        qth  = rec["qth"].upper()
-                        rx   = rec["srx_string"].strip().upper()
-                        a    = rx.split(',') 
-                        num_in = int( reverse_cut_numbers( a[0] ) )
-                        print(call,'\t',band,'\t',mode,'\t',num_in,'\t',qth)
-                        if num_last>=num_in or (len(qth_last)>0 and qth_last!=qth):
-                            print('$$$$$$$$$$$$ POTENTIAL ERROR $$$$$$$$$$$$$$')
-                            print('Serials not increasing &/or different QTH')
-                        num_last=num_in
-                        qth_last=qth
-                print(' ')
-                        
-        #sys.exit(0)
-
-        
     def read_hist2(self,fname):
 
         print('READ_HIST2 - fname=',fname)
@@ -352,8 +351,8 @@ class CQP_SCORING(CONTEST_SCORING):
         if len(fname)>0:
             print('Well, we have a histroy file ...',fname)
             qsos = parse_adif(fname)
-            print(len(qsos))
-            print(qsos[0])
+            print('# QSOs=',len(qsos))
+            print('First QSO:',qsos[0])
 
             for qso in qsos:
                 #print(qso)
@@ -403,8 +402,3 @@ class CQP_SCORING(CONTEST_SCORING):
             #sys.exit(0)
 
         return HIST2
-    
-
-        
-
-        

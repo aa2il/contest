@@ -179,6 +179,9 @@ for f in P.input_files:
 
     if ext=='.LOG':
         qsos1 = parse_simple_log(fname,args)
+    elif ext=='.csv':
+        print('Reading CSV file ...')
+        qsos1,hdr=read_csv_file(fname)
     else:
         qsos1 = parse_adif(fname)
     #print qsos1
@@ -309,8 +312,11 @@ for i in range(len(qsos)):
             dt=(t1-t0).total_seconds() / 60.0
             if P.sc.contest!='Specific Call':
                 op_time=( (t1 - P.sc.date0).total_seconds()/60.0 - cum_gap)/60.
-                print(nqsos,'\t',op_time,'\tdt=',int(dt+.5),'\t\trate = ',qrate,' per hour\t\t',
-                      rec['call'],'\t',rec['mode'],'\t',rec['band'],'\t',df==0)
+                if False:
+                    print(nqsos,'\t',op_time,'\tdt=',int(dt+.5),
+                          '\t\trate = ',qrate,' per hour\t\t',
+                          rec['call'],'\t',rec['mode'],'\t',
+                          rec['band'],'\t',df==0)
                 times.append(dt/60.)
                 rates.append(qrate)
                 if rec['mode']=='CW':
