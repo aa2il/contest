@@ -317,7 +317,7 @@ class PARAMS:
             fname = MY_CALL2+'.adif'
             DIR_NAME = '../pyKeyer/CQP/'
             fname = 'CQP.csv'
-            #fname = 'CQP.adif'
+            fname = 'CQP.adif'
             
         elif args.sst:
 

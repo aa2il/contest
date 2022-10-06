@@ -30,7 +30,8 @@ from utilities import reverse_cut_numbers
 
 ############################################################################################
 
-CQP_MULTS  = STATES + ['MR', 'QC', 'ON', 'MB', 'SK', 'AB', 'BC', 'NT']
+CQP_VE_CALL_AREAS =   ['MR','QC','ON','MB','SK','AB','BC','NT']
+CQP_MULTS  = STATES + CQP_VE_CALL_AREAS
 CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','NT']
 CQP_COUNTRIES=['United States','Canada','Alaska','Hawaii'] 
 
@@ -151,7 +152,19 @@ class CQP_SCORING(CONTEST_SCORING):
             self.list_all_qsos(call,qsos)
             if TRAP_ERRORS:
                 sys.exit(0)
-        
+
+        if 'qth' in rec:
+            if qth_in != rec['qth']:
+                print('@@@@@@@@@@@@@ QTH Mismatch @@@@@@@@@@@@@')
+                print('Call   =',call)
+                print('QTH    =',qth_in,rec['qth'])
+                print('rec=',rec)
+                print('Date   =',rec["qso_date_off"])
+                print('Time   =',rec["time_off"])
+                self.list_all_qsos(call,qsos)
+                if TRAP_ERRORS:
+                    sys.exit(0)
+                
         try:
             num_in = int( reverse_cut_numbers( a[0].replace('?','') ) )
         except:
@@ -177,10 +190,10 @@ class CQP_SCORING(CONTEST_SCORING):
             print('rec=',rec)
             pprint(vars(dx_station))
             print('call     =',call)
-            print('prefix   =',prefix)
+            print('prefix   =',dx_station.prefix)
             print('exch out =',num_out,qth_out)
             print('exch in  =',num_in,qth_in)
-            #sys,exit(0)
+            sys,exit(0)
 
         # Determine multipliers
         if qth_in in CA_COUNTIES:
@@ -219,6 +232,12 @@ class CQP_SCORING(CONTEST_SCORING):
                 print('$$$$$$$$$$$$$$$$$$$$$$')
         
         # Error checking
+        if country=='Canada':
+            qth2=oh_canada2(dx_station)
+            if qth2!=qth_in and TRAP_ERRORS:
+                print('Oh Canada: qth_in=',qth_in,'\tqth2=',qth2)
+                sys.exit(0)
+        
         if( country not in CQP_COUNTRIES and qth_in!='DX') or \
           ( country in CQP_COUNTRIES and qth_in not in CQP_STATES):
             pprint(vars(dx_station))
@@ -402,3 +421,64 @@ class CQP_SCORING(CONTEST_SCORING):
             #sys.exit(0)
 
         return HIST2
+
+
+
+
+# Routine to give QTH of a Canadian station
+def oh_canada2(dx_station):
+
+    """ Prefixes	Province/Territory
+    VE1 VA1	Nova Scotia
+    VE2 VA2	Quebec	
+    VE3 VA3	Ontario	
+    VE4 VA4	Manitoba	
+    VE5 VA5	Saskatchewan	
+    VE6 VA6	Alberta	
+    VE7 VA7	British Columbia	
+    VE8	Northwest Territories	
+    VE9	New Brunswick	
+    VE0*	International Waters
+    VO1	Newfoundland
+    VO2	Labrador
+    VY1	Yukon	
+    VY2	Prince Edward Island
+    VY9**	Government of Canada
+    VY0	Nunavut	
+    CY0***	Sable Is.[16]	
+    CY9***	St-Paul Is.[16]	
+
+    For the CQP:
+    MR      Maritimes
+    QC      Quebec
+    ON      Ontario
+    MB      Manitoba
+    SK      Saskatchewan
+    AB      Alberta
+    BC      British Columbia
+    NT """
+
+    # For Cali QSO Party:
+    # MR = Maritime provinces plus Newfoundland and Labrador (NB, NL, NS, PE)
+
+    qth=''
+    #print('Oh Canada ... 1')
+    #pprint(vars(dx_station))
+    if dx_station.country=='Canada':
+        if dx_station.prefix in ['VO2','VY2','VE9']:
+            qth='MR'
+        elif dx_station.prefix in ['VY1']:
+            # YT --> NT for CQP
+            qth='NT'
+        else:
+            num=int( dx_station.call_number )
+            if num>=0 and num<len( CQP_VE_CALL_AREAS ):
+                qth=CQP_VE_CALL_AREAS[num-1]
+            else:
+                print('**** ERROR *** CQP - Oh Canada2 - having trouble with',\
+                      dx_station.call,dx_station.call_number,num)
+
+    else:
+        print('I dont know what I am doing here')
+        
+    return qth

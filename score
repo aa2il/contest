@@ -34,7 +34,7 @@ set CONTEST=""
 #set CONTEST="cwss"              # Sweepstakes
 #set CONTEST="arrl_dx"
 #set CONTEST="fd"                # Field Day
-set CONTEST="cqp"                # CA QSO party
+#set CONTEST="cqp"
 #set CONTEST="naqpcw"
 #set CONTEST="naqprtty"
 #set CONTEST="wwdigi"             # CQ WW Digi
@@ -52,6 +52,7 @@ set CONTEST="cqp"                # CA QSO party
 
 set SESSION=""                   
 #set SESSION="19"                 # Session start time
+#set SESSION="03"                 # Session start time
 
 set TIME_LIMIT=""
 #set TIME_LIMIT="-limit 10"        # NAQP
