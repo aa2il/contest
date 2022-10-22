@@ -156,6 +156,7 @@ class CWT_SCORING(CONTEST_SCORING):
 
         # Check against history
         if call2 in keys:
+            
             #print 'hist=',HIST[call2]
             state=HIST[call2]['cwops']
             if len(state)==0:
@@ -169,12 +170,25 @@ class CWT_SCORING(CONTEST_SCORING):
                 print(' ')
 
         else:
+            
             print('\n++++++++++++ Warning - no history for call:',call)
             self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
 
-        line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
-            (freq_khz,mode,date_off,time_off,self.MY_CALL,self.MY_NAME,self.MY_STATE,call,name,qth)
+        # Info for multi-qsos
+        exch_in=name+' '+qth
+        if call in self.EXCHANGES.keys():
+            self.EXCHANGES[call].append(exch_in)
+        else:
+            self.EXCHANGES[call]=[exch_in]
+                        
+#000000000111111111122222222223333333333444444444455555555556666666666777777777788
+#123456789012345678901234567890123456789012345678901234567890123456789012345678901
+#                              -----info sent------ -----info rcvd------
+
+        line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' %    \
+            (freq_khz,mode,date_off,time_off,self.MY_CALL,self.MY_NAME,self.MY_STATE, \
+             call,name,qth)
         
         return line
                         
