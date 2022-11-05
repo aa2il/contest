@@ -33,6 +33,7 @@ from cwopen import *
 from sst import *
 from mst import *
 from naqp import *
+from qsop import *
 from wpx import *
 from iaru import *
 from cqp import *
@@ -79,9 +80,13 @@ class PARAMS:
         arg_proc.add_argument('-sats', action='store_true',help='Satellites Worked')
         arg_proc.add_argument('-naqpcw', action='store_true',help='NAQP CW')
         arg_proc.add_argument('-naqprtty', action='store_true',help='NAQP RTTY')
+        arg_proc.add_argument('-qsop', help='State QSO Party',\
+                              type=str,default=None)
         arg_proc.add_argument('-wpx', action='store_true',help='CQ WPX')
         arg_proc.add_argument('-iaru', action='store_true',help='IARU HF')
         arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
+        arg_proc.add_argument('-nograph', action='store_true',
+                              help='Dont plot rate graph')
         arg_proc.add_argument('-assisted', action='store_true',
                               help='Used assitance (cluster, etc.)')
         arg_proc.add_argument("-i", help="Input ADIF file",
@@ -102,9 +107,10 @@ class PARAMS:
         self.history = ''
         self.sc=None
 
-        self.category_band='ALL'
-        self.TIME_LIMIT = args.limit
-        self.ASSISTED   = args.assisted
+        self.category_band ='ALL'
+        self.TIME_LIMIT    = args.limit
+        self.ASSISTED      = args.assisted
+        self.RATE_GRAPH    = not args.nograph
 
         P=CONFIG_PARAMS('.keyerrc')
         self.SETTINGS=P.SETTINGS
@@ -214,16 +220,18 @@ class PARAMS:
 
         elif args.cwss:
             sc = ARRL_SS_SCORING(P)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            date0=sc.date0
-            date1=sc.date1
+            self.sc=sc
             
-            fname = 'AA2IL.adif'
-            DIR_NAME = '../pyKeyer/'
-            #history = 'HIST_DIR/SSCW.txt'
-            history = 'HIST_DIR/SSCW-2021-LAST-2.txt'
-            output_file = 'AA2IL_CWSS_2021.LOG'
+            #contest=sc.contest
+            #MY_MODE=sc.my_mode
+            #date0=sc.date0
+            #date1=sc.date1
+            
+            fname = 'AA2IL_2021.adif'
+            DIR_NAME = '~/AA2IL'
+            #self.history = HIST_DIR+'/SSCW.txt'
+            #history = 'HIST_DIR/SSCW-2021-LAST-2.txt'
+            #output_file = 'AA2IL_CWSS_2021.LOG'
             
         elif args.naqprtty:
             contest='NAQP-RTTY'
@@ -250,6 +258,16 @@ class PARAMS:
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
 
+        elif args.qsop:
+
+            # State QSO Party
+            sc = QSOP_SCORING(P,'CW',args.qsop)
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+            fname = MY_CALL+'.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
+            
         elif args.wwcw:
             contest='CQ-WW-CW'
             MY_MODE='CW'

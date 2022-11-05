@@ -370,7 +370,7 @@ for i in range(len(qsos)):
                 if line:
                     print('@@@@@@@@@@@@@@@@@@@@@@@@ Duplicate line found\n',line)
                 dupe=True
-        if not dupe:
+        if line!=None and not dupe:
             lines.append(line)
             fp.write('%s\n' % line)
 
@@ -444,19 +444,20 @@ times5=np.array(times5)
 #print('dts=',dts,len(dts))
     
 # Plot qso rate vs time
-fig, ax = plt.subplots()
-ax.plot(tscale*times,rates,color='red',label='All Modes')
-ax.plot(tscale*time_cw,rates,color='blue',label='CW')
-#ax.plot(times2,rates2,color='green',label='Interp')
-ax.plot(tscale*times5,rate_inst,color='cyan',label='Inst')
-ax.plot(tscale*times2,rates3,color='orange',label='Smoothed')
-ax.set_xlabel('Time from Start ('+lab+')')
-ax.set_ylabel('QSO Rate (per hour)')
-#fig.suptitle('QSO RATE')
-fig.suptitle(P.sc.contest)
-#ax.set_title('Starting at '+date1)
-ax.grid(True)    
-plt.xlim(0,tend*tscale)
-plt.ylim(0,200)
-ax.legend(loc='upper left')
-plt.show()
+if P.RATE_GRAPH:
+    fig, ax = plt.subplots()
+    ax.plot(tscale*times,rates,color='red',label='All Modes')
+    ax.plot(tscale*time_cw,rates,color='blue',label='CW')
+    #ax.plot(times2,rates2,color='green',label='Interp')
+    ax.plot(tscale*times5,rate_inst,color='cyan',label='Inst')
+    ax.plot(tscale*times2,rates3,color='orange',label='Smoothed')
+    ax.set_xlabel('Time from Start ('+lab+')')
+    ax.set_ylabel('QSO Rate (per hour)')
+    #fig.suptitle('QSO RATE')
+    fig.suptitle(P.sc.contest)
+    #ax.set_title('Starting at '+date1)
+    ax.grid(True)    
+    plt.xlim(0,tend*tscale)
+    plt.ylim(0,200)
+    ax.legend(loc='upper left')
+    plt.show()

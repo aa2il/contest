@@ -31,7 +31,8 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 class SST_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        CONTEST_SCORING.__init__(self,P,'Slow Speed Mini-Test',mode='CW')
+        #CONTEST_SCORING.__init__(self,P,'Slow Speed Mini-Test',mode='CW')
+        super().__init__(P,'Slow Speed Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros(len(self.BANDS),np.int32)

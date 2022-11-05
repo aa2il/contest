@@ -31,35 +31,39 @@ set CONTEST=""
 #set CONTEST="cwopen"
 #set CONTEST="cqww"
 #set CONTEST="wwrtty"             # CQ WW RTTY
-#set CONTEST="cwss"              # Sweepstakes
+set CONTEST="cwss"               # Sweepstakes
 #set CONTEST="arrl_dx"
-#set CONTEST="fd"                # Field Day
+#set CONTEST="fd"                 # Field Day
 #set CONTEST="cqp"
 #set CONTEST="naqpcw"
 #set CONTEST="naqprtty"
+#set CONTEST="qsop"
 #set CONTEST="wwdigi"             # CQ WW Digi
 #set CONTEST="wpx"
 #set CONTEST="arrl_10m"
-#set CONTEST="vhf"               # ARRL VHF - Jan, June & Sept.
-#set CONTEST="cqvhf"             # CQ WW VHF - July
-#set CONTEST="fall50"            # SE VHF Soc -  50 MHz Fall Sprint - August - svhfs.org
+#set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
+#set CONTEST="cqvhf"              # CQ WW VHF - July
+#set CONTEST="fall50"             # SE VHF Soc -  50 MHz Fall Sprint - August - svhfs.org
 #set CONTEST="namss"              # NA Meteor Scatter Sprint - August
 #set CONTEST="iaru"
-#set CONTEST="cols13"            # 13 colonies special event - worked in 2021
-#set CONTEST="sats"              # Satellites worked  - worked in 2021
+#set CONTEST="cols13"             # 13 colonies special event - worked in 2021
+#set CONTEST="sats"               # Satellites worked  - worked in 2021
 #set CONTEST="ft8ru"
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
 
 set SESSION=""                   
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
+#set SESSION="NY"                   
+#set SESSION="IL"                   
 
 set TIME_LIMIT=""
-#set TIME_LIMIT="-limit 10"        # NAQP
+set TIME_LIMIT="-nograph"
+#set TIME_LIMIT="-limit 10"       # NAQP
 
 set ASSISTED=""
 #set ASSISTED="-assisted"
-set ASSISTED="-hist ../pyKeyer/CQP/lotwreport.adi"
+#set ASSISTED="-hist ../pyKeyer/CQP/lotwreport.adi"
 
 echo " "
 set d=`date`
@@ -71,7 +75,7 @@ else if( X$CONTEST == "X" && ( $d[1] == "Mon" || $d[1] == "Tue" ) )then
     set CONTEST="mst"
 else if( X$CONTEST == "X" && ( $d[1] == "Wed" || $d[1] == "Thu" ) )then
     set CONTEST="cwt"
-else if( X$CONTEST == "X" && ($d[1] == "Fri" || $d[1] == "Sun"))then
+else if( X$CONTEST == "X" && ($d[1] == "Fri" || $d[1] == "Sat" || $d[1] == "Sun"))then
     set CONTEST="sst"
 else
     echo " "

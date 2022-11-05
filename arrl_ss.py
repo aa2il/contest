@@ -44,10 +44,13 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
 
         # Contest occurs on 1st full weekend of November
         now = datetime.datetime.utcnow()
-        day1=datetime.date(now.year,11,1).weekday()                    # Day of week of 1st of month 0=Monday, 6=Sunday
+        year=now.year
+        #year=2021               # Testing
+        
+        day1=datetime.date(year,11,1).weekday()                        # Day of week of 1st of month 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
                                                                        # No. days until 1st Saturday (day 5) + 7 more days 
-        self.date0=datetime.datetime(now.year,now.month,sat2,21)       # Contest starts at 2100 UTC on Saturday ...
+        self.date0=datetime.datetime(year,now.month,sat2,21)           # Contest starts at 2100 UTC on Saturday ...
         self.date1 = self.date0 + datetime.timedelta(hours=30)         # ... and ends at 0300 UTC on Sunday
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
         #sys.exit(0)
@@ -56,7 +59,10 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
             # Manual override
             self.date0 = datetime.datetime.strptime( "20201107 2100" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = self.date0 + datetime.timedelta(hours=30)
-        
+
+        # Name of output file
+        self.output_file = self.MY_CALL+'_CW_SS'+'_'+str(self.date0.year)+'.LOG'
+            
     # Contest-dependent header stuff
     def output_header(self,fp):
         fp.write('LOCATION: %s\n' % self.MY_STATE)

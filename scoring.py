@@ -253,8 +253,8 @@ class CONTEST_SCORING:
             else:
                 print('There were no discrepancies found.\n')
         elif self.TRAP_ERRORS:
-            print('\nCheck Multis - TRAPPED ERROR\n')
-            sys.exit(0)
+            print('\nCheck Multis - UNTRAPPED ERROR - REVIEW THIS !!!\n')
+            #sys.exit(0)
     
     
         
