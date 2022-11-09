@@ -119,6 +119,7 @@ class PARAMS:
         MY_CALL = self.SETTINGS['MY_CALL']
         MY_CALL2 = self.SETTINGS['MY_CALL'].split('/')[0]
         HIST_DIR = os.path.expanduser('~/'+MY_CALL2+'/')
+        HIST_DIR2 = os.path.expanduser('~/Python/history/data/')
         self.output_file = args.o.replace('MY_CALL',MY_CALL)
 
         #######################################################################################
@@ -222,16 +223,16 @@ class PARAMS:
             sc = ARRL_SS_SCORING(P)
             self.sc=sc
             
-            #contest=sc.contest
-            #MY_MODE=sc.my_mode
-            #date0=sc.date0
-            #date1=sc.date1
-            
             fname = 'AA2IL_2021.adif'
+            fname = 'AA2IL.adif'
             DIR_NAME = '~/AA2IL'
-            #self.history = HIST_DIR+'/SSCW.txt'
-            #history = 'HIST_DIR/SSCW-2021-LAST-2.txt'
-            #output_file = 'AA2IL_CWSS_2021.LOG'
+
+            fname='SS.adif'
+            DIR_NAME = '../pyKeyer/SS'
+            
+            self.history = HIST_DIR2+'/SSCW-2023.txt'
+            #self.history = 'HIST_DIR/SSCW-2021-LAST-2.txt'
+            #self.history = HIST_DIR+'master.csv'
             
         elif args.naqprtty:
             contest='NAQP-RTTY'

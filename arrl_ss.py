@@ -30,7 +30,7 @@ from utilities import reverse_cut_numbers
 #######################################################################################
     
 TRAP_ERRORS = False
-#TRAP_ERRORS = True
+TRAP_ERRORS = True
 
 ############################################################################################
     
@@ -40,7 +40,12 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
     def __init__(self,P):
         CONTEST_SCORING.__init__(self,P,'ARRL-SS-CW',mode='CW')
         
+        self.BANDS = ['160m','80m','40m','20m','15m','10m']
+        self.band_cnt = np.zeros((len(self.BANDS)))
         self.sec_cnt = np.zeros(len(ARRL_SECS))
+        self.TRAP_ERRORS = TRAP_ERRORS
+        self.nproblems=0
+        self.nwarnings=0
 
         # Contest occurs on 1st full weekend of November
         now = datetime.datetime.utcnow()
@@ -71,8 +76,11 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
     # Scoring routine for ARRL CW Sweepstakes
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print rec
-
         keys=list(HIST.keys())
+        if len(keys)==0:
+            print('*** WARNING *** No History !!!! ***')
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         # Pull out relavent entries
         call = rec["call"]
@@ -82,124 +90,59 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
         if 'srx_string' in rec:
-            if True:
-                # Things should be properly formatted by pyKeyer
-                try:
-                    rexch  = rec["srx_string"].strip().upper().split(',')
-                    #serial = rexch[0]
-                    serial = int( reverse_cut_numbers( rexch[0] ) )
-                    prec   = rexch[1]
-                    call2  = rexch[2]
-                    check  = int( rexch[3] )
-                    sec    = rexch[4]
-                except Exception as e: 
-                    print( str(e) )
-                    print('Problem unpacking rx exchange')
-                    print(rec)
-                    if TRAP_ERRORS:
-                        sys.exit(0)
 
-            else:
-                # Old way
-                rexch  = rec["srx_string"].strip().upper()
-                #print rexch
-
-                # Check for call
-                call_ok = rexch.find(call)>=0
-                if call_ok:
-                    rexch=rexch.replace(call,'')
-                    call2=call
+            # Things should be properly formatted by pyKeyer
+            rexch  = rec["srx_string"]
+            if '?' in rexch:
+                print('\ncall=',call,'\trexech=',rexch)
+                print('Uncertain field(s) - need to fix ADIF entry')
+                if TRAP_ERRORS:
+                    sys.exit(0)
                 else:
-                    print('\n*** CALL MISMATCH or NOT FOUND ***')
-                    print(rec)
-                    print(call)
-                    print(rexch)
-                    call2='????'
-
-                # Find serial
-                s=''
-                i=0
-                for ch in rexch:
-                    if not ch.isalpha():
-                        s=s+ch
-                        i+=1
-                    else:
-                        break
+                    rexch=rexch.replace('?','')
+                    self.nproblems+=1
+                        
+            rexch=rexch.strip().upper().split(',')
+            try:
+                s=reverse_cut_numbers( rexch[0] )
                 if s=='':
-                    print('\n*** ERROR - No serial number - setting to 0')
-                    print(rec)
-                    print(rexch)
-                    s='0'
-
-                try:
-                    serial=int(s)
-                    print('serial=',serial,i)
-                except:
-                    print('BAD serial',s)
-                    serial=0
+                    print('Invalid serial s=',s)
                     if TRAP_ERRORS:
-                        print(rec)
                         sys.exit(0)
-
-                # Find prec
-                #print(rexch[i:])
-                for ch in rexch[i:]:
-                    if ch.isalpha():
-                        i+=1
-                        s=s+ch
-                        break
-                prec=ch
-                if not prec in ['Q','A','B','U','M','S']:
-                    print('\n*** ERROR - Bad PREC:',prec,'\tcall=',call)
-                    print(rec)
-                    #sys,exit(0)
-                #print 'prec=',prec,i
-
-                # Find check
-                s=''
-                for ch in rexch[i:]:
-                    #print ch,ch.isalpha()
-                    if not ch.isalpha():
-                        i+=1
-                        s=s+ch
                     else:
-                        break
-
-                try:
-                    check=int(s)
-                    #print('check=',check,i)
-                except:
-                    print('BAD Check',s)
-                    check=-1
+                        s=0
+                serial = int(s)
+                    
+                prec   = rexch[1]
+                call2  = rexch[2]
+                
+                if rexch[3]=='':
+                    print('Invalid check =',rexch[3])
                     if TRAP_ERRORS:
-                        print(rec)
                         sys.exit(0)
-
-                # Find section
-                sec=''
-                for ch in rexch[i:]:
-                    #print ch,ch.isalpha()
-                    if ch.isalpha():
-                        i+=1
-                        sec=sec+ch
                     else:
-                        break
-                if sec=='PEI':
-                    sec='PE'
-                #print 'sec=',sec,i
-
-            if not dupe:
-                self.nqsos2 += 1;
+                        rexch[3]=0
+                check  = int( rexch[3] )
+                sec    = rexch[4]
+                
+            except Exception as e: 
+                print('Problem unpacking rx exchange')
+                print( str(e) )
+                print('rexch=',rexch)
+                print(rec)
+                if TRAP_ERRORS:
+                    sys.exit(0)
 
         else:
             print(" ")
             print("*** ERROR - Problem with record")
             print(rec)
             print(" ")
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         # Construct sent data
         try:
-            #serial_out = int( rec["stx"] )
             serial_out = int( reverse_cut_numbers( rec["stx"] ) )
         except:
             print('BAD Serial Out:',rec["stx"] )
@@ -207,14 +150,6 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
             if TRAP_ERRORS:
                 print(rec)
                 sys.exit(0)
-
-        if False:
-            exch_in = '%3.3d %c %s %2d %3s' % (serial,prec,call2,check,sec)
-            print('exch_in=',exch_in)
-            exch_out = '%3.3d %c %s %2d %3s' % \
-                (serial_out,self.MY_PREC,self.MY_CALL,self.MY_CHECK,self.MY_SECTION)
-            print('exch_out=',exch_out)
-            sys.exit(0)
 
         # Some simple error checking
         if not prec in ['Q','A','B','U','M','S']:
@@ -229,17 +164,33 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
             if TRAP_ERRORS:
                 sys,exit(0)
                         
-        try:
-            idx = ARRL_SECS.index(sec)
-            self.sec_cnt[idx] += 1
-        except:
-            print('Well that didnt work - BAD sec=',sec)
-            print(rec)
-            if TRAP_ERRORS:
-                sys,exit(0)
-
         self.check_serial_out(serial_out,rec,TRAP_ERRORS)
+
+        idx2 = self.BANDS.index(band)
+        self.band_cnt[idx2] += 1
             
+        if not dupe:
+            self.nqsos2 += 1;
+
+            try:
+                idx1 = ARRL_SECS.index(sec)
+                self.sec_cnt[idx1] = 1
+            except Exception as e: 
+                print('\n$$$$$$$$$$$$$$$$$$$$$$')
+                print( str(e) )
+                print(sec,' not found in list of ARRL sections',len(sec))
+                print(rec)
+                print('$$$$$$$$$$$$$$$$$$$$$$')
+                if TRAP_ERRORS:
+                    sys.exit(0)
+    
+            # Info for multi-qsos
+            exch_in=str(serial)+' '+prec+' '+str(check)+' '+sec
+            if call in self.EXCHANGES.keys():
+                self.EXCHANGES[call].append(exch_in)
+            else:
+                self.EXCHANGES[call]=[exch_in]
+        
 #                              --------info sent------- -------info rcvd--------
 #QSO: freq  mo date       time call       nr   p ck sec call       nr   p ck sec
 #QSO: ***** ** yyyy-mm-dd nnnn ********** nnnn a nn aaa ********** nnnn a nn aaa
@@ -258,10 +209,12 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
             check9=HIST[call]['check']
             if sec!=sec9 or str(check)!=check9:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
-                print(rec)
-                print(line)
-                print(call,sec,check)
-                print(HIST[call])
+                #print(rec)
+                #print(line)
+                print(call,'\tCurrent:',sec,check,'\tHistory:',sec9,check9)
+                #print(len(sec),len(check),len(sec9),len(check9))
+                #print(HIST[call])
+                self.nwarnings+=1
                 #sys,exit(0)
                 
         if '?' in line:
@@ -274,7 +227,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
 
     # Summary & final tally
     def summary(self):
-        
+
         mults=0
         for i in range(len(ARRL_SECS)):
             print(i,'\t',ARRL_SECS[i],'\t',int( self.sec_cnt[i] ))
@@ -286,13 +239,22 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
             if self.sec_cnt[i]==1:
                 print('Only one: ',ARRL_SECS[i])
 
-        print(' ')
-        for i in range(len(ARRL_SECS)):
-            if self.sec_cnt[i]==0:
-                print('Missing: ',ARRL_SECS[i])
+        if all(self.sec_cnt)>0:
+            print('\n!!! CLEAN SWEEP !!!')
+        else:
+            print(' ')
+            for i in range(len(ARRL_SECS)):
+                if self.sec_cnt[i]==0:
+                    print('Missing: ',ARRL_SECS[i])
 
-        print('\nnqsos=',self.nqsos2)
+        print('\nNo. QSOs        =',self.nqsos1)
+        print('No. Uniques     =',self.nqsos2)
+        print('No. Problems    =',self.nproblems)
+        print('No. Warnings    =',self.nwarnings)
+        print('Raw QSOs by Band:')
+        for i in range(len(self.band_cnt)):
+            print(i,'\t',self.BANDS[i],'\t',int(self.band_cnt[i]) )
+        print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
         print('mults=',mults)
         print('score=',2*self.nqsos2*mults)
-
     
