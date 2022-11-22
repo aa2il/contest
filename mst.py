@@ -38,7 +38,8 @@ TRAP_ERRORS = False
 class MST_SCORING(CONTEST_SCORING):
 
     def __init__(self,P,session=None):
-        CONTEST_SCORING.__init__(self,P,'ICWC Medium Speed Test',mode='CW')
+        #CONTEST_SCORING.__init__(self,P,'ICWC Medium Speed Test',mode='CW')
+        super().__init__(P,'ICWC Medium Speed Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.sec_cnt = np.zeros((len(self.BANDS)),dtype=int)

@@ -231,7 +231,9 @@ class SST_SCORING(CONTEST_SCORING):
     
         print('\nNo. QSOs         =',self.nqsos2,\
               '\t(',self.nqsos1,')')
-        print('Band Count       =',list(zip(self.BANDS,self.band_cnt)) )
+        #print('Band Count       =',list(zip(self.BANDS,self.band_cnt)) )
+        for i in range(len(self.BANDS)):
+            print(self.BANDS[i],'\t',self.band_cnt[i])
         print('QSO Points       =',self.total_points,\
               '\t(',self.total_points_all,')')
         #print('State/Prov count =',self.sec_cnt,np.sum(self.sec_cnt))

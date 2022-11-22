@@ -2,7 +2,7 @@
 ################################################################################
 #
 # score - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Script to run cabrillo converter/scoring code.
 #
@@ -25,46 +25,50 @@ pushd ~/Python/contest
 # Select a contest
 set CONTEST=""
 
-#set CONTEST="cwt"
-#set CONTEST="sst"
-#set CONTEST="mst"
-#set CONTEST="cwopen"
-#set CONTEST="cqww"
+#set CONTEST="cwt"                # CWops CWT
+#set CONTEST="sst"                # K1USN Slow Speed Test
+#set CONTEST="mst"                # ICWC Medium Speed Test
+#set CONTEST="cwopen"             # CWops CW Open
+#set CONTEST="wwcw"               # CQ WW CW
 #set CONTEST="wwrtty"             # CQ WW RTTY
-set CONTEST="cwss"               # Sweepstakes
-#set CONTEST="arrl_dx"
-#set CONTEST="fd"                 # Field Day
-#set CONTEST="cqp"
-#set CONTEST="naqpcw"
-#set CONTEST="naqprtty"
-#set CONTEST="qsop"
-#set CONTEST="wwdigi"             # CQ WW Digi
-#set CONTEST="wpx"
-#set CONTEST="arrl_10m"
+#set CONTEST="cwss"               # ARRL Sweepstakes
+#set CONTEST="arrl_dx"            # ARRL Intl DX
+#set CONTEST="fd"                 # ARRL Field Day
+#set CONTEST="cqp"                # Commiefornia QSO Party
+#set CONTEST="naqpcw"             # North American QSO Party CW
+#set CONTEST="naqprtty"           # North American QSO Party RTTY
+#set CONTEST="qsop"               # State (other than CA) QSO Party
+#set CONTEST="wwdigi"             # CQ WW Digi 
+#set CONTEST="wpx"                # CQ WPX
+#set CONTEST="arrl_10m"           # ARRL 10-meter 
 #set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
 #set CONTEST="cqvhf"              # CQ WW VHF - July
 #set CONTEST="fall50"             # SE VHF Soc -  50 MHz Fall Sprint - August - svhfs.org
 #set CONTEST="namss"              # NA Meteor Scatter Sprint - August
-#set CONTEST="iaru"
+#set CONTEST="iaru"               # IRAU HF Champs
 #set CONTEST="cols13"             # 13 colonies special event - worked in 2021
 #set CONTEST="sats"               # Satellites worked  - worked in 2021
-#set CONTEST="ft8ru"
+#set CONTEST="ft8ru"              # FT Round-up
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
 
+# Select specific CWT/MST sessions or State QSO party here
 set SESSION=""                   
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
-#set SESSION="NY"                   
+#set SESSION=3                    # CW Open Session 1, 2 or 3
+#set SESSION="NY"                 # State QSO party
 #set SESSION="IL"                   
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
 #set TIME_LIMIT="-limit 10"       # NAQP
 
+# Most of time, I'm running assited
 set ASSISTED=""
-#set ASSISTED="-assisted"
+set ASSISTED="-assisted"
 #set ASSISTED="-hist ../pyKeyer/CQP/lotwreport.adi"
 
+# Figure out if we're in a weekly practice contests
 echo " "
 set d=`date`
 echo d=$d

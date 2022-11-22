@@ -81,7 +81,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         # Determine start & end dates/times
         now = datetime.datetime.utcnow()
         year=now.year
-        #year=2019               # Last time I participated
+        #year=2020               # Debug - Last time I participated
 
         day1=datetime.date(year,month,1).weekday()                     # Day of week of 1st of month - 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7) + ndays                                # Day no. for 4th Saturday = 1 since day1 is the 1st of the month
@@ -92,9 +92,10 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         
         # Manual override
         if False:
-            date0 = datetime.datetime.strptime( "20190928 0000" , "%Y%m%d %H%M")  # Start of contest
-            date1 = date0 + datetime.timedelta(hours=48)
-
+            self.date0 = datetime.datetime.strptime( "20190928 0000" , "%Y%m%d %H%M")  # Start of contest
+            self.date0 = datetime.datetime.strptime( "20201128 0000" , "%Y%m%d %H%M")  # Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=48)
+            
         if False:
             print('now=',now)
             print('day1=',day1,'\tsat2=',sat2)
@@ -133,10 +134,12 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         # Minor corrections
         if qth=='':
             qth=dx_station.cqz
+        elif qth=='AK':
+            qth=1
         try:
             zone=int(qth)
         except:
-            print('Problem converting zone:',qth)
+            print('\nProblem converting zone:',qth)
             print(rec)
             zone = int( dx_station.cqz )
             if TRAP_ERRORS:

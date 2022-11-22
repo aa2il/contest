@@ -67,13 +67,13 @@ class CWOPEN_SCORING(CONTEST_SCORING):
             session='ALL'
             start_time=0                                               # 1st session is 0000-0400 UTC
             duration=24
-        elif session==1:
+        elif session==00 or session==1:
             start_time=0                                               # 1st session is 0000-0400 UTC                           
             duration=4
-        elif session==2:
+        elif session==12 or session==2:
             start_time=12                                              # 2nd session is 1200-1600 UTC                           
             duration=4
-        elif session==3:
+        elif session==20 or session==3:
             start_time=20                                              # 3rd session is 2000-2400 UTC
             duration=4
         else:

@@ -270,16 +270,22 @@ class PARAMS:
             DIR_NAME = '~/'+MY_CALL+'/'
             
         elif args.wwcw:
-            contest='CQ-WW-CW'
-            MY_MODE='CW'
-            date0 = datetime.datetime.strptime( "20201128 0000" , "%Y%m%d %H%M")  # Start of contest
-            date1 = date0 + datetime.timedelta(hours=48)
+
+            # CQ World Wide CW
+            sc = CQ_WW_SCORING(P,'CW')
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+
+            DIR_NAME = '~/AA2IL/'
+            fname = 'AA2IL_2021.adif'
             
-            history = 'HIST_DIR/master.csv'
-            fname = 'AA2IL.adif'
-            DIR_NAME = '../pyKeyer/'
+            #DIR_NAME = '~/logs/'
+            #fname = 'AA2IL.adif'
     
         elif args.wwrtty:
+            
+            # CQ World Wide RTTY
             sc = CQ_WW_SCORING(P,'RTTY')
             self.sc=sc
 
