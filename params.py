@@ -278,10 +278,10 @@ class PARAMS:
             self.history = HIST_DIR+'master.csv'
 
             DIR_NAME = '~/AA2IL/'
-            fname = 'AA2IL_2021.adif'
+            #fname = 'AA2IL_2021.adif'
             
             #DIR_NAME = '~/logs/'
-            #fname = 'AA2IL.adif'
+            fname = 'AA2IL.adif'
     
         elif args.wwrtty:
             

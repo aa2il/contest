@@ -26,7 +26,7 @@ pushd ~/Python/contest
 set CONTEST=""
 
 #set CONTEST="cwt"                # CWops CWT
-#set CONTEST="sst"                # K1USN Slow Speed Test
+set CONTEST="sst"                # K1USN Slow Speed Test
 #set CONTEST="mst"                # ICWC Medium Speed Test
 #set CONTEST="cwopen"             # CWops CW Open
 #set CONTEST="wwcw"               # CQ WW CW

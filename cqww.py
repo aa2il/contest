@@ -1,9 +1,12 @@
 ############################################################################################
 #
 # cqww.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
 #
-# Routines for scoring CQ WW contests
+# Routines for scoring CQ WW contests.
+#
+# To Do: There is a lot of overlap between the RTTY & CW contests so we should be able to
+# combine the two scoring routines at some point.
 #
 ############################################################################################
 #
@@ -47,12 +50,14 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         zones  = []
         dxccs  = []
         self.NQSOS = OrderedDict()
+        self.POINTS = OrderedDict()
         for b in self.BANDS:
             mults.append((b,set([])))
             states.append((b,set([])))
             zones.append((b,set([])))
             dxccs.append((b,set([])))
             self.NQSOS[b]=0
+            self.POINTS[b]=0
         self.mults = OrderedDict(mults)
         self.states = OrderedDict(states)
         self.zones = OrderedDict(zones)
@@ -147,9 +152,21 @@ class CQ_WW_SCORING(CONTEST_SCORING):
 
         warning=False
         problem=False
+
+        # Error checking
+        if zone!=dx_station.cqz or zone<0 or zone>40:
+            print('*** Zone Mismatch ***')
+            print('call=',call)
+            print('zone=',zone)
+            print('state=',state)
+            warning=True;
+            self.warnings += 1
+            if TRAP_ERRORS:
+                sys.exit(0)
         
         if not dupe:
             self.nqsos2 += 1;
+            self.NQSOS[band]+=1
             if dx_station.country=='United States':
                 qso_points=0
             elif dx_station.continent=='NA':
@@ -157,10 +174,15 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             else:
                 qso_points=3
             self.total_points += qso_points
+            self.POINTS[band] += qso_points
 
             self.mults[band].add(str(zone))
             self.mults[band].add(dx_station.country)
+            self.zones[band].add(str(zone))
+            self.dxccs[band].add(dx_station.country)
 
+            self.countries.add(dx_station.country)
+            
         if MY_MODE=='CW':
             mode='CW'
             rst_out=599
@@ -169,8 +191,15 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             mode='PH'
             rst_in=59
         else:
-            mode='??'
+            print('Unknown my Mode',MY_MODE)
+            sys.exit(0)
 
+        # Info for multi-qsos
+        exch_in=str(rst_in)+' '+str(zone)
+        if call in self.EXCHANGES.keys():
+            self.EXCHANGES[call].append(exch_in)
+        else:
+            self.EXCHANGES[call]=[exch_in]
             
 #QSO:  3799 PH 2000-10-26 0711 AA1ZZZ          59  05     K9QZO         59  04     0
         line='QSO: %5d %2s %10s %4s %-13s %3d %2.2d %-13s %3d %2.2d  0' % \
@@ -192,7 +221,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             print('Time =',time_off)
             
             print(line)
-            if problem:
+            if problem and TRAP_ERRORS:
                 sys,exit(0)
 
         return line
@@ -362,7 +391,13 @@ class CQ_WW_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
 
-        print(self.states)
+        dxcc = list( self.countries )
+        dxcc.sort()
+        print('\nCountries:\t',len(dxcc))
+        for i in range(len(dxcc)):
+            print('   ',dxcc[i])
+
+        print('\nZones:')
         print(self.zones)
 
         print('nqsos2=',self.nqsos2)
@@ -397,6 +432,12 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             z.sort()
             print(b,' Zones :',z,len(z))
             nzones+=len(z)
+
+
+        print('\nBand\tQSOs\tPoints\tZones\tDXCCs')
+        for b in self.BANDS:
+            print(b,'\t',self.NQSOS[b],'\t',self.POINTS[b],'\t',len( self.zones[b] ),'\t',len( self.dxccs[b] ))
+        print('\nTotal:\t',nqsos3,'\t',self.total_points,'\t',nzones,'\t',ndxccs)
             
         print('\nnqsos         =',self.nqsos2,nqsos3)
         print('qso points    =',self.total_points)
