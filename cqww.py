@@ -178,10 +178,10 @@ class CQ_WW_SCORING(CONTEST_SCORING):
 
             self.mults[band].add(str(zone))
             self.mults[band].add(dx_station.country)
-            self.zones[band].add(str(zone))
+            self.zones[band].add(int(zone))
             self.dxccs[band].add(dx_station.country)
 
-            self.countries.add(dx_station.country)
+            #self.countries.add(dx_station.country)
             
         if MY_MODE=='CW':
             mode='CW'
@@ -391,11 +391,13 @@ class CQ_WW_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
 
+        """
         dxcc = list( self.countries )
         dxcc.sort()
         print('\nCountries:\t',len(dxcc))
         for i in range(len(dxcc)):
             print('   ',dxcc[i])
+        """
 
         print('\nZones:')
         print(self.zones)
@@ -409,6 +411,8 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         nzones=0
         ndxccs=0
         nqsos3=0
+        dxccs=[]
+        zones=[]
         for b in self.BANDS:
             print('\n',b,'# QSOs=',self.NQSOS[b])
             nqsos3+=self.NQSOS[b]
@@ -427,18 +431,34 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             d.sort()
             print(b,' DXCCs :',d,len(d))
             ndxccs+=len(d)
+            dxccs+=d
 
             z = list( self.zones[b] )
             z.sort()
             print(b,' Zones :',z,len(z))
             nzones+=len(z)
-
+            zones+=z
 
         print('\nBand\tQSOs\tPoints\tZones\tDXCCs')
         for b in self.BANDS:
             print(b,'\t',self.NQSOS[b],'\t',self.POINTS[b],'\t',len( self.zones[b] ),'\t',len( self.dxccs[b] ))
-        print('\nTotal:\t',nqsos3,'\t',self.total_points,'\t',nzones,'\t',ndxccs)
-            
+        print('\nTotals:\t',nqsos3,'\t',self.total_points,'\t',nzones,'\t',ndxccs)
+
+        print('\nClaimed score =',self.total_points*mults)
+
+        zones=list(set(zones)) 
+        zones.sort()
+        print('\nNo. unique Zones =',len(zones))
+        print(zones)
+        
+        dxccs=list(set(dxccs)) 
+        dxccs.sort()
+        print('\nNo. unique DXCCs =',len(dxccs))
+        print(dxccs)
+        #for i in range(len(dxccs)):
+        #    print('   ',dxccs[i])
+
+        """
         print('\nnqsos         =',self.nqsos2,nqsos3)
         print('qso points    =',self.total_points)
         print('# states      =',nstates)
@@ -446,4 +466,4 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         print('# zones       =',nzones)
         print('# mults       =',mults)
         print('Claimed score =',self.total_points*mults)
-    
+        """

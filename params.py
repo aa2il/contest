@@ -59,7 +59,7 @@ class PARAMS:
         arg_proc.add_argument('-wwcw', action='store_true',help='CQ WW CW')
         arg_proc.add_argument('-wwrtty', action='store_true',help='CQ WW RTTY')
         arg_proc.add_argument('-rttyru', action='store_true',help='ARRL RTTY Round Up')
-        arg_proc.add_argument('-ft8ru', action='store_true',help='FT8 Round Up')
+        arg_proc.add_argument('-ftru', action='store_true',help='FT Round Up')
         arg_proc.add_argument('-ten', action='store_true',help='ARRL 10 Meter')
         arg_proc.add_argument('-vhf', action='store_true',help='ARRL VHF')
         arg_proc.add_argument('-cqvhf', action='store_true',help='CQ WW VHF')
@@ -134,6 +134,8 @@ class PARAMS:
 
         elif args.rttyru:
             sc = ARRL_RTTY_RU_SCORING(P,'ARRL-RTTY')
+            #self.sc=sc
+            
             contest=sc.contest
             MY_MODE='MIXED'          # sc.my_mode
             date0=sc.date0
@@ -149,24 +151,29 @@ class PARAMS:
             fnames.append( DIR_NAME+'/'+fname2 )
             output_file = sc.output_file
 
-        elif args.ft8ru:
+        elif args.ftru:
+
+            # FT Round-up in Decembet
             sc = ARRL_RTTY_RU_SCORING(P,'FT8-RU')
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            date0=sc.date0
-            date1=sc.date1
+            self.sc=sc
             
+            self.history = HIST_DIR+'master.csv'
             fname = 'wsjtx_log.adi'
             DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
     
         elif args.ten:
-            contest='ARRL 10'
-            MY_MODE='CW'
-            date0 = datetime.datetime.strptime( "20201212 0000" , "%Y%m%d %H%M")  # Start of contest
-            date1 = date0 + datetime.timedelta(hours=48)
-            DIR_NAME = '../pyKeyer'
+
+            # ARRL 10m contest
+            sc = ARRL_RTTY_RU_SCORING(P,'ARRL-10')
+            self.sc=sc
+            
+            fname = 'AA2IL_2021.adif'
             fname = 'AA2IL.adif'
-            output_file = 'AA2IL_10m_2020.LOG'
+            DIR_NAME = '~/AA2IL'
+
+            #DIR_NAME = '../pyKeyer'
+            #fname = 'AA2IL.adif'
+            output_file = sc.output_file
     
         elif args.vhf or args.cqvhf or args.fall50 or args.namss:
 

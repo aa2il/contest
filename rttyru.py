@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # rttyru.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring ARRL RTTY ROUNDUP, ARRL 10m and FT8 ROUNDUP.
 #
@@ -24,6 +24,7 @@ import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
+from utilities import reverse_cut_numbers
 
 ############################################################################################
     
@@ -36,16 +37,13 @@ TRAP_ERRORS = True
 class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
  
     def __init__(self,P,contest):
-        #print('contest=',contest)
-        #print('Settings=',P.SETTINGS)
-        
         CONTEST_SCORING.__init__(self,P,contest)
 
         print('RTTY RU Scoring Init...')
 
-        self.rttyru   = contest=='ARRL-RTTY'
-        self.ft8ru    = contest=='FT8-RU'
-        self.ten_m    = contest=='ARRL-10'
+        self.rttyru = contest =='ARRL-RTTY'
+        self.ft8ru  = contest =='FT8-RU'
+        self.ten_m  = contest =='ARRL-10'
         if not self.rttyru and not self.ft8ru and not self.ten_m:
             print('*** UNKNOWN CONTEST ***',contest)
             sys.exit(0)        
@@ -53,8 +51,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             self.secs = TEN_METER_SECS
         else:
             self.secs = RU_SECS
-        self.sec_cnt  = np.zeros(len(self.secs))
-        self.band_cnt = np.zeros(len(CONTEST_BANDS))
+        self.sec_cnt  = np.zeros(len(self.secs),dtype=int)
+        self.band_cnt = np.zeros(len(CONTEST_BANDS),dtype=int)
         
         if self.rttyru:
             self.my_mode = 'MIXED'
@@ -62,6 +60,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         self.rtty_qsos = 0
         self.ft4_qsos  = 0
         self.ft8_qsos  = 0
+        self.cw_qsos   = 0
 
         # History file
         self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
@@ -80,8 +79,16 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
 
         elif self.ten_m:
             
-            print('RTTYRU Init - need date calcs for this contest')
-            sys.exit(0)
+            # Contest occurs on 2nd full weekend of Dec
+            year=now.year
+            #year=2020
+            day1=datetime.date(year,12,1).weekday()                        # Day of week of 1st of month 0=Monday, 6=Sunday
+            sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                           # No. days until 1st Saturday (day 5) + 7 more days 
+            self.date0=datetime.datetime(year,12,sat2,0)                   # Contest starts at 0000 UTC on Saturday (Friday night local) ...
+            #self.date0 = datetime.datetime.strptime( "20201212 0000" , "%Y%m%d %H%M")  # Override Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=48)         # ... and ends at 1200 UTC on Sunday
+            print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
             
         else:
 
@@ -170,7 +177,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         band = rec["band"]
         mode = rec["mode"]
         RST_OUT = rec["rst_sent"]
-        RST_IN  = rec["rst_rcvd"]
+        RST_IN  = reverse_cut_numbers( rec['rst_rcvd'] )
 
         if 'country' in rec :
             country = rec["country"]
@@ -181,8 +188,12 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
 
         if country in ['USA','United States','Canada']:
             try:
-                qth = rec["state"]
-            except:
+                if 'state' in rec:
+                    qth = rec["state"]
+                else:
+                    qth = rec["qth"]
+            except Exception as e: 
+                print(e)
                 print('\n',call,"*** EXPECTING STATE/PROVINCE ***")
                 if TRAP_ERRORS:
                     print(rec)
@@ -240,8 +251,15 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             mode='RY'
             if not dupe:
                 self.rtty_qsos += 1
+        elif self.ten_m:
+            if mode=='CW':
+                if not dupe:
+                    self.cw_qsos += 1
+            else:
+                print('RTTYRU SCORING: Unknown mode',mode,' - EXPCETING CW')
+                sys.exit(0)
         else:
-            print('RTTYRU SCORING: Unknow mode',mode)
+            print('RTTYRU SCORING: Unknown mode',mode)
             sys.exit(0)
             
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
@@ -260,9 +278,30 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             else:
                 self.countries.add(country)
                 dx=True
-                
+                try:
+                    qth=reverse_cut_numbers( qth )
+                    val=int(qth)
+                except:
+                    print('Invalid serial for DX',qth)
+                    if TRAP_ERRORS:
+                        sys.exit(0)
+                    
         if not dupe:
+
+            if self.ten_m:
+                if mode=='PH':
+                    qso_points=2
+                elif mode=='CW':
+                    qso_points=4
+                else:
+                    print('RTTYRU - Unknown mode',mode)
+                    sys.exit(0)
+            else:
+                qso_points=1
+
+            # Non-duplicate & points
             self.nqsos2 += 1;
+            self.total_points += qso_points
             idx2 = CONTEST_BANDS.index(band)
             self.band_cnt[idx2] += 1
 
@@ -337,7 +376,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         return line
 
     # Routine to sift through station we had multiple contacts with to identify any discrepancies
-    def check_multis(self,qsos):
+    def check_multis_OLD(self,qsos):
 
         print('There were multiple qsos with the following stations:')
         qsos2=qsos.copy()
@@ -364,8 +403,10 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                             try:
                                 qth  = rec["srx"]
                             except:
+                                print('\nWHOOOPS!')
                                 print(rec)
-                                sys.exit(0)
+                                if TRAP_ERRORS:
+                                      sys.exit(0)
 
                         flag=''
                         if qth_old=='':
@@ -397,15 +438,23 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             print('   ',dxcc[i])
             
         mults = len(dxcc) + int( np.sum(self.sec_cnt) )
-        print('\nBy Band:',self.band_cnt,sum(self.band_cnt))
+        #print('\nBy Band:',self.band_cnt,sum(self.band_cnt))
+        print('\nBand\tQSOs')
+        for i in range(len(CONTEST_BANDS)):
+            print(CONTEST_BANDS[i],'\t',self.band_cnt[i])
+        print('\nTotals:\t',sum(self.band_cnt))
     
         print('\nNo. QSOs        =\t',self.nqsos1)
         print('No. Unique QSOs =\t',self.nqsos2)
-        print('No. RTTY QSOs   =\t',self.rtty_qsos)
-        print('No. FT8 QSOs    =\t',self.ft8_qsos)
-        print('No. FT4 QSOs    =\t',self.ft4_qsos)
+        if self.rttyru:
+            print('No. RTTY QSOs   =\t',self.rtty_qsos)
+        if self.rttyru or self.ft8ru:
+            print('No. FT8 QSOs    =\t',self.ft8_qsos)
+            print('No. FT4 QSOs    =\t',self.ft4_qsos)
+        if self.ten_m:
+            print('No. CW QSOs     =\t',self.cw_qsos)
         print('Multipliers     =\t',mults)
-        print('Claimed Score   =\t',self.nqsos2*mults)
+        print('Claimed Score   =\t',self.total_points*mults)
 
     #######################################################################################
 

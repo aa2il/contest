@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # cwt.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring CWops mini tests.
 #
@@ -37,7 +37,7 @@ class CWT_SCORING(CONTEST_SCORING):
         super().__init__(P,'CW Ops Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.sec_cnt = np.zeros((len(self.BANDS)))
+        self.sec_cnt = np.zeros(len(self.BANDS),dtype=int)
         self.calls=set([])
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
@@ -196,12 +196,13 @@ class CWT_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
+        print('\nUnique calls =',self.calls)
         print('\nnqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
-        #print('band count =',self.sec_cnt)
+        print('\nBand\tQSOs')
         for i in range(len(self.BANDS)):
             print(self.BANDS[i],'\t',self.sec_cnt[i])
-        print('calls =',self.calls)
+        print('\nTotals:\t',self.nqsos2)
         mults = len(self.calls)
         print('mults=',mults)
-        print('total score=',mults*self.nqsos2,'\t(',mults*self.nqsos1,')')
+        print('\nClaimed score =',mults*self.nqsos2,'\t(',mults*self.nqsos1,')')
