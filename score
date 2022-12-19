@@ -41,6 +41,7 @@ set CONTEST=""
 #set CONTEST="wwdigi"             # CQ WW Digi 
 #set CONTEST="wpx"                # CQ WPX
 #set CONTEST="ten"                 # ARRL 10-meter 
+set CONTEST="rac"                 # RAC Winter Contest
 #set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
 #set CONTEST="cqvhf"              # CQ WW VHF - July
 #set CONTEST="fall50"             # SE VHF Soc -  50 MHz Fall Sprint - August - svhfs.org

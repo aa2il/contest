@@ -41,6 +41,7 @@ from wwdigi import *
 from mak import *
 from rttyru import *
 from cqww import *
+from rac import *
 from colonies import *
 from satellites import *
 from call import *
@@ -74,6 +75,7 @@ class PARAMS:
         arg_proc.add_argument('-mst',help='Medium  Speed Mini-Test',
                               nargs='*',type=int,default=None)
         arg_proc.add_argument('-sst', action='store_true',help='Slow Speed Mini-Test')
+        arg_proc.add_argument('-rac', action='store_true',help='RAC Winter Contest')
         arg_proc.add_argument('-call',help='All QSOs with a Specific Call(s)',
                               nargs='*',type=str,default=None)
         arg_proc.add_argument('-cols13', action='store_true',help='13 Colonies Special Event')
@@ -351,6 +353,16 @@ class PARAMS:
             fname = 'CQP.csv'
             fname = 'CQP.adif'
             
+        elif args.rac:
+
+            # RAC Winter Contest
+            sc = RAC_SCORING(P)
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+            fname = MY_CALL+'.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
+
         elif args.sst:
 
             # K1USN SST

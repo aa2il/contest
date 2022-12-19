@@ -9,3 +9,10 @@
 /AA2IL.txt1
 /*.LOG
 /JUNK
+*.adif
+/*.log
+/AA2IL_CQP_2022.LOG1
+/AA2IL_CQP_2022.LOG2
+/AA2IL_*.TXT
+/lotwreport.adi
+/upload_adif_log

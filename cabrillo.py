@@ -6,14 +6,6 @@
 #
 # Program to convert contest log to cabrillo format and compute claimed score.
 #
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#
-# NOTE:
-#     Most up-to-date contest module is the IARU CONTEST.
-#     Use it as model for subsequent contests
-#
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#
 ############################################################################################
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,7 +27,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-from load_history import *
+from load_history import load_history
 from fileio import *
 from params import *
 
