@@ -22,12 +22,14 @@
 
 pushd ~/Python/contest
 
-# Select a contest
+# Select a contest - Start putting them a chornological order ...
 set CONTEST=""
-
 #set CONTEST="cwt"                # CWops CWT
 #set CONTEST="sst"                # K1USN Slow Speed Test
 #set CONTEST="mst"                # ICWC Medium Speed Test
+
+#set CONTEST="rttyru"             # ARRL RTTY Round-up
+
 #set CONTEST="cwopen"             # CWops CW Open
 #set CONTEST="wwcw"               # CQ WW CW
 #set CONTEST="wwrtty"             # CQ WW RTTY
@@ -40,8 +42,6 @@ set CONTEST=""
 #set CONTEST="qsop"               # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
 #set CONTEST="wpx"                # CQ WPX
-#set CONTEST="ten"                 # ARRL 10-meter 
-set CONTEST="rac"                 # RAC Winter Contest
 #set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
 #set CONTEST="cqvhf"              # CQ WW VHF - July
 #set CONTEST="fall50"             # SE VHF Soc -  50 MHz Fall Sprint - August - svhfs.org
@@ -50,7 +50,8 @@ set CONTEST="rac"                 # RAC Winter Contest
 #set CONTEST="cols13"             # 13 colonies special event - worked in 2021
 #set CONTEST="sats"               # Satellites worked  - worked in 2021
 #set CONTEST="ftru"                # FT Round-up - December
-#set CONTEST="rttyru"             # ARRL RTTY Round-up
+#set CONTEST="ten"                 # ARRL 10-meter 
+#set CONTEST="rac"                 # RAC Winter Contest
 
 # Select specific CWT/MST sessions or State QSO party here
 set SESSION=""                   
