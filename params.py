@@ -265,8 +265,14 @@ class PARAMS:
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
-            fname = MY_CALL+'.adif'
-            DIR_NAME = '~/'+MY_CALL+'/'
+            #print('fname=',fname)
+            if fname==None:
+                fname = MY_CALL+'.adif'
+                DIR_NAME = '~/'+MY_CALL+'/'
+            else:
+                DIR_NAME = '.'
+            print('fname=',fname)
+            #sys.exit(0)
 
         elif args.qsop:
 
@@ -349,7 +355,7 @@ class PARAMS:
             #fname = MY_CALL2+'_2021.adif'    # Testing
             DIR_NAME = '~/'+MY_CALL1+'/'
             fname = MY_CALL2+'.adif'
-            DIR_NAME = '../pyKeyer/CQP/'
+            DIR_NAME = '../pyKeyer/CQP_2022/'
             fname = 'CQP.csv'
             fname = 'CQP.adif'
             

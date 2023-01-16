@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # naqp.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring NAQP CW & RTTY contests
 #
@@ -43,25 +43,34 @@ class NAQP_SCORING(CONTEST_SCORING):
         self.MY_STATE    = P.SETTINGS['MY_STATE']
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.band_cnt = np.zeros((len(self.BANDS)))
-        self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)))        
+        self.band_cnt = np.zeros((len(self.BANDS)),dtype=np.int)
+        self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)),dtype=np.int)
         self.TRAP_ERRORS = TRAP_ERRORS
 
+        # Jan CW contest occurs on 2nd full weekend of Jan
         # Aug CW contest occurs on 1st full weekend of Aug
-        # Need to update this for other events
         now = datetime.datetime.utcnow()
         year=now.year
+        MONTH = now.strftime('%b').upper()
+        print('month=',MONTH)
+
         #year=2021                                                   # Override
-        day1=datetime.date(year,8,1).weekday()                      # Day of week of 1st of month 0=Monday, 6=Sunday
-        sat1=1 + ((5-day1) % 7)                                     # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+        if MONTH=='JAN':
+            m=1
+            dd=7
+        else:
+            m=8
+            dd=0
+        day1=datetime.date(year,m,1).weekday()                      # Day of week of 1st of month 0=Monday, 6=Sunday
+        sat1=1 + ((5-day1) % 7)  +dd                                # Day no. for 1st or 2nd Saturday = 1 since day1 is the 1st of the month
         start_hour=18
-        self.date0=datetime.datetime(year,8,sat1,start_hour)       # Contest starts at 1800 UTC on Saturday ...
+        self.date0=datetime.datetime(year,m,sat1,start_hour)       # Contest starts at 1800 UTC on Saturday ...
         self.date1 = self.date0 + datetime.timedelta(hours=12)         # ... and ends at 0600 UTC on Sunday
         print('day1=',day1,'\tsat1=',sat1,'\tdate0=',self.date0)
         #sys.exit(0)
         
         # Name of output file - stupid web uploader doesn't recognize .LOG extenion!
-        self.output_file = self.MY_CALL+'_NAQP_'+MODE+'_'+str(self.date0.year)+'.TXT'
+        self.output_file = self.MY_CALL+'_NAQP_'+MONTH+'_'+MODE+'_'+str(self.date0.year)+'.TXT'
 
     # Contest-dependent header stuff
     def output_header(self,fp):
@@ -89,6 +98,17 @@ class NAQP_SCORING(CONTEST_SCORING):
             print('Invalid mode',MY_MODE)
             sys.exit(1)
 
+        # There is some duplication in the adif file
+        rx_string = rec["srx_string"].upper().split(',')
+        if rx_string[0]!=name or rx_string[1]!=qth:
+            print('\n******** Houston, we have a problem - inconsitency in recorded  exchange')
+            print('\tcall=',call)
+            print('\tqth=',qth)
+            print('\tname=',name)
+            print('\tsrx_string=',srx_string)
+            if TRAP_ERRORS:
+                sys.exit(0)
+            
         """
         # In 2017, there was some inconsistancies in how the name & state were saved
         if call=='AA2IL' or qth==name:
@@ -187,8 +207,12 @@ class NAQP_SCORING(CONTEST_SCORING):
         print('\nNo. QSOs        =',self.nqsos1)
         print('No. Uniques     =',self.nqsos2)
         print('No. Skipped     =',self.nskipped)
-        print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
-        print('Mults           =',mults,'  =  ',int(sum(mults)))
+        #print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
+        #print('Mults           =',mults,'  =  ',int(sum(mults)))
+        print('\nBand\tQSOs\tMults')
+        for i in range(len(self.BANDS)):
+            print(self.BANDS[i],'\t',self.band_cnt[i],'\t',mults[i])
+        print('\nTotals:\t',sum(self.band_cnt),'\t',sum(mults))
         print('Claimed score=',sum(mults)*self.nqsos2)
         if False:
             for j in range(len(BANDS)):

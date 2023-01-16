@@ -20,7 +20,7 @@
 #
 ################################################################################
 
-pushd ~/Python/contest
+#pushd ~/Python/contest
 
 # Select a contest - Start putting them a chornological order ...
 set CONTEST=""
@@ -37,7 +37,7 @@ set CONTEST=""
 #set CONTEST="arrl_dx"            # ARRL Intl DX
 #set CONTEST="fd"                 # ARRL Field Day
 #set CONTEST="cqp"                # Commiefornia QSO Party
-#set CONTEST="naqpcw"             # North American QSO Party CW
+set CONTEST="naqpcw"             # North American QSO Party CW
 #set CONTEST="naqprtty"           # North American QSO Party RTTY
 #set CONTEST="qsop"               # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
@@ -63,7 +63,10 @@ set SESSION=""
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
-#set TIME_LIMIT="-limit 10"       # NAQP
+set TIME_LIMIT="-limit 10"       # NAQP
+
+set LOG_FILE=""
+set LOG_FILE="-i NAQP.csv"
 
 # Most of time, I'm running assited
 set ASSISTED=""
@@ -93,18 +96,17 @@ echo CONTEST=$CONTEST     SESSION=$SESSION
 
 ################################################################################
 
-echo cabrillo.py -$CONTEST $SESSION $TIME_LIMIT $ASSISTED
-cabrillo.py -$CONTEST $SESSION  $TIME_LIMIT $ASSISTED
+set EXE="~/Python/contest/cabrillo.py"
+pwd
+echo $EXE -$CONTEST $SESSION $TIME_LIMIT $ASSISTED $LOG_FILE
+$EXE -$CONTEST $SESSION  $TIME_LIMIT $ASSISTED $LOG_FILE
 
-popd
+#popd
 
 # cabrillo.py -cqp -hist lotwreport.adi
 
 # ARRL 10 meter
 #cabrillo.py -ten
-
-# CQ WW CW - seems to work in 2020
-#cabrillo.py -wwcw
 
 # Makroten
 #cabrillo.py -mak

@@ -299,6 +299,8 @@ for i in range(len(qsos)):
                     print('Time gap:',gap_min,'minutes')
                 if gap_min>30:
                     cum_gap += gap_min
+                    print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Time Gap %%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+                    print(date_off,rec['call'],qsos[i-1]['call'])
 
             #print('t1=',t1)
             dt=(t1-t0).total_seconds() / 60.0
@@ -324,19 +326,20 @@ for i in range(len(qsos)):
         dts.append(dt2)
         tlast = date_off
                     
-        # Check for operating time limit - NAQP has this (as do others)
-        #if op_time>P.sc.time_limit and P.TIME_LIMIT:
-        if op_time>P.TIME_LIMIT:
-            print('<<<<<<<<<<< Op time limit exceeded - skipped >>>>>>>>>>>>>>\n')
-            P.sc.nskipped+=1
-            continue
-
         # Check for rapid dupes - this often happens with FT4/8
         dupe,rapid = P.sc.check_dupes(rec,qsos,i,istart)
         if rapid and (P.sc.contest!='FT8-RU' or False):
             print('<<<<<<<<<<< RAPID dupe skipped >>>>>>>>>>>>>>\n')
             P.sc.nskipped+=1
             continue
+
+        # Check for operating time limit - NAQP has this (as do others)
+        if op_time>P.TIME_LIMIT:
+            print('<<<<<<<<<<< Time limit exceeded >>>>>>>>>>>>>>',
+                  60*(op_time-P.TIME_LIMIT),'\t',rec['call'])
+            P.sc.nskipped+=1
+            dupe=True
+            #continue
 
         if P.sc.contest=='13 Colonies Special Event':
             # This one has a different API - leaving it like this for now
