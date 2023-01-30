@@ -2,7 +2,7 @@
 ################################################################################
 #
 # Params.py - Rev 1.0
-# Copyright (C) 2022 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2022-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Command line param parser for contest scorer.
 #
@@ -58,6 +58,7 @@ class PARAMS:
         arg_proc.add_argument('-mak', action='store_true',help='Makrothen RTTY')
         arg_proc.add_argument('-cwss', action='store_true',help='ARRL CW Sweepstakes')
         arg_proc.add_argument('-wwcw', action='store_true',help='CQ WW CW')
+        arg_proc.add_argument('-cq160m', action='store_true',help='CQ 160m')
         arg_proc.add_argument('-wwrtty', action='store_true',help='CQ WW RTTY')
         arg_proc.add_argument('-rttyru', action='store_true',help='ARRL RTTY Round Up')
         arg_proc.add_argument('-ftru', action='store_true',help='FT Round Up')
@@ -175,6 +176,16 @@ class PARAMS:
 
             #DIR_NAME = '../pyKeyer'
             #fname = 'AA2IL.adif'
+            output_file = sc.output_file
+    
+        elif args.cq160m:
+
+            # ARRL 10m contest
+            sc = ARRL_RTTY_RU_SCORING(P,'CQ-160')
+            self.sc=sc
+            
+            fname = 'AA2IL.adif'
+            DIR_NAME = '~/AA2IL'
             output_file = sc.output_file
     
         elif args.vhf or args.cqvhf or args.fall50 or args.namss:

@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # cwt.py - Rev 1.0
-# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring CWops mini tests.
 #
@@ -26,6 +26,11 @@ from scoring import CONTEST_SCORING
 from dx.spot_processing import Station
 from pprint import pprint
 from utilities import reverse_cut_numbers
+
+############################################################################################
+    
+TRAP_ERRORS = False
+TRAP_ERRORS = True
 
 ############################################################################################
     
@@ -144,6 +149,13 @@ class CWT_SCORING(CONTEST_SCORING):
         else:
             print('??????????????? Dupe?',call)
         #print call,self.nqsos2
+
+        # Sometimes, I'll put a "?" to indicate that I need to review
+        if '?' in call+name+qth:
+            print('\n??? Check this one again: ???')
+            print('call=',call,'\t\tname=',name,'\t\tqth=',qth,'\ttime=',time_off)
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         # Check for DX calls
         if call not in keys and '/' in call:

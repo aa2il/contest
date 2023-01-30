@@ -1,9 +1,9 @@
 ############################################################################################
 #
 # rttyru.py - Rev 1.0
-# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
-# Routines for scoring ARRL RTTY ROUNDUP, ARRL 10m and FT8 ROUNDUP.
+# Routines for scoring ARRL RTTY ROUNDUP, ARRL 10m, CQ 160m and FT8 ROUNDUP.
 #
 ############################################################################################
 #
@@ -44,11 +44,14 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         self.rttyru = contest =='ARRL-RTTY'
         self.ft8ru  = contest =='FT8-RU'
         self.ten_m  = contest =='ARRL-10'
-        if not self.rttyru and not self.ft8ru and not self.ten_m:
+        self.cq160m = contest =='CQ-160'
+        if not self.rttyru and not self.ft8ru and not self.ten_m and not self.cq160m:
             print('*** UNKNOWN CONTEST ***',contest)
             sys.exit(0)        
         elif self.ten_m:
             self.secs = TEN_METER_SECS
+        elif self.cq160m:
+            self.secs = STATES + PROVINCES 
         else:
             self.secs = RU_SECS
         self.sec_cnt  = np.zeros(len(self.secs),dtype=int)
@@ -86,6 +89,18 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
                                                                            # No. days until 1st Saturday (day 5) + 7 more days 
             self.date0=datetime.datetime(year,12,sat2,0)                   # Contest starts at 0000 UTC on Saturday (Friday night local) ...
+            #self.date0 = datetime.datetime.strptime( "20201212 0000" , "%Y%m%d %H%M")  # Override Start of contest
+            self.date1 = self.date0 + datetime.timedelta(hours=48)         # ... and ends at 1200 UTC on Sunday
+            print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
+            
+        elif self.cq160m:
+            
+            # Contest occurs on 4th full weekend of Jan
+            year=now.year
+            day1=datetime.date(year,1,1).weekday()                        # Day of week of 1st of month 0=Monday, 6=Sunday
+            sat2=1 + ((5-day1) % 7) + 3*7                                  # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
+                                                                           # No. days until 1st Saturday (day 5) + 7 more days 
+            self.date0=datetime.datetime(year,1,sat2,0)                   # Contest starts at 0000 UTC on Saturday (Friday night local) ...
             #self.date0 = datetime.datetime.strptime( "20201212 0000" , "%Y%m%d %H%M")  # Override Start of contest
             self.date1 = self.date0 + datetime.timedelta(hours=48)         # ... and ends at 1200 UTC on Sunday
             print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
@@ -251,7 +266,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             mode='RY'
             if not dupe:
                 self.rtty_qsos += 1
-        elif self.ten_m:
+        elif self.ten_m or self.cq160m:
             if mode=='CW':
                 if not dupe:
                     self.cw_qsos += 1
@@ -271,8 +286,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             dx=False
         except:
             if country=='United States' or country=='Canada' or (self.ten_m and country=='Mexico'):
+                print('\n*** ERROR *** qth=',qth,' not found in list of Sections - call=',call,country)
                 print('\nrec=',rec)
-                print('qth=',qth,' not found in list of RU sections - call=',call,country)
                 if TRAP_ERRORS:
                     sys.exit(0)
             else:

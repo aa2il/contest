@@ -325,7 +325,8 @@ for i in range(len(qsos)):
         dt2 = (date_off-tlast).total_seconds()
         dts.append(dt2)
         tlast = date_off
-                    
+        last_rec = rec
+        
         # Check for rapid dupes - this often happens with FT4/8
         dupe,rapid = P.sc.check_dupes(rec,qsos,i,istart)
         if rapid and (P.sc.contest!='FT8-RU' or False):
@@ -371,6 +372,7 @@ for i in range(len(qsos)):
 
 fp.write('END-OF-LOG:\n')
 fp.close()
+print('\nLasst call=',last_rec['call'],'\t',last_rec['band'])
 
 print(" ")
 P.sc.check_multis(qsos)
