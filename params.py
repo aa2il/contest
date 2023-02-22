@@ -41,6 +41,7 @@ from wwdigi import *
 from mak import *
 from rttyru import *
 from cqww import *
+from arrl_dx import *
 from rac import *
 from colonies import *
 from satellites import *
@@ -58,6 +59,7 @@ class PARAMS:
         arg_proc.add_argument('-mak', action='store_true',help='Makrothen RTTY')
         arg_proc.add_argument('-cwss', action='store_true',help='ARRL CW Sweepstakes')
         arg_proc.add_argument('-wwcw', action='store_true',help='CQ WW CW')
+        arg_proc.add_argument('-arrl_dx', action='store_true',help='ARRL Intl DX')
         arg_proc.add_argument('-cq160m', action='store_true',help='CQ 160m')
         arg_proc.add_argument('-wwrtty', action='store_true',help='CQ WW RTTY')
         arg_proc.add_argument('-rttyru', action='store_true',help='ARRL RTTY Round Up')
@@ -295,6 +297,17 @@ class PARAMS:
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
             
+        elif args.arrl_dx:
+
+            # ARRL Internationl DX 
+            sc = ARRL_INTL_DX_SCORING(P,'CW')
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+
+            DIR_NAME = '~/AA2IL/'
+            fname = 'AA2IL.adif'
+    
         elif args.wwcw:
 
             # CQ World Wide CW

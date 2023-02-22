@@ -32,12 +32,12 @@ set CONTEST=""
 #set CONTEST="naqpcw"             # North American QSO Party CW
 #set CONTEST="naqprtty"           # North American QSO Party RTTY
 #set CONTEST="cq160m"              # CQ 160m CW
+#set CONTEST="arrl_dx"            # ARRL Intl DX
 
 #set CONTEST="cwopen"             # CWops CW Open
 #set CONTEST="wwcw"               # CQ WW CW
 #set CONTEST="wwrtty"             # CQ WW RTTY
 #set CONTEST="cwss"               # ARRL Sweepstakes
-#set CONTEST="arrl_dx"            # ARRL Intl DX
 #set CONTEST="fd"                 # ARRL Field Day
 #set CONTEST="cqp"                # Commiefornia QSO Party
 #set CONTEST="qsop"               # State (other than CA) QSO Party
@@ -63,11 +63,11 @@ set SESSION=""
 #set SESSION="IL"                   
 
 set TIME_LIMIT=""
-set TIME_LIMIT="-nograph"
-set TIME_LIMIT="-limit 10"       # NAQP
+#set TIME_LIMIT="-nograph"
+#set TIME_LIMIT="-limit 10"       # NAQP
 
 set LOG_FILE=""
-set LOG_FILE="-i NAQP.csv"
+#set LOG_FILE="-i NAQP.csv"
 
 # Most of time, I'm running assited
 set ASSISTED=""

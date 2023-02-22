@@ -2,7 +2,7 @@
 ############################################################################################
 #
 # cabrillo.py - Rev 1.0
-# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Program to convert contest log to cabrillo format and compute claimed score.
 #
