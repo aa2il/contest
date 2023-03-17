@@ -58,6 +58,9 @@ class NAQP_SCORING(CONTEST_SCORING):
         if MONTH=='JAN':
             m=1
             dd=7
+        elif MONTH=='FEB':
+            m=2
+            dd=21
         else:
             m=8
             dd=0
@@ -84,8 +87,14 @@ class NAQP_SCORING(CONTEST_SCORING):
 
         # Pull out relavent entries
         call = rec["call"].upper()
-        qth  = rec["qth"].upper()
-        name = rec["name"].upper()
+        if 'qth' in rec:
+            qth  = rec["qth"].upper()
+        else:
+            qth='?'
+        if 'name' in rec:
+            name = rec["name"].upper()
+        else:
+            name='?'
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
@@ -99,15 +108,16 @@ class NAQP_SCORING(CONTEST_SCORING):
             sys.exit(1)
 
         # There is some duplication in the adif file
-        rx_string = rec["srx_string"].upper().split(',')
-        if rx_string[0]!=name or rx_string[1]!=qth:
-            print('\n******** Houston, we have a problem - inconsitency in recorded  exchange')
-            print('\tcall=',call)
-            print('\tqth=',qth)
-            print('\tname=',name)
-            print('\tsrx_string=',srx_string)
-            if TRAP_ERRORS:
-                sys.exit(0)
+        if "srx_string" in rec:
+            rx_string = rec["srx_string"].upper().split(',')
+            if rx_string[0]!=name or rx_string[1]!=qth:
+                print('\n******** Houston, we have a problem - inconsitency in recorded  exchange')
+                print('\tcall=',call)
+                print('\tqth=',qth)
+                print('\tname=',name)
+                print('\tsrx_string=',srx_string)
+                if TRAP_ERRORS:
+                    sys.exit(0)
             
         """
         # In 2017, there was some inconsistancies in how the name & state were saved
@@ -132,6 +142,7 @@ class NAQP_SCORING(CONTEST_SCORING):
             print('call=',call,'\t\tname=',name,'\t\tqth=',qth)
             self.list_all_qsos(call,qsos)
             if TRAP_ERRORS:
+                print('HIST=',HIST[call.replace('?','')])
                 sys.exit(0)
 
         # Misc fix-ups

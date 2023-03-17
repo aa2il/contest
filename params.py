@@ -257,19 +257,37 @@ class PARAMS:
             #self.history = HIST_DIR+'master.csv'
             
         elif args.naqprtty:
-            contest='NAQP-RTTY'
-            MY_MODE='RTTY'
-            date0 = datetime.datetime.strptime( "20180224 1800" , "%Y%m%d %H%M")  # Start of contest
-            date1 = datetime.datetime.strptime( "20180225 0600" , "%Y%m%d %H%M")  # End of contest
-            date0 = datetime.datetime.strptime( "20180721 1800" , "%Y%m%d %H%M")  # Start of contest
-            date1 = datetime.datetime.strptime( "20180722 0600" , "%Y%m%d %H%M")  # End of contest
-            history = '../data/NAQP_CallHistory_AOCC072717.txt'
+
+            # North American QSO Party RTTY
+            sc = NAQP_SCORING(P,'RTTY')
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+            #print('fname=',fname)
+            if fname==None:
+                #fname = MY_CALL+'.adif'
+                #DIR_NAME = '~/'+MY_CALL+'/'
+                DIR_NAME = '~/logs/'
+                fname='naqp_rtty_2023.adif'
+            else:
+                DIR_NAME = '.'
+                #DIR_NAME = '~/.fllog/'
+            print('fname=',fname)
+            #sys.exit(0)
+
+            #contest='NAQP-RTTY'
+            #MY_MODE='RTTY'
+            #date0 = datetime.datetime.strptime( "20180224 1800" , "%Y%m%d %H%M")  # Start of contest
+            #date1 = datetime.datetime.strptime( "20180225 0600" , "%Y%m%d %H%M")  # End of contest
+            #date0 = datetime.datetime.strptime( "20180721 1800" , "%Y%m%d %H%M")  # Start of contest
+            #date1 = datetime.datetime.strptime( "20180722 0600" , "%Y%m%d %H%M")  # End of contest
+            #history = '../data/NAQP_CallHistory_AOCC072717.txt'
             
-            date0 = datetime.datetime.strptime( "20190223 1800" , "%Y%m%d %H%M")  # Start of contest
-            date1 = date0 + datetime.timedelta(hours=12)
-            history = 'HIST_DIR/master.csv'
-            fname = 'naqp.adif'
-            DIR_NAME = '~/.fllog/'
+            #date0 = datetime.datetime.strptime( "20190223 1800" , "%Y%m%d %H%M")  # Start of contest
+            #date1 = date0 + datetime.timedelta(hours=12)
+            #history = 'HIST_DIR/master.csv'
+            #fname = 'naqp.adif'
+            #DIR_NAME = '~/.fllog/'
     
         elif args.naqpcw:
 
