@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # naqp.py - Rev 1.0
-# Copyright (C) 2022 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2022-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring state QSO parties
 #
@@ -29,9 +29,13 @@ from scoring import CONTEST_SCORING
 TRAP_ERRORS = False
 TRAP_ERRORS = True
 
+VERBOSITY=0
+
 NY_COUNTIES = ['ALB',	'ALL',	'BRX',	'BRM',	'CAT',	'CAY',	'CHA',	'CHE',	'CGO',	'CLI',	'COL',	'COR',	'DEL',	'DUT',	'ERI',	'ESS',	'FRA',	'FUL',	'GEN',	'GRE',	'HAM',	'HER',	'JEF',	'KIN',	'LEW',	'LIV',	'MAD',	'MON',	'MTG',	'NAS',	'NEW',	'NIA',	'ONE',	'ONO',	'ONT',	'ORA',	'ORL',	'OSW',	'OTS',	'PUT',	'QUE',	'REN',	'ROC',	'RIC',	'SAR',	'SCH',	'SCO',	'SCU',	'SEN',	'STL',	'STE',	'SUF',	'SUL',	'TIO',	'TOM',	'ULS',	'WAR',	'WAS',	'WAY',	'WES',	'WYO',	'YAT']
 
 IL_COUNTIES=['ADAM',	'ALEX',	'BOND',	'BOON',	'BROW',	'BURO',	'CALH',	'CARR',	'CASS',	'CHAM',	'CHRS',	'CLRK',	'CLAY',	'CLNT',	'COLE',	'COOK',	'CRAW',	'CUMB',	'DEKA',	'DEWT',	'DOUG',	'DUPG',	'EDGR',	'EDWA',	'EFFG',	'FAYE',	'FORD',	'FRNK',	'FULT',	'GALL',	'GREE',	'GRUN',	'HAML',	'HANC',	'HARD',	'HNDR',	'HENR',	'IROQ',	'JACK',	'JASP',	'JEFF',	'JERS',	'JODA',	'JOHN',	'KANE',	'KANK',	'KEND',	'KNOX',	'LAKE',	'LASA',	'LAWR',	'LEE',	'LIVG',	'LOGN',	'MACN',	'MCPN',	'MADN',	'MARI',	'MSHL',	'MASN',	'MSSC',	'MCDN',	'MCHE',	'MCLN',	'MNRD',	'MRCR',	'MNRO',	'MNTG',	'MORG',	'MOUL',	'OGLE',	'PEOR',	'PERR',	'PIAT',	'PIKE',	'POPE',	'PULA',	'PUTN',	'RAND',	'RICH',	'ROCK',	'SALI',	'SANG',	'SCHY',	'SCOT',	'SHEL',	'STAR',	'SCLA',	'STEP',	'TAZW',	'UNIO',	'VERM',	'WABA',	'WARR',	'WASH',	'WAYN',	'WHIT',	'WTSD',	'WILL',	'WMSN',	'WBGO',	'WOOD']
+
+ID_COUNTIES=['ADA','ADM','BAN','BEA','BEN','BIN','BLA','BOI','BNR','BNV','BOU','BUT','CAM','CAN','CAR','CAS','CLA','CLE','CUS','ELM','FRA','FRE','GEM','GOO','IDA','JEF','JER','KOO','LAT','LEM','LEW','LIN','MAD','MIN','NEZ','ONE','OWY','PAY','POW','SHO','TET','TWI','VAL','WAS']
 
 ############################################################################################
     
@@ -54,13 +58,17 @@ class QSOP_SCORING(CONTEST_SCORING):
             self.date0 = datetime.datetime.strptime( "20221016 1700" , "%Y%m%d %H%M")  # NYQP
             self.date1 = self.date0 + datetime.timedelta(hours=8)
             self.COUNTIES=IL_COUNTIES
+        elif STATE in ['ID','VA']:
+            self.date0 = datetime.datetime.strptime( "20230101 0000" , "%Y%m%d %H%M")  # NYQP
+            self.date1 = self.date0 + datetime.timedelta(days=365)
+            self.COUNTIES=[]
+            #self.COUNTIES=ID_COUNTIES
         else:
-            print('Unknown state party -',STATE)
+            print('QSOP_SCORING: Unknown state party -',STATE)
             sys.exit(0)
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros((len(self.BANDS)))
-        #self.sec_cnt = np.zeros((len(self.COUNTIES),len(self.BANDS)))        
         self.sec_cnt = np.zeros((len(self.COUNTIES),))
         self.TRAP_ERRORS = TRAP_ERRORS
 
@@ -80,15 +88,21 @@ class QSOP_SCORING(CONTEST_SCORING):
                             
     # Scoring routine for State QSO Parties
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
-        print('rec=',rec)
+        if VERBOSITY>0:
+            print('rec=',rec)
         keys=list(HIST.keys())
 
         # Check for correct contest
         id   = rec["contest_id"].upper()
         if id!=self.STATE+'-QSO-PARTY':
-            print('contest=',self.contest,id)
-            print('QSO not part of',self.STATE,'QSO Party - skipping')
+            if VERBOSITY>0:
+                print('contest=',self.contest,id)
+                print('QSO not part of',self.STATE,'QSO Party - skipping')
             return
+        #else:
+        #    print('\nrec=',rec)
+        #    print('id=',id,'\t\t',self.STATE+'-QSO-PARTY')
+        #    sys.exit(0)
 
         # Pull out relavent entries
         call = rec["call"].upper()
@@ -117,14 +131,19 @@ class QSOP_SCORING(CONTEST_SCORING):
             try:
                 idx2 = self.BANDS.index(band)
                 self.band_cnt[idx2] += 1
-                qth2=qth.split('/')
-                for qth1 in qth2:
-                    idx1 = self.COUNTIES.index(qth1)
-                    self.sec_cnt[idx1] = 1
-                    #self.sec_cnt[idx1,idx2] = 1
-            except:
+                if len(self.COUNTIES)>0:
+                    qth2=qth.split('/')
+                    for qth1 in qth2:
+                        idx1 = self.COUNTIES.index(qth1)
+                        self.sec_cnt[idx1] = 1
+                        #self.sec_cnt[idx1,idx2] = 1
+                else:
+                    print('Consider adding list of counties for this party!\t',qth)
+            except Exception as e: 
+                print( str(e) )
                 print('\n$$$$$$$$$$$$$$$$$$$$$$')
                 print(qth,' not found in list of Counties')
+                print(self.COUNTIES)
                 print(rec)
                 print('$$$$$$$$$$$$$$$$$$$$$$')
                 if TRAP_ERRORS:

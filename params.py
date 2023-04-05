@@ -85,7 +85,7 @@ class PARAMS:
         arg_proc.add_argument('-sats', action='store_true',help='Satellites Worked')
         arg_proc.add_argument('-naqpcw', action='store_true',help='NAQP CW')
         arg_proc.add_argument('-naqprtty', action='store_true',help='NAQP RTTY')
-        arg_proc.add_argument('-qsop', help='State QSO Party',\
+        arg_proc.add_argument('-state', help='State QSO Party',\
                               type=str,default=None)
         arg_proc.add_argument('-wpx', action='store_true',help='CQ WPX')
         arg_proc.add_argument('-iaru', action='store_true',help='IARU HF')
@@ -305,10 +305,10 @@ class PARAMS:
             print('fname=',fname)
             #sys.exit(0)
 
-        elif args.qsop:
+        elif args.state:
 
             # State QSO Party
-            sc = QSOP_SCORING(P,'CW',args.qsop)
+            sc = QSOP_SCORING(P,'CW',args.state)
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'

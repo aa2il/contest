@@ -157,6 +157,9 @@ elif not P.sc:
     print('\nUnrecognized contest - aborting -',P.sc.contest,'\n')
     sys.exit(0)
 
+#print(P.sc.contest)
+#sys.exit(0)
+
 # Read adif input file(s)
 qsos2=[]
 for f in P.input_files:
@@ -246,6 +249,18 @@ for i in range(len(qsos)):
     #print('\n',i,rec)
     #date_off = datetime.datetime.strptime( rec["qso_date_off"]+" "+rec["time_off"] , "%Y%m%d %H%M%S")
     date_off = rec['time_stamp']
+
+    # Examine QSOs from a specific contest
+    if P.sc.contest[2:]=='-QSO-PARTY':
+        try:
+            id   = rec["contest_id"].upper()
+            if id!=P.sc.contest:
+                continue
+        except Exception as e: 
+            #print( str(e) )
+            #print('Skipping record rec=',rec)
+            #sys.exit(0)
+            continue
 
     # Ignore entries outside contest window - this is now done above so can eventually clean this up
     if date_off>=P.sc.date0 and date_off<=P.sc.date1:
@@ -372,7 +387,7 @@ for i in range(len(qsos)):
 
 fp.write('END-OF-LOG:\n')
 fp.close()
-print('\nLasst call=',last_rec['call'],'\t',last_rec['band'])
+print('\nLast call=',last_rec['call'],'\t',last_rec['band'])
 
 print(" ")
 P.sc.check_multis(qsos)
