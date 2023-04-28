@@ -86,9 +86,11 @@ class MST_SCORING(CONTEST_SCORING):
                 start_time=19
             else:
                 start_time=3
+        elif hour>=14 and hour<19:
+            start_time=13
         elif hour>=19 and hour<24:
             start_time=19
-        elif hour>=0 and hour<19:
+        elif hour>=0 and hour<14:
             start_time=3
         else:
             print('MST_SCORING_INIT: Unable to determine contest time')
