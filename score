@@ -40,7 +40,7 @@ set CONTEST=""
 #set CONTEST="cwss"               # ARRL Sweepstakes
 #set CONTEST="fd"                 # ARRL Field Day
 #set CONTEST="cqp"                # Commiefornia QSO Party
-#set CONTEST="state"               # State (other than CA) QSO Party
+set CONTEST="state"               # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
 #set CONTEST="wpx"                # CQ WPX
 #set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
@@ -59,14 +59,14 @@ set SESSION=""
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
 #set SESSION=3                    # CW Open Session 1, 2 or 3
-#set SESSION="VA"                 # State QSO party
+set SESSION="W7"                 # State QSO party
 
 set TIME_LIMIT=""
 #set TIME_LIMIT="-nograph"
 #set TIME_LIMIT="-limit 10"       # NAQP
 
 set LOG_FILE=""
-#set LOG_FILE="-i NAQP.csv"
+set LOG_FILE="-i QP.csv"
 
 # Most of time, I'm running assited
 set ASSISTED=""

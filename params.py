@@ -312,8 +312,9 @@ class PARAMS:
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
-            fname = MY_CALL+'.adif'
-            DIR_NAME = '~/'+MY_CALL+'/'
+            #fname = MY_CALL+'.adif'
+            #DIR_NAME = '~/'+MY_CALL+'/'
+            DIR_NAME='./'
             
         elif args.arrl_dx:
 

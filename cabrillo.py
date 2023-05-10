@@ -138,6 +138,7 @@ P=PARAMS()
 if True:
     print("P=")
     pprint(vars(P))
+    #sys.exit(0)
 print('Start Date=',P.sc.date0)
 print('Stop Date =',P.sc.date1)
 print('\nInput file(s):',P.input_files)
