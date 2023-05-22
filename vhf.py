@@ -59,6 +59,8 @@ class VHF_SCORING(CONTEST_SCORING):
                 dm=1
         elif SPONSER=='CQ':
             contest_name=SPONSER+'-VHF'
+        elif SPONSER=='CSVHF':
+            contest_name='SPRING-SPRINT'
         elif SPONSER=='SVHFS':
             contest_name='50MHZ-FALL-SPRINT'
         elif SPONSER=='NAMSS':
@@ -99,6 +101,11 @@ class VHF_SCORING(CONTEST_SCORING):
             sat2+=7                                                    # 3rd Saturday
             start=18                                                   # CQ WW starts at 1800 UTC on Saturday ...
             hrs=27                                                     # CQ contest is for 27 hours
+        elif SPONSER=='CSVHF':
+            # Central State VHF Soc Spring Sprints - not sure what their scheme is so just hardwire for noe
+            sat2=13
+            start=23
+            hrs=4
         elif SPONSER=='SVHFS':
             # SE VHF Soc 50 MHz Fall Sprint - not sure what their scheme is so just hardwire for noe
             sat2=13

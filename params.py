@@ -67,6 +67,7 @@ class PARAMS:
         arg_proc.add_argument('-ten', action='store_true',help='ARRL 10 Meter')
         arg_proc.add_argument('-vhf', action='store_true',help='ARRL VHF')
         arg_proc.add_argument('-cqvhf', action='store_true',help='CQ WW VHF')
+        arg_proc.add_argument('-vhfss', action='store_true',help='CW VHF Soc. Spring Sprint')
         arg_proc.add_argument('-fall50', action='store_true',help='SE VHF Soc. 50 MHz Fall Sprint')
         arg_proc.add_argument('-namss', action='store_true',help='NA Meteor Scatter Sprint')
         arg_proc.add_argument('-fd', action='store_true',help='ARRL Field Day')
@@ -190,13 +191,15 @@ class PARAMS:
             DIR_NAME = '~/AA2IL'
             output_file = sc.output_file
     
-        elif args.vhf or args.cqvhf or args.fall50 or args.namss:
+        elif args.vhf or args.cqvhf or args.fall50 or args.namss or args.vhfss:
 
             # ARRL & CQ WW VHF Contests
             if args.vhf:
                 org='ARRL'
             elif args.cqvhf:
                 org='CQ'
+            elif args.vhfss:
+                org='CSVHF'
             elif args.fall50:
                 org='SVHFS'
             elif args.namss:
