@@ -88,7 +88,8 @@ class PARAMS:
         arg_proc.add_argument('-naqprtty', action='store_true',help='NAQP RTTY')
         arg_proc.add_argument('-state', help='State QSO Party',\
                               type=str,default=None)
-        arg_proc.add_argument('-wpx', action='store_true',help='CQ WPX')
+        arg_proc.add_argument('-wpxcw', action='store_true',help='CQ WPX CW')
+        arg_proc.add_argument('-wpxrtty', action='store_true',help='CQ WPX RTTY')
         arg_proc.add_argument('-iaru', action='store_true',help='IARU HF')
         arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
         arg_proc.add_argument('-nograph', action='store_true',
@@ -356,21 +357,30 @@ class PARAMS:
             #fname = 'cqww_rtty_2019.adif'
             fname = 'cqwwrtty_2022.adif'
 
-        elif args.wpx:
-            MODE='CW'
-            MODE='RTTY'
-            sc = CQ_WPX_SCORING(P,MODE)
-            contest=sc.contest
-            MY_MODE=sc.my_mode
-            category_band=sc.category_band
-            date0=sc.date0
-            date1=sc.date1
-            history = sc.history
-            output_file = sc.output_file
+        elif args.wpxcw or  args.wpxrtty:
             
-            if MY_MODE=='CW':
-                DIR_NAME = '../pyKeyer/'
+            # CQ WPX
+            if args.wpxcw:
+                MODE='CW'
+            else:
+                MODE='RTTY'
+            sc = CQ_WPX_SCORING(P,MODE)
+            self.sc=sc
+
+            #contest=sc.contest
+            
+            #MY_MODE=sc.my_mode
+            #category_band=sc.category_band
+            #date0=sc.date0
+            #date1=sc.date1
+            #history = sc.history
+            #output_file = sc.output_file
+            
+            if MODE=='CW':
+                DIR_NAME = '~/Python/pyKeyer/'
                 fname = 'AA2IL.adif'
+                DIR_NAME = './'
+                fname = 'WPX.adif'
             else:
                 DIR_NAME = '../../logs/fllog/'
                 fname = 'cq_wpx_rtty_2019.adif'

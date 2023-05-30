@@ -230,7 +230,9 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
     def summary(self):
 
         print('\nNo. QSOs         =',self.nqsos2)
-        print('Band Count       =',self.sec_cnt)
+        #print('Band Count       =',self.sec_cnt)
+        for i in range( len(self.BANDS) ):
+            print(self.BANDS[i],'# QSOs=',int(self.sec_cnt[i]))
         print('Prefixes         =',sorted( self.calls ))
         print('QSO Points       =',self.total_points)
         mults = len(self.calls)

@@ -82,7 +82,14 @@ class SST_SCORING(CONTEST_SCORING):
 
         # Pull out relavent entries
         call = rec["call"].upper()
-        qth  = rec["qth"].upper()
+        if 'qth' in rec:
+            qth  = rec["qth"].upper()
+        else:
+            qth=''
+            print('No QTH for',call)
+            print(rec)
+            return
+            sys.exit(0)
         name = rec["name"].upper()
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
 
