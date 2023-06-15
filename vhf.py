@@ -43,7 +43,7 @@ class VHF_SCORING(CONTEST_SCORING):
         self.SPONSER=SPONSER
 
         self.BANDS = ['6m','2m','1.25m','70cm','33cm','23cm']
-        self.sec_cnt = np.zeros((len(self.BANDS)))
+        self.sec_cnt = np.zeros(len(self.BANDS),dtype=int)
         
         # Determine contest based on sponser and month
         now = datetime.datetime.utcnow()
@@ -151,6 +151,11 @@ class VHF_SCORING(CONTEST_SCORING):
     # Scoring routine for ARRL VHF contest for a single qso
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         keys=list(HIST.keys())
+
+        if False:
+            print('\nrec=',rec)
+            sys,exit(0)
+            
         if False:
             #print('\nrec=',rec)
             #print('\nqsos=',qsos)
@@ -213,6 +218,27 @@ class VHF_SCORING(CONTEST_SCORING):
         
         #print('call=',call)
         
+        # Check mode vs freq
+        freq=float(rec['freq'])
+        mode=rec['mode']
+        if band=='6m':
+            valid3 = (freq<50.11 and mode=='CW') or (freq<50.2 and freq>50.11 and mode=='USB') or (freq>50.3 and mode=='FT8')
+        elif band=='2m':
+            valid3 = (freq<144.5 and mode=='USB') or (freq>145. and mode=='FM') # or (freq>144.3 and mode=='FT8')
+        elif band=='1.25m':
+            valid3 = mode=='FM'
+        elif band=='70cm':
+            valid3 = (freq<435 and mode=='USB') or (freq>445. and mode=='FM') # or (freq>144.3 and mode=='FT8')
+        else:
+            valid3=False
+
+        if not valid3:
+            print('Skipping QSO from',band,'band - \tfreq=',freq,'\tmode=',mode)
+            if TRAP_ERRORS:
+                sys.exit(0)
+            else:
+                return
+            
         dx_station = Station(call)
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
@@ -289,11 +315,57 @@ class VHF_SCORING(CONTEST_SCORING):
         else:
             if rec["mode"]!='FT8':
                 print('\n++++++++++++ Warning - no history for call:',call)
-                self.list_all_qsos(call,qsos)
+                #self.list_all_qsos(call,qsos)
         
         #print(line)
         return line
 
+
+
+    # Routine to check for dupes
+    def check_dupes(self,rec,qsos,i,istart):
+
+        # Count no. of raw qsos
+        self.nqsos1+=1
+
+        # Pull out info
+        call = rec["call"]
+        band = rec["band"]
+        mode = rec["mode"]
+        if mode in ['FT8','FT4']:
+            grid  = rec["gridsquare"]
+        else:
+            grid  = rec["qth"]
+       
+        # Check for dupes
+        duplicate=False
+        rapid=False
+        for j in range(istart,i):
+            rec2  = qsos[j]
+            call2 = rec2["call"]
+            band2 = rec2["band"]
+            mode2 = rec2["mode"]
+            if mode2 in ['FT8','FT4']:
+                grid2 = rec2["gridsquare"]
+            else:
+                grid2 = rec2["qth"]
+                
+            dupe  = call==call2 and band==band2 and grid==grid2
+
+            if dupe:
+                if i-j<=2:
+                    print("\n*** WARNING - RAPID Dupe",call,band,' ***')
+                    rapid = True
+                else:
+                    print("\n*** WARNING - Dupe",call,band,' ***')
+                print(j,rec2)
+                print(i,rec)
+                print(" ")
+                duplicate = True
+
+        return (duplicate,rapid)
+
+    
 
     # Routine to sift through station we had multiple contacts with to identify any discrepancies
     def check_multis(self,qsos):
@@ -339,10 +411,11 @@ class VHF_SCORING(CONTEST_SCORING):
                 print(' No. QSOs,Mults:',self.NQSOS[b],len(grids))
                 mults+=len(grids)
 
-        print('\nBy Band:')
+        print('\nBy Band:\tQSOs\tMults')
         for b in self.BANDS:
             idx2 = self.BANDS.index(b)
-            print('\t',b,':\t',self.sec_cnt[idx2])
+            grids = list( self.grids[b] )
+            print('\t',b,':\t',self.sec_cnt[idx2],'\t',len(grids))
         print('\nBy Mode:')
         for m in self.MODES:
             print('\t',m,':\t',self.Nmode[m])

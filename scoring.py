@@ -125,6 +125,8 @@ class CONTEST_SCORING:
         band = rec["band"]
         if self.contest=='ARRL-FD':
             mode = self.group_modes( rec["mode"] )
+        else:
+            mode = rec["mode"]
         duplicate=False
         rapid=False
         for j in range(istart,i):
@@ -132,7 +134,19 @@ class CONTEST_SCORING:
             call2 = rec2["call"]
             band2 = rec2["band"]
             mode2 = rec2["mode"]
-            if self.contest=='ARRL-SS-CW':
+
+            if self.contest[0:8]=='ARRL-VHF':
+                if mode in ['FT8','FT4']:
+                    grid  = rec["gridsquare"]
+                else:
+                    grid  = rec["qth"]
+                if mode2 in ['FT8','FT4']:
+                    grid2 = rec2["gridsquare"]
+                else:
+                    grid2 = rec2["qth"]
+                dupe  = call==call2 and band==band2 and grid==grid2
+                    
+            elif self.contest=='ARRL-SS-CW':
                 dupe  = call==call2
             elif self.contest=='ARRL-FD':
                 mode2 = self.group_modes(mode2)

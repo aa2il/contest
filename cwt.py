@@ -38,7 +38,6 @@ TRAP_ERRORS = True
 class CWT_SCORING(CONTEST_SCORING):
 
     def __init__(self,P,session=None):
-        #CONTEST_SCORING.__init__(self,P,'CW Ops Mini-Test',mode='CW')
         super().__init__(P,'CW Ops Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
