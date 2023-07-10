@@ -426,7 +426,7 @@ class CQP_SCORING(CONTEST_SCORING):
 
 
 # Routine to give QTH of a Canadian station
-def oh_canada2(dx_station):
+def oh_canada2_OLD(dx_station):
 
     """ Prefixes	Province/Territory
     VE1 VA1	Nova Scotia

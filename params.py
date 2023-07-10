@@ -231,11 +231,12 @@ class PARAMS:
             
             # Need to merge FT8 and CW logs
             fnames=[]
-            DIR_NAME = '~/logs/'
-            #DIR_NAME = '~/AA2IL/Contesting/Field_Day/field_day_2022/'
+            #DIR_NAME = '~/logs/'
+            DIR_NAME = '~/Python/pyKeyer/Field_Day'
             fnames=[]
-            #for fname in ['AA2IL.adif','ft8_contest.adi','pi2_ft8_contest.adi']:
-            for fname in ['AA2IL.adif','ft8_contest.adi','rpi_fd_2022.adi']:
+            #for fname in ['AA2IL.adif','contest_wsjtx_log.adi']:
+            for fname in ['FD.csv','FTx.csv']:
+            #for fname in ['FD.csv']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
                 fnames.append(f)
     
@@ -369,15 +370,6 @@ class PARAMS:
             sc = CQ_WPX_SCORING(P,MODE)
             self.sc=sc
 
-            #contest=sc.contest
-            
-            #MY_MODE=sc.my_mode
-            #category_band=sc.category_band
-            #date0=sc.date0
-            #date1=sc.date1
-            #history = sc.history
-            #output_file = sc.output_file
-            
             if MODE=='CW':
                 DIR_NAME = '~/Python/pyKeyer/'
                 fname = 'AA2IL.adif'
@@ -393,10 +385,9 @@ class PARAMS:
             # IARU HF Champs
             sc = IARU_HF_SCORING(P)
             self.sc=sc
-            
-            self.history = HIST_DIR+'master.csv'
-            fname = MY_CALL+'.adif'
-            DIR_NAME = '~/'+MY_CALL+'/'
+            self.history = sc.history
+            fname = sc.fname
+            DIR_NAME = sc.DIR_NAME
 
         elif args.cqp:
 

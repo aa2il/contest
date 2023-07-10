@@ -245,6 +245,8 @@ times5=[0]
 tlast=P.sc.date0
 nqsos=0
 op_time=0
+last_rec = None
+gap_min0 = 0
 for i in range(len(qsos)):
     rec=qsos[i]
     #print('\n',i,rec)
@@ -388,7 +390,8 @@ for i in range(len(qsos)):
 
 fp.write('END-OF-LOG:\n')
 fp.close()
-print('\nLast call=',last_rec['call'],'\t',last_rec['band'])
+if last_rec:
+    print('\nLast call=',last_rec['call'],'\t',last_rec['band'])
 
 print(" ")
 P.sc.check_multis(qsos)
@@ -439,8 +442,11 @@ else:
     tscale=60.
     lab='Minutes'
 h=np.ones(N)/float(N)
-rates5=np.array(rates2)
-rates3=np.convolve(rates5,h,'same')
+if len(rates2)>0:
+    rates5=np.array(rates2)
+    rates3=np.convolve(rates5,h,'same')
+else:
+    P.RATE_GRAPH=False
 
 times=np.array(times)
 time_cw=np.array(time_cw)

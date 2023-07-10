@@ -107,11 +107,14 @@ class CONTEST_SCORING:
             freq_khz = 50
         elif band=='2m':
             freq_khz = 144
+        elif band=='1.25m':
+            freq_khz = 223
         elif band=='70cm':
             freq_khz = 432
         else:
-            print('CONVERT_FREQ - Need more code!!',freq)
-        
+            print('CONVERT_FREQ - Need more code!!',freq,band)
+            sys.exit(0)
+                    
         return freq_khz
 
     # Routine to check for dupes

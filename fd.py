@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # fd.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring ARRL Field Day
 #
@@ -23,6 +23,9 @@ import sys
 import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
+from dx.spot_processing import Station   #, Spot, WWV, Comment, ChallengeData
+from pprint import pprint
+from utilities import Oh_Canada
 
 ############################################################################################
     
@@ -38,10 +41,10 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,P,'ARRL-FD',mode='MIXED')
         print('FD Scoring Init')
         
-        self.BANDS = ['160m','80m','40m','20m','15m','10m','6m','2m','70cm']
-        self.MODES = ['CW','DG','PH']
-        self.sec_cnt = np.zeros((len(FD_SECS),len(self.MODES),len(self.BANDS)))
-        self.band_mode_cnt = np.zeros((len(self.MODES),len(self.BANDS)))
+        self.BANDS = ['160m','80m','40m','20m','15m','10m','6m','2m','1.25m','70cm']
+        self.MODES = ['CW','PH','DG']
+        self.sec_cnt = np.zeros((len(FD_SECS),len(self.MODES),len(self.BANDS)),dtype=int)
+        self.band_mode_cnt = np.zeros((len(self.MODES),len(self.BANDS)),dtype=int)
         tmp=[]
         for b in self.BANDS:
             for m in self.MODES:
@@ -118,17 +121,30 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         mode = self.group_modes(mode)
 
         # Check rx'ed category and section
-        n   = cat_in[:-1]
-        cat = cat_in[-1]
+        try:
+            n   = cat_in[:-1]
+            cat = cat_in[-1]
+        except:
+            print('Uh Oh! call=',call,'\tcat_in=',cat_in)
+            print('rec=',rec)
+            if TRAP_ERRORS:
+                sys.exit(0)
+            
         if not n.isdigit() or cat not in ['A','B','C','D','E','F']:
-            print('Received category '+cat_in+' not recognized - srx=',rx)
-            sys.exit(0)
+            print('\nReceived category '+cat_in+' not recognized - srx=',rx)
+            print('call=',call)
+            print('rec=',rec)
+            if TRAP_ERRORS:
+                sys.exit(0)
         if sec_in not in FD_SECS:
             #print('FD Secs=',FD_SECS)
             print('call=',call)
-            print('Received section '+sec_in+' not recognized - srx=',rx)
+            print('\nReceived section '+sec_in+' not recognized - srx=',rx)
+            print('call=',call)
             print('History=',HIST[call])
-            sys.exit(0)
+            print('rec=',rec)
+            if TRAP_ERRORS:
+                sys.exit(0)
         
         if False:
             print('\n',rec)
@@ -138,6 +154,16 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             print('exch out: ',cat_out,sec_out)
             print(n)
             print(cat)
+
+        # Check obvious errors
+        dx_station = Station(call)
+        if dx_station.country=='Canada':
+            qth2,valid_secs=Oh_Canada(dx_station)
+            if sec_in not in valid_secs:
+                print('Oh Canada - call/section mismatch: call=',call,'\tsec_in=',sec_in,'\tshould be',valid_secs)
+                #pprint(vars(dx_station))
+                if TRAP_ERRORS:
+                    sys.exit(0)        
 
         # Count up the qsos
         if not dupe:
@@ -149,9 +175,16 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
                 qso_points=2
             else:
                 print('FD - Unknown mode',mode)
-                sys.exit(0)
+                #print('rec=',rec)
+                if TRAP_ERRORS:
+                    sys.exit(0)
 
-            self.CALLS[band+' '+mode].append(call)        
+            try:
+                self.CALLS[band+' '+mode].append(call)
+            except:
+                print('\nWhoops! rec=',rec)
+                if TRAP_ERRORS:
+                    sys.exit(0)
 
             # Non-duplicate & points
             self.nqsos2 += 1;
@@ -213,11 +246,26 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             if cnt==0:
                 print(FD_SECS[i],' - Missing')
 
-        print('\nBand\t',self.MODES,'\tTotal')
+        #print('\nBand\t',self.MODES,'\tTotal')
+        print('\nBand\t',end='')
+        for m in self.MODES:
+            print(m,'\t',end='')
+        print('Total')
+            
         for b in self.BANDS:
             idx3 = self.BANDS.index(b)
-            print(b,'\t',self.band_mode_cnt[:,idx3],'\t',int(np.sum(self.band_mode_cnt[:,idx3],axis=0)) )
-        print('By Mode:\t',np.sum(self.band_mode_cnt,axis=1),int( np.sum(self.band_mode_cnt) ) )
+            #print(b,'\t',self.band_mode_cnt[:,idx3],'\t',int(np.sum(self.band_mode_cnt[:,idx3],axis=0)) )
+            print(b,'\t',end='')
+            for i in range(len(self.MODES)):
+                print(self.band_mode_cnt[i,idx3],'\t',end='')
+            print(int(np.sum(self.band_mode_cnt[:,idx3],axis=0)) )
+            
+        #print('By Mode:\t',np.sum(self.band_mode_cnt,axis=1),int( np.sum(self.band_mode_cnt) ) )
+        print('Total:\t',end='')
+        for i in range(len(self.MODES)):
+            print(np.sum(self.band_mode_cnt[i,:]),'\t',end='')
+                  #np.sum(self.band_mode_cnt,axis=1),
+        print(int( np.sum(self.band_mode_cnt)))
 
         print('\nNo. raw QSOS (nqsos1)         =',self.nqsos1)
         print('No. skipped (e.g. rapid dupe) =',self.nskipped)

@@ -199,7 +199,7 @@ class RAC_SCORING(CONTEST_SCORING):
 
 
 # Routine to give QTH of a Canadian station
-def oh_canada3(dx_station):
+def oh_canada3_old(dx_station):
 
     """
     Prefixes	Province/Territory

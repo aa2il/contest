@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # iaru.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring IARU HF contest.
 #
@@ -20,6 +20,7 @@
 ############################################################################################
 
 import sys
+import os
 import datetime
 from rig_io.ft_tables import SST_SECS
 from scoring import CONTEST_SCORING
@@ -31,7 +32,7 @@ import csv
 
 ############################################################################################
 
-#TRAP_ERRORS = False
+TRAP_ERRORS = False
 TRAP_ERRORS = True
 
 ############################################################################################
@@ -56,23 +57,16 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             self.NQSOS[b]=0
             self.POINTS[b]=0
         self.ZONES = OrderedDict(zones)
-        #self.nqsos=0
+        self.wrtc = set([])
 
-        # Determine contest time - assumes this is dones wihtin a few hours of the contest
-        if False:
-            now = datetime.datetime.utcnow()
-            #print(now)
-            #date0 = datetime.datetime.strptime( "20210710 1200" , "%Y%m%d %H%M")  # Start of contest
-            day=10
-            self.date0=datetime.datetime(now.year,now.month,day,12)
-            self.date1 = self.date0 + datetime.timedelta(hours=24)
-
-        # Contest occurs on 2nd full weekend of July
+        # Determine contest time - Contest occurs on 2nd full weekend of July
         now = datetime.datetime.utcnow()
-        day1=datetime.date(now.year,7,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
+        year=now.year
+        #year=2022                                                     # Override for testing
+        day1=datetime.date(year,7,1).weekday()                     # Day of week of 1st of month 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7) + 7                                    # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
                                                                        # No. days until 1st Saturday (day 5) + 7 more days 
-        self.date0=datetime.datetime(now.year,7,sat2,12)       # Contest starts at 1200 UTC on Saturday ...
+        self.date0=datetime.datetime(year,7,sat2,12)       # Contest starts at 1200 UTC on Saturday ...
         self.date1 = self.date0 + datetime.timedelta(hours=24)         # ... and ends at 1200 UTC on Sunday
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
         #sys.exit(0)
@@ -85,9 +79,19 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         # Name of output file
         self.output_file = self.MY_CALL+'_IARU_HF_CHAMPS_'+str(self.date0.year)+'.LOG'
 
+        # Names of input files
+        MY_CALL = P.SETTINGS['MY_CALL']
+        self.history = os.path.expanduser('~/'+MY_CALL+'/master.csv')
+        if year==now.year:
+            self.fname = MY_CALL+'.adif'
+        else:
+            self.fname = MY_CALL+'_'+str(year)+'.adif'
+        self.DIR_NAME = os.path.expanduser('~/'+MY_CALL+'/')
+        
         # Create a list of IARU member societies
         societies=set([])
-        with open('iaru.txt') as f:
+        fname7 = os.path.expanduser('~/Python/contest/iaru.txt')
+        with open(fname7) as f:
             rows = csv.reader(f)
             for row in rows:
                 #print('row=',row)
@@ -120,10 +124,13 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         a    = rx.split(',')
         rst_in = reverse_cut_numbers( a[0] )
 
-        if '?' in a[0] or '?' in a[1] and TRAP_ERRORS:
-            print('\n$$$$$$$$$$ Need to correct ADIF file $$$$$$$$$$$')
+        if '?' in a[0] or '?' in a[1]:
+            print('\n???????? Need to correct ADIF file - ????????')
             print('rec=',rec)
-            sys.exit(0)
+            print('a=',a)
+            if TRAP_ERRORS:
+                self.list_all_qsos(call,qsos)
+                sys.exit(0)
         
         if len(a[1])<=2 and a[1] not in self.societies+SST_SECS:
             num_in = reverse_cut_numbers( a[1] , 2)
@@ -165,13 +172,14 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         #if len(num_in)==0 or zone>75:
         if len(num_in)==0 or (num_in.isnumeric() and int(num_in)>75) or\
            (not num_in.isnumeric() and  num_in not in self.societies):
-            print('Houston, we have problem - invalid zone')
+            print('\nHouston, we have problem - invalid zone:',num_in)
             print('rec=',rec)
             pprint(vars(dx_station))
             print('call     =',call)
             print('exch out =',rst_out,num_out)
             print('exch in  =',rst_in,num_in)
             if TRAP_ERRORS:
+                self.list_all_qsos(call,qsos)
                 sys,exit(0)
         if dx_station.ituz!=zone and False:
             print('\nWarning - ITU Zone mismatch')
@@ -183,7 +191,7 @@ class IARU_HF_SCORING(CONTEST_SCORING):
 
         # Determine multipliers
         #self.nqsos+=1
-        SPECIAL_CALLS=[]                # For 2021: ['TO5GR']
+        SPECIAL_CALLS=['WR1TC/MM','W2XX']                # For 2021: ['TO5GR']
         if not dupe:
             if zone==self.MY_ITU_ZONE or zone==0:
                 qso_points = 1
@@ -194,8 +202,19 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             else:
                 print('\n*** IARU HF: Not Sure what to do with this??!! ***')
                 pprint(vars(dx_station))
-                sys.exit(0)
-            
+                print('call     =',call)
+                print('zone=',zone)
+                if TRAP_ERRORS:
+                    sys.exit(0)
+                else:
+                    qso_points = 1
+
+            if dx_station.country:
+                self.countries.add(dx_station.country)
+
+            if len(call)==4 and call[:2]=='I4':
+                self.wrtc.add(call)
+                    
             #print(call,zone,self.MY_ITU_ZONE,qso_points)
             self.ZONES[band].add(num_in)
             self.NQSOS[band]+=1
@@ -245,27 +264,39 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             else:
                 txt='*** Uh oh - call not a known contester :-( :-( :-('
             print('Calls matching',call,':',scp,'\t',txt)
-            print('rec=',rec)
+            print('\nrec=',rec)
             self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
-            if dx_station.ituz!=zone and zone>0 and not call in SPECIAL_CALLS and TRAP_ERRORS:
+            if dx_station.ituz!=zone and zone>0 and not call in SPECIAL_CALLS:
                 print('Zone     =',dx_station.ituz,zone)
                 pprint(vars(dx_station))
-                sys.exit(0)
+                if TRAP_ERRORS:
+                    sys.exit(0)
         
         return line
 
     # Summary & final tally
     def summary(self):
 
-        print('ZONES:',self.ZONES)
+        dxcc = sorted( list( self.countries ) )
+        print('\nCountries:\t',len(dxcc))
+        for i in range(len(dxcc)):
+            print('   ',dxcc[i])
+
+        wrtc = sorted( list( self.wrtc ) )
+        print('\nWRTCs:\t',len(wrtc))
+        for i in range(len(wrtc)):
+            print('   ',wrtc[i])
+
+        #print('\nZONES:',self.ZONES)
         nmults=0
         nzones=0
         nhq=0
         for b in self.BANDS:
             mults = list( self.ZONES[b] )
             mults.sort()
-            print('\n',b,'Mults:',mults)
+            print(' ')
+            #print('\n',b,'Mults:',mults)
             hq    = []
             zones = []
             for mult in mults:
@@ -273,9 +304,9 @@ class IARU_HF_SCORING(CONTEST_SCORING):
                     zones.append(mult)
                 else:
                     hq.append(mult)
-            print(b,'Zones:',zones,len(zones))
-            print(b,'HQ   :',hq,len(hq))
-            print(b,' No. QSOs:',self.NQSOS[b],'\tZones:',len(zones),'\tHQ:',len(hq),'\tPoints:',self.POINTS[b])
+            print(b,'Zones   :',zones,len(zones))
+            print(b,'HQ      :',hq,len(hq))
+            print(b,'No. QSOs:',self.NQSOS[b],'\tZones:',len(zones),'\tHQ:',len(hq),'\tPoints:',self.POINTS[b])
             nzones += len(zones)
             nhq    += len(hq)
             nmults += len(zones)+len(hq)
