@@ -48,9 +48,8 @@ Command-line program to convert adif log for a contest into cabrillo format and 
            - conda list
 
 3) Create a working enviroment for ham radio stuff:
-   - Check which python version we have:
-       - conda list   
-   - conda create --name aa2il python=3.11
+   - !!! THERE IS A BUG IN re in python 3.11 - need to use 3.10 !!!
+   - conda create --name aa2il python=3.10
 
    - To activate this environment, use:
        - conda activate aa2il
@@ -84,6 +83,4 @@ Command-line program to convert adif log for a contest into cabrillo format and 
 # Installation for Windoz:
 
 1) Best bet is to use mini-conda and follow the instructions above.
-2) There is an older compiled binary/installer listed on the right panel
-   of this screen.  If you want/need a more recent binary, email me
-   or follow the steps in windoz.bat to build it from the source.
+2) If you want/need a binary, email me.
