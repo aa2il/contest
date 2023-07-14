@@ -190,12 +190,27 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             sys,exit(0)
 
         # Determine multipliers
-        #self.nqsos+=1
+        # Seems like there are always some problem children
         SPECIAL_CALLS=['WR1TC/MM','W2XX']                # For 2021: ['TO5GR']
         if not dupe:
+
+            # Trying to reconcile diff between my calcs and raw score when submitted log - let's see if this is it
+            # In 2023, there was a MM station that I think was the culprit
+            if dx_station.mm:
+                if not dx_station.continent and zone==63:
+                    dx_station.continent='OC'
+                else:
+                    print("HELP - not sure what to do with this ????")
+                    pprint(vars(dx_station))
+                    print('call     =',call)
+                    print('zone=',zone)
+                    print('num_in=',num_in)
+                    if TRAP_ERRORS and False:
+                        sys.exit(0)
+
             if zone==self.MY_ITU_ZONE or zone==0:
                 qso_points = 1
-            elif dx_station.continent=='NA' or call in SPECIAL_CALLS:
+            elif dx_station.continent=='NA':    # or call in SPECIAL_CALLS:
                 qso_points = 3
             elif dx_station.continent in ['SA','EU','OC','AF','AS']:
                 qso_points = 5
