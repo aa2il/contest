@@ -211,7 +211,10 @@ class PARAMS:
                 
             sc = VHF_SCORING(P,org)
             self.sc=sc
+            fname = sc.fname
+            DIR_NAME = sc.DIR_NAME
 
+            """
             # Need to merge FT8 and CW/Phone logs from RPi
             fnames=[]
             #DIR_NAME = '~/.fldigi/logs/'
@@ -220,7 +223,8 @@ class PARAMS:
             for fname in ['VHF.adif','FT8.adif']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
                 fnames.append(f)
-
+            """
+            
         elif args.fd:
 
             # ARRL Field Day

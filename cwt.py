@@ -83,7 +83,7 @@ class CWT_SCORING(CONTEST_SCORING):
             else:
                 # 0300 Session
                 start_time=3
-        elif hour>=14 and hour<19:
+        elif hour>=13 and hour<19:
             start_time=13
         elif hour>=19 and hour<24:
             start_time=19

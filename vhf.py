@@ -101,6 +101,10 @@ class VHF_SCORING(CONTEST_SCORING):
             sat2+=7                                                    # 3rd Saturday
             start=18                                                   # CQ WW starts at 1800 UTC on Saturday ...
             hrs=27                                                     # CQ contest is for 27 hours
+
+            self.DIR_NAME = os.path.expanduser('~/Python/pyKeyer/CQ_VHF')
+            self.fname = 'CQ_VHF.adif'
+            
         elif SPONSER=='CSVHF':
             # Central State VHF Soc Spring Sprints - not sure what their scheme is so just hardwire for noe
             sat2=13
@@ -141,6 +145,9 @@ class VHF_SCORING(CONTEST_SCORING):
             
         # Name of output file
         self.output_file = self.MY_CALL+'_'+SPONSER+'_'+month+'_VHF_'+str(self.date0.year)+'.LOG'
+
+        MY_CALL = P.SETTINGS['MY_CALL']
+        self.history = os.path.expanduser('~/'+MY_CALL+'/master.csv')
         
     # Contest-dependent header stuff
     def output_header(self,fp):
@@ -204,6 +211,8 @@ class VHF_SCORING(CONTEST_SCORING):
         valid2 = band in self.BANDS
         if not valid2:
             print('Skipping QSO from',band,'band')
+            print('valid=',valid,valid2)
+            print(self.BANDS)
             if TRAP_ERRORS:
                 sys.exit(0)
             else:
@@ -221,10 +230,12 @@ class VHF_SCORING(CONTEST_SCORING):
         # Check mode vs freq
         freq=float(rec['freq'])
         mode=rec['mode']
+        if mode=='SSB':
+            mode='USB'
         if band=='6m':
             valid3 = (freq<50.11 and mode=='CW') or (freq<50.2 and freq>50.11 and mode=='USB') or (freq>50.3 and mode=='FT8')
         elif band=='2m':
-            valid3 = (freq<144.5 and mode=='USB') or (freq>145. and mode=='FM') # or (freq>144.3 and mode=='FT8')
+            valid3 = (freq<144.5 and mode in ['SSB','USB','FT8']) or (freq>145. and mode=='FM')
         elif band=='1.25m':
             valid3 = mode=='FM'
         elif band=='70cm':
@@ -234,6 +245,9 @@ class VHF_SCORING(CONTEST_SCORING):
 
         if not valid3:
             print('Skipping QSO from',band,'band - \tfreq=',freq,'\tmode=',mode)
+            print('valid3=',valid3)
+            print('freq=',freq)
+            print('mode=',mode)
             if TRAP_ERRORS:
                 sys.exit(0)
             else:
@@ -249,7 +263,7 @@ class VHF_SCORING(CONTEST_SCORING):
             mode='DG'
         elif rec["mode"]=='CW':
             mode='CW'
-        elif rec["mode"]=='FM' or  rec["mode"]=='USB':
+        elif rec["mode"] in ['FM','USB','SSB']:
             mode='PH'
         else:
             print('\n******** VHF SCORING: Unknown mode:',rec["mode"])
