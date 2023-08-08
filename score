@@ -29,7 +29,7 @@ set CONTEST=""
 #set CONTEST="mst"                # ICWC Medium Speed Test
 
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
-#set CONTEST="naqpcw"             # North American QSO Party CW
+set CONTEST="naqpcw"             # North American QSO Party CW
 #set CONTEST="naqprtty"           # North American QSO Party RTTY
 #set CONTEST="cq160m"              # CQ 160m CW
 #set CONTEST="arrl_dx"            # ARRL Intl DX
@@ -63,11 +63,12 @@ set SESSION=""
 #set SESSION="W7"                 # State QSO party
 
 set TIME_LIMIT=""
-#set TIME_LIMIT="-nograph"
-#set TIME_LIMIT="-limit 10"       # NAQP
+set TIME_LIMIT="-nograph"
+#set TIME_LIMIT="-nograph -limit 10"       # NAQP
 
 set LOG_FILE=""
-#set LOG_FILE="-i QP.csv"
+set LOG_FILE="-i NAQP.csv"                 # NAQP
+#set LOG_FILE="-i NAQP.adif"
 
 # Most of time, I'm running assited
 set ASSISTED=""
@@ -97,6 +98,7 @@ echo CONTEST=$CONTEST     SESSION=$SESSION
 
 ################################################################################
 
+echo " "
 set EXE="~/Python/contest/cabrillo.py"
 pwd
 echo $EXE -$CONTEST $SESSION $TIME_LIMIT $ASSISTED $LOG_FILE

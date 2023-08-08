@@ -229,7 +229,9 @@ class CONTEST_SCORING:
                     else:
                         srx_string = ''
                     band = rec["band"]
-                    print('call=',call,'\tname=',name,'\tqth=',qth,
+                    date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
+                    time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
+                    print(date_off,time_off,call,'\tname=',name,'\tqth=',qth,
                           '\tsrx=',srx_string,'\tband=',band)
 
                     if name_old:

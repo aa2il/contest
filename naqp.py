@@ -46,6 +46,7 @@ class NAQP_SCORING(CONTEST_SCORING):
         self.band_cnt = np.zeros((len(self.BANDS)),dtype=np.int)
         self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)),dtype=np.int)
         self.TRAP_ERRORS = TRAP_ERRORS
+        self.checked = []
 
         # Jan CW contest occurs on 2nd full weekend of Jan
         # Aug CW contest occurs on 1st full weekend of Aug
@@ -73,6 +74,7 @@ class NAQP_SCORING(CONTEST_SCORING):
         #sys.exit(0)
         
         # Name of output file - stupid web uploader doesn't recognize .LOG extenion!
+        # !!!!!!!!!!!!!! MUST BE .TXT !!!!!!!!!!!!!!!
         self.output_file = self.MY_CALL+'_NAQP_'+MONTH+'_'+MODE+'_'+str(self.date0.year)+'.TXT'
 
     # Contest-dependent header stuff
@@ -115,7 +117,7 @@ class NAQP_SCORING(CONTEST_SCORING):
                 print('\tcall=',call)
                 print('\tqth=',qth)
                 print('\tname=',name)
-                print('\tsrx_string=',srx_string)
+                print('\trx_string=',rx_string)
                 if TRAP_ERRORS:
                     sys.exit(0)
             
@@ -192,7 +194,8 @@ class NAQP_SCORING(CONTEST_SCORING):
                     state=sec
             name9=HIST[call]['name']
             #print call,qth,state
-            if qth!=state or name!=name9:
+            if call not in self.checked and (qth!=state or name!=name9):
+                self.checked.append(call)
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
                 print(call,':  Current:',qth,name,' - History:',state,name9)
                 self.list_all_qsos(call,qsos)
