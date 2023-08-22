@@ -59,11 +59,13 @@ class MST_SCORING(CONTEST_SCORING):
         # Working on relaxing this restriction because I'm lazy sometimes!
         now = datetime.datetime.utcnow()
         weekday = now.weekday()
-        print('now=',now,'\t\t','weekday=',weekday)
+        print('now=',now,'\thour=',now.hour,'\t','weekday=',weekday)
         if weekday!=0:
             # If we finally getting around to running this on any day but Mon, roll back date to Mon
             # Note - Monday is day 0
-            if weekday==1:
+            if weekday==2:
+                weekday-=2
+            elif weekday==1:
                 weekday-=1
             elif session==3:
                 weekday-=1
@@ -73,12 +75,17 @@ class MST_SCORING(CONTEST_SCORING):
         day   = now.day
         hour  = now.hour
         today = now.strftime('%A')
+        print('day=',day,'\thour=',hour,'\ttoday=',today)
 
         if session!=None:
             start_time=session
             if today=='Tuesday' and session>3:
                 # Must be looking at Monday's session
                 day-=1
+        elif today=='Wednesday':
+            # Must be looking at Monday's evening session
+            day-=1
+            start_time=3
         elif today=='Tuesday':
             # Must be looking at previous session
             if hour<3:
@@ -99,7 +106,7 @@ class MST_SCORING(CONTEST_SCORING):
             
         self.date1 = self.date0 + datetime.timedelta(hours=1+30/3600.)
         if False:
-            print('session=',session)
+            print('\nsession=',session)
             print('now=',now)
             print('today=',today)
             print('weekday=',weekday)
@@ -213,6 +220,9 @@ class MST_SCORING(CONTEST_SCORING):
             self.EXCHANGES[call].append(exch_in)
         else:
             self.EXCHANGES[call]=[exch_in]
+
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST)
                 
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
@@ -230,13 +240,14 @@ class MST_SCORING(CONTEST_SCORING):
                         
     # Summary & final tally
     def summary(self):
-        
+
+        print('\ncalls =',self.calls)
         print('\nnqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
-        #print('band count =',self.sec_cnt)
         for i in range(len(self.BANDS)):
             print(self.BANDS[i],'\t',self.sec_cnt[i])
-        print('calls =',self.calls)
         mults = len(self.calls)
         print('mults=',mults)
         print('total score=',mults*self.nqsos2)
+        print('\n# CWops=',self.num_cwops,' =',int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+                        

@@ -174,6 +174,9 @@ class NAQP_SCORING(CONTEST_SCORING):
             else:
                 self.EXCHANGES[call]=[exch_in]
                 
+            # Count no. of CWops guys worked
+            self.count_cwops(call,HIST)
+                
 #                              ----------info sent----------- ----------info rcvd----------- 
 #QSO: freq  mo date       time call            ex1        ex2 call            ex1        ex2 t
 #QSO: ***** ** yyyy-mm-dd nnnn **********      aaaaaaaaaa aaa **********      aaaaaaaaaa aaa n
@@ -221,17 +224,9 @@ class NAQP_SCORING(CONTEST_SCORING):
         print('\nNo. QSOs        =',self.nqsos1)
         print('No. Uniques     =',self.nqsos2)
         print('No. Skipped     =',self.nskipped)
-        #print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
-        #print('Mults           =',mults,'  =  ',int(sum(mults)))
         print('\nBand\tQSOs\tMults')
         for i in range(len(self.BANDS)):
             print(self.BANDS[i],'\t',self.band_cnt[i],'\t',mults[i])
         print('\nTotals:\t',sum(self.band_cnt),'\t',sum(mults))
         print('Claimed score=',sum(mults)*self.nqsos2)
-        if False:
-            for j in range(len(BANDS)):
-                print(BANDS[j])
-                for i in range(len(NAQP_SECS)):
-                    if self.sec_cnt[i,j]==0:
-                        print('Missing ',NAQP_SECS[i])
-
+        print('\n# CWops=',self.num_cwops,' =',int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')

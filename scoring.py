@@ -67,6 +67,7 @@ class CONTEST_SCORING:
         self.num_prev    = 0
         self.rec_prev    = []
         self.TRAP_ERRORS = False
+        self.num_cwops   = 0
 
         # History file
         self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
@@ -85,6 +86,16 @@ class CONTEST_SCORING:
 
         # Init super check partial
         self.SCP=SUPER_CHECK_PARTIAL()
+
+        
+    # Function to count the no. of CWops memebrs worked in this contest
+    def count_cwops(self,call,HIST):
+        if call in HIST.keys():
+            num=HIST[call]['cwops']
+            if num.isdigit():
+                self.num_cwops += 1
+            #print('COUNT CWOPS:',call,num,self.num_cwops)        
+        
         
     # Routine to group modes according to cw, digi or phone
     def group_modes(self,mode):

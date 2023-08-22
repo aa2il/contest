@@ -35,8 +35,9 @@ class SST_SCORING(CONTEST_SCORING):
         super().__init__(P,'Slow Speed Mini-Test',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.band_cnt = np.zeros(len(self.BANDS),np.int32)
-        self.sec_cnt = np.zeros(len(SST_SECS))
+        self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int)
+        #self.sec_cnt  = np.zeros(len(SST_SECS))
+        self.sec_cnt = np.zeros((len(SST_SECS),len(self.BANDS)),dtype=np.int)
 
         # Determine contest time - assumes this is dones within a few hours of the contest
         # Working on relaxing this restriction because I'm lazy sometimes!
@@ -114,11 +115,13 @@ class SST_SCORING(CONTEST_SCORING):
 
         try:
             idx1 = SST_SECS.index(qth)
+            #idx2 = self.BANDS.index(band)
         except:
             print('\n',rec)
             print(qth,'not in list of of SST Sections - call=',call)
             sys.exit(0)
-        self.sec_cnt[idx1] = 1
+        self.sec_cnt[idx1,idx] = 1
+        #self.sec_cnt[idx1,idx2] = 1
         
         self.total_points_all += qso_points
         if not dupe:
@@ -230,22 +233,32 @@ class SST_SCORING(CONTEST_SCORING):
         print('Countries:')
         for i in range(len(dxcc)):
             print('   ',dxcc[i])
+            
         print('States/Provs:')
+        sec_cnts=np.sum(self.sec_cnt,axis=1)>0
         for i in range(len(SST_SECS)):
-            if self.sec_cnt[i]>0:
+            if sec_cnts[i]>0:
                 print(' ',SST_SECS[i],end='')
-        mults = len(dxcc) + int( np.sum(self.sec_cnt) )
-    
-        print('\nNo. QSOs         =',self.nqsos2,\
+        print('')
+                
+        mults1 = np.sum(self.sec_cnt,axis=0)
+        mults = [int(i) for i in mults1]
+        
+        print('No. QSOs         =',self.nqsos2,\
               '\t(',self.nqsos1,')')
-        #print('Band Count       =',list(zip(self.BANDS,self.band_cnt)) )
+        print('\nBand\tQSOs\tMults')        
         for i in range(len(self.BANDS)):
-            print(self.BANDS[i],'\t',self.band_cnt[i])
+            print(self.BANDS[i],'\t',self.band_cnt[i],'\t',mults[i],'\t',end='')
+            for j in range(len(SST_SECS)):
+                if self.sec_cnt[j,i]>0:
+                    print(' ',SST_SECS[j],end='')
+            print('')
+                
+        print('Totals:\t',self.total_points,'\t',sum(mults),'\n')
+        
         print('QSO Points       =',self.total_points,\
               '\t(',self.total_points_all,')')
-        #print('State/Prov count =',self.sec_cnt,np.sum(self.sec_cnt))
-        print('Mults            =',mults)
-        print('Claimed score    =',self.total_points*mults,\
-              '\t(',self.total_points_all*mults,')')
+        print('Claimed score    =',self.total_points*sum(mults),\
+              '\t(',self.total_points_all*sum(mults),')')
     
         
