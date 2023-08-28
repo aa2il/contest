@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # wwdigi.py - Rev 1.0
-# Copyright (C) 2021-2 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring World Wide Digi contest.
 #
@@ -37,11 +37,11 @@ class WWDIGI_SCORING(CONTEST_SCORING):
 
         self.MY_CALL = P.SETTINGS['MY_CALL']
         self.MY_GRID = P.SETTINGS['MY_GRID']
-        #self.MY_STATE    = P.SETTINGS['MY_STATE']
 
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.band_cnt = np.zeros((len(self.BANDS)))
+        self.band_cnt = np.zeros((len(self.BANDS)),dtype=int)
         self.NQSOS = OrderedDict()
+        self.dxccs  = []
         grids = []
         for b in self.BANDS:
             grids.append((b,set([])))
@@ -49,7 +49,9 @@ class WWDIGI_SCORING(CONTEST_SCORING):
         self.grid_fields = OrderedDict(grids)
         self.nqsos=0
 
-        # Determine contest time - last first weekend in August
+        self.Qs=[]
+
+        # Determine contest time - last weekend in August
         now = datetime.datetime.utcnow()
         year=now.year
         #year=2019                                                      # Override for testing
@@ -117,6 +119,8 @@ class WWDIGI_SCORING(CONTEST_SCORING):
             self.max_km=dx_km
             self.longest=rec
             
+        self.Qs.append([call,grid,dx_km,qso_points])
+            
         self.nqsos+=1
         if not dupe:
             self.total_km += dx_km
@@ -126,6 +130,7 @@ class WWDIGI_SCORING(CONTEST_SCORING):
             self.NQSOS[band] +=1
             idx2 = self.BANDS.index(band)
             self.band_cnt[idx2] += 1
+            self.dxccs.append(dx_station.country)
 
             # Info for multi-qsos
             exch_in=grid
@@ -150,24 +155,35 @@ class WWDIGI_SCORING(CONTEST_SCORING):
 
     # Summary & final tally
     def summary(self):
+
+        for Q in self.Qs:
+            print(Q)
+
+        dxccs=list(set(self.dxccs)) 
+        dxccs.sort()
+        print('\nNo. unique DXCCs =',len(dxccs))
+        print(dxccs)
         
         avg_dx_km = self.total_km / self.nqsos2
         print('\nLongest DX:',self.max_km,'km')
         print(self.longest)
-        print('\nAverage DX:',avg_dx_km,'km\n')
-    
+        print('\nAverage DX:',avg_dx_km,'km')
+        
         #print 'GRID FIELDS:',sc.grid_fields
+        print('\nBand\t# QSOs\t# Fields\tGrid Fields')
         mults=0
         for i in range(len(self.BANDS)):
             b=self.BANDS[i]
             fields = list( self.grid_fields[b] )
             fields.sort()
-            print(b,'\tNo. QSOs:',self.band_cnt[i],'\tNo. Grid Fields:',len(fields),'\tGrid Fields:',fields,len(fields))
+            print(b,'\t',self.band_cnt[i],'\t',len(fields),'\t',fields)
             mults+=len(fields)
+
+        print('Totals:\t',self.nqsos,'\t',mults)
 
         print('\nNo. QSOs      =',self.nqsos)
         print('No. Uniques   =',self.nqsos2)
-        print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
+        #print('Band Count      =',self.band_cnt,'  =  ',int(sum(self.band_cnt)))
         print('QSO points    =',self.total_points)
         print('Multipliers   =',mults)
         print('Claimed Score =',self.total_points*mults)
