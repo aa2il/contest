@@ -94,7 +94,7 @@ class CWT_SCORING(CONTEST_SCORING):
             sys.exit(0)
         self.date0=datetime.datetime(now.year,now.month,day,start_time)
             
-        self.date1 = self.date0 + datetime.timedelta(hours=1+30/3600.)
+        self.date1 = self.date0 + datetime.timedelta(hours=1+3*30/3600.)
         if False:
             print('session=',session)
             print('now=',now)

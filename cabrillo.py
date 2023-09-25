@@ -385,8 +385,14 @@ for i in range(len(qsos)):
                     print('@@@@@@@@@@@@@@@@@@@@@@@@ Duplicate line found\n',line)
                 dupe=True
         if line!=None and not dupe:
-            lines.append(line)
-            fp.write('%s\n' % line)
+            # Some QSOs give multiple credits, e.g. State QP from a county line
+            if type(line) is list:
+                for line1 in line:
+                    lines.append(line1)
+                    fp.write('%s\n' % line1)
+            else:
+                lines.append(line)
+                fp.write('%s\n' % line)
 
 fp.write('END-OF-LOG:\n')
 fp.close()

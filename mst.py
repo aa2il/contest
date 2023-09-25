@@ -34,7 +34,7 @@ TRAP_ERRORS = False
 
 ############################################################################################
     
-# Scoring class for CWops CW Open - Inherits the base contest scoring class
+# Scoring class for ICWC Medium Speed Test - Inherits the base contest scoring class
 class MST_SCORING(CONTEST_SCORING):
 
     def __init__(self,P,session=None):

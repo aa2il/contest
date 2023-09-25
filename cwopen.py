@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # cwopen.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring CWops CW Open.
 #
@@ -41,7 +41,7 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,P,'CW-OPEN',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.sec_cnt = np.zeros((len(self.BANDS)))
+        self.sec_cnt = np.zeros((len(self.BANDS)),dtype=np.int)
         self.calls=set([])
         self.last_num_out=0
 
@@ -123,6 +123,7 @@ class CWOPEN_SCORING(CONTEST_SCORING):
             print('Hmmmmmmmmmmm:',call,a[0],num_in)
         name_in = a[1]
         #name = rec["name"].upper()
+        name_in2 = rec["name"].upper()
 
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         band = rec["band"]
@@ -133,9 +134,9 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         b    = tx.split(',')
         num_out  = int( reverse_cut_numbers( b[0] ) )
         name_out = b[1]
-        my_call = rec["station_callsign"].strip().upper()
+        #my_call = rec["station_callsign"].strip().upper()
                 
-        if '?' in str(num_in)+name_in or not name_in.isalpha() or not num_in.isnumeric():
+        if '?' in str(num_in)+name_in or not name_in.isalpha() or not num_in.isnumeric() or (name_in!=name_in2):
             print('\n*** ERROR *** "?" in serial number and/or name and/or name contains numbers or serial is not numeric ***')
             print('call   =',call)
             print('serial =',num_in)
@@ -213,6 +214,9 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         else:
             self.EXCHANGES[call]=[exch_in]
                 
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST)
+                
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #                              -----info sent------       -----info rcvd------
@@ -222,7 +226,7 @@ class CWOPEN_SCORING(CONTEST_SCORING):
 
         line='QSO: %5d %2s %10s %4s %-10s %4s %-11s %-10s %4s %-11s' % \
             (freq_khz,mode,date_off,time_off,
-             my_call,num_out,name_out,
+             self.MY_CALL,num_out,name_out,
              call,num_in,name_in)
         
         return line
@@ -230,10 +234,19 @@ class CWOPEN_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
-        print('\nnqsos1=',self.nqsos1)
-        print('nqsos2=',self.nqsos2)
-        print('band count =',self.sec_cnt)
-        print('calls =',self.calls)
         mults = len(self.calls)
+        print('Calls =',self.calls)
         print('mults=',mults)
-        print('total score=',mults*self.nqsos2)
+
+        print('\nNo. QSOs        =',self.nqsos1)
+        print('No. Uniques     =',self.nqsos2)
+        print('No. Skipped     =',self.nskipped)
+
+        #print('band count =',self.sec_cnt)
+        print('\nBand\tQSOs\tMults')
+        for i in range(len(self.BANDS)):
+            print(self.BANDS[i],'\t',self.sec_cnt[i],'\t','-')
+        print('\nTotals:\t',sum(self.sec_cnt),'\t',mults)
+        print('Claimed score=',mults*self.nqsos2)
+        print('\nNo. CWops=',self.num_cwops,' =',int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        

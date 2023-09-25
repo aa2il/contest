@@ -51,6 +51,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         dxccs  = []
         self.NQSOS = OrderedDict()
         self.POINTS = OrderedDict()
+        self.NSTATES = OrderedDict()
         for b in self.BANDS:
             mults.append((b,set([])))
             states.append((b,set([])))
@@ -58,6 +59,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             dxccs.append((b,set([])))
             self.NQSOS[b]=0
             self.POINTS[b]=0
+            self.NSTATES[b]=0
         self.mults = OrderedDict(mults)
         self.states = OrderedDict(states)
         self.zones = OrderedDict(zones)
@@ -86,7 +88,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         # Determine start & end dates/times
         now = datetime.datetime.utcnow()
         year=now.year
-        #year=2020               # Debug - Last time I participated
+        #year=2022               # Debug
 
         day1=datetime.date(year,month,1).weekday()                     # Day of week of 1st of month - 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7) + ndays                                # Day no. for 4th Saturday = 1 since day1 is the 1st of the month
@@ -101,12 +103,12 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             self.date0 = datetime.datetime.strptime( "20201128 0000" , "%Y%m%d %H%M")  # Start of contest
             self.date1 = self.date0 + datetime.timedelta(hours=48)
             
-        if False:
+        if True:
             print('now=',now)
             print('day1=',day1,'\tsat2=',sat2)
             print('date0=',self.date0)
             print('date1=',self.date1)
-            sys.exit(0)
+            #sys.exit(0)
 
         # Name of output file
         self.output_file = self.MY_CALL+'_CQ-WW-'+MODE+'_'+str(self.date0.year)+'.LOG'
@@ -201,6 +203,9 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         else:
             self.EXCHANGES[call]=[exch_in]
             
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST)
+                
 #QSO:  3799 PH 2000-10-26 0711 AA1ZZZ          59  05     K9QZO         59  04     0
         line='QSO: %5d %2s %10s %4s %-13s %3d %2.2d %-13s %3d %2.2d  0' % \
             (freq_khz,mode,date_off,time_off,self.MY_CALL,rst_out,int(self.MY_CQ_ZONE),call,rst_in,zone)
@@ -235,26 +240,34 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         call = rec["call"]
         freq_khz = int( 1000*float(rec["freq"]) + 0.0 )
         band = rec["band"]
+        
         if 'name' in rec :
             name = rec["name"]
         else:
             name = ''
+            
         if 'qth' in rec :
             qth = rec["qth"]
         else:
             qth = ''
+            
         if 'cqz' in rec :
             cqz = rec["cqz"]
         else:
             cqz = ''
+            
         if 'country' in rec :
             country = rec["country"]
         else:
             country = ''
-        #if 'state' in rec :
-        #    state = rec["state"]
-        #else:
-        #    state = ''
+
+        """
+        if 'state' in rec :
+            state = rec["state"]
+        else:
+            state = ''
+        """
+        
         if 'rst_rcvd' in rec :
             rst_in = reverse_cut_numbers( rec['rst_rcvd'] )
         else:
@@ -287,8 +300,8 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         else:
             print('*** ERROR *** Cant resolve zone and state')
             print('call=',call)
-            print('name=',name)
-            print('qth=',qth)
+            print('name=',name,name.isdigit())
+            print('qth=',qth,qth.isdigit())
             print('cqz=',cqz)
             print('country=',country)
             print('rec=',rec)
@@ -306,11 +319,21 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
         # Minor corrections
-        if state=='' or zone==31:
+        if state=='' or zone in [1,31] or dx_station.country in ['Puerto Rico']:
             state='DX'
 
         warning=False
         problem=False
+
+        if call==self.MY_CALL:
+            print('*** Are you talking to yourself again! ***')
+            print('call=',call)
+            print('zone=',zone)
+            print('state=',state)
+            warning=True;
+            self.warnings += 1
+            if TRAP_ERRORS:
+                sys.exit(0)
         
         if ((state in STATES) and zone!=CQ_ZONES[state] ) or \
            ( not (state in STATES) and zone!=dx_station.cqz):
@@ -323,13 +346,18 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             if TRAP_ERRORS:
                 sys.exit(0)
             
-        if zone>=3 and zone<=5 and not (state in CQ_STATES):
+        #if zone>=3 and zone<=5 and not (state in CQ_STATES):
+        if dx_station.country in ['United States','Canada'] and not (state in CQ_STATES):
+            
             # This is not quite right for some parts of Canada but go with it for now
             print('\n*** Expected US/Canada  ***')
             print('zone=',zone)
             print('state=',state)
             problem=True;
-        elif (zone<3 or zone>5) and state!='DX':
+            
+        #elif (zone<3 or zone>5) and state!='DX':
+        elif not dx_station.country in ['United States','Canada'] and state!='DX':
+            
             # This is not quite right for some parts of Canada but go with it for now
             print('\n*** Expected DX ***')
             problem=True;
@@ -344,6 +372,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             else:
                 qso_points=3
             self.total_points += qso_points
+            self.POINTS[band] += qso_points
 
             self.mults[band].add(str(zone))
             self.mults[band].add(dx_station.country)
@@ -363,6 +392,9 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             else:
                 self.EXCHANGES[call]=[exch_in]
                         
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST)
+                
 #QSO: 14073 RY 2008-09-27 0005 HC8N 599 10 DX WC2C   599 05 NY 
         line='QSO: %5d RY %10s %4s %-13s 599 %2.2d %-2s %-13s 599 %2.2d %-3s  0' % \
             (freq_khz,date_off,time_off,self.MY_CALL,int(self.MY_CQ_ZONE),self.MY_STATE,call,zone,state)
@@ -426,6 +458,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             s.sort()
             print(b,' States:',s,len(s))
             nstates+=len(s)
+            self.NSTATES[b]=len(s)
             
             d = list( self.dxccs[b] )
             d.sort()
@@ -439,10 +472,11 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             nzones+=len(z)
             zones+=z
 
-        print('\nBand\tQSOs\tPoints\tZones\tDXCCs')
+        print('\nBand\tQSOs\tPoints\tStates\tZones\tDXCCs')
         for b in self.BANDS:
-            print(b,'\t',self.NQSOS[b],'\t',self.POINTS[b],'\t',len( self.zones[b] ),'\t',len( self.dxccs[b] ))
-        print('\nTotals:\t',nqsos3,'\t',self.total_points,'\t',nzones,'\t',ndxccs)
+            print(b,'\t',self.NQSOS[b],'\t',self.POINTS[b],'\t',self.NSTATES[b],
+                  '\t',len( self.zones[b] ),'\t',len( self.dxccs[b] ))
+        print('\nTotals:\t',nqsos3,'\t',self.total_points,'\t',nstates,'\t',nzones,'\t',ndxccs)
 
         print('\nClaimed score =',self.total_points*mults)
 
@@ -457,6 +491,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         print(dxccs)
         #for i in range(len(dxccs)):
         #    print('   ',dxccs[i])
+        print('\n# CWops=',self.num_cwops,' =',int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
 
         """
         print('\nnqsos         =',self.nqsos2,nqsos3)

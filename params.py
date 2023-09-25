@@ -58,10 +58,10 @@ class PARAMS:
         arg_proc = argparse.ArgumentParser()
         arg_proc.add_argument('-mak', action='store_true',help='Makrothen RTTY')
         arg_proc.add_argument('-cwss', action='store_true',help='ARRL CW Sweepstakes')
-        arg_proc.add_argument('-wwcw', action='store_true',help='CQ WW CW')
+        arg_proc.add_argument('-cqwwcw', action='store_true',help='CQ WW CW')
         arg_proc.add_argument('-arrl_dx', action='store_true',help='ARRL Intl DX')
         arg_proc.add_argument('-cq160m', action='store_true',help='CQ 160m')
-        arg_proc.add_argument('-wwrtty', action='store_true',help='CQ WW RTTY')
+        arg_proc.add_argument('-cqwwrtty', action='store_true',help='CQ WW RTTY')
         arg_proc.add_argument('-rttyru', action='store_true',help='ARRL RTTY Round Up')
         arg_proc.add_argument('-ftru', action='store_true',help='FT Round Up')
         arg_proc.add_argument('-ten', action='store_true',help='ARRL 10 Meter')
@@ -323,7 +323,7 @@ class PARAMS:
             DIR_NAME = '~/AA2IL/'
             fname = 'AA2IL.adif'
     
-        elif args.wwcw:
+        elif args.cqwwcw:
 
             # CQ World Wide CW
             sc = CQ_WW_SCORING(P,'CW')
@@ -337,7 +337,7 @@ class PARAMS:
             #DIR_NAME = '~/logs/'
             fname = 'AA2IL.adif'
     
-        elif args.wwrtty:
+        elif args.cqwwrtty:
             
             # CQ World Wide RTTY
             sc = CQ_WW_SCORING(P,'RTTY')
@@ -347,7 +347,8 @@ class PARAMS:
             
             DIR_NAME = '~/logs/'
             #fname = 'cqww_rtty_2019.adif'
-            fname = 'cqwwrtty_2022.adif'
+            #fname = 'cqwwrtty_2022.adif'
+            fname = 'cqww_rtty_2023.adif'
 
         elif args.wpxcw or  args.wpxrtty:
             
@@ -444,8 +445,12 @@ class PARAMS:
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
-            fname = MY_CALL+'.adif'
-            DIR_NAME = '~/'+MY_CALL+'/'
+            if fname==None:
+                fname = MY_CALL+'.adif'
+                DIR_NAME = '~/'+MY_CALL+'/'
+            else:
+                DIR_NAME = '.'
+            print('fname=',fname)
             
         elif args.mst!=None:
             print('mst=',args.mst)

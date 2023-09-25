@@ -31,27 +31,27 @@ set CONTEST=""
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
 #set CONTEST="naqpcw"             # North American QSO Party CW
 #set CONTEST="naqprtty"           # North American QSO Party RTTY
-#set CONTEST="cq160m"              # CQ 160m CW
+#set CONTEST="cq160m"             # CQ 160m CW
 #set CONTEST="arrl_dx"            # ARRL Intl DX
 
 #set CONTEST="cwopen"             # CWops CW Open
-#set CONTEST="wwcw"               # CQ WW CW
-#set CONTEST="wwrtty"             # CQ WW RTTY
+#set CONTEST="cqwwcw"             # CQ WW CW
+set CONTEST="cqwwrtty"           # CQ WW RTTY
 #set CONTEST="cwss"               # ARRL Sweepstakes
 #set CONTEST="fd"                 # ARRL Field Day
 #set CONTEST="cqp"                # Commiefornia QSO Party
-#set CONTEST="state"               # State (other than CA) QSO Party
+#set CONTEST="state"              # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
-#set CONTEST="wpxcw"                # CQ WPX CW
+#set CONTEST="wpxcw"              # CQ WPX CW
 #set CONTEST="vhf"                # ARRL VHF - Jan, June & Sept.
-#set CONTEST="vhfss"                # VHF Spring Sprint
+#set CONTEST="vhfss"              # VHF Spring Sprint
 #set CONTEST="cqvhf"              # CQ WW VHF - July
 #set CONTEST="fall50"             # SE VHF Soc -  50 MHz Fall Sprint - August - svhfs.org
 #set CONTEST="namss"              # NA Meteor Scatter Sprint - August
 #set CONTEST="iaru"               # IRAU HF Champs
 #set CONTEST="cols13"             # 13 colonies special event - worked in 2021
 #set CONTEST="sats"               # Satellites worked  - worked in 2021
-#set CONTEST="ftru"                # FT Round-up - December
+#set CONTEST="ftru"               # FT Round-up - December
 #set CONTEST="ten"                 # ARRL 10-meter 
 #set CONTEST="rac"                 # RAC Winter Contest
 
@@ -60,7 +60,7 @@ set SESSION=""
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
 #set SESSION=3                    # CW Open Session 1, 2 or 3
-#set SESSION="W7"                 # State QSO party
+#set SESSION="OH"                 # State QSO party
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
@@ -69,6 +69,8 @@ set TIME_LIMIT="-nograph"
 set LOG_FILE=""
 #set LOG_FILE="-i NAQP.csv"                 # NAQP
 #set LOG_FILE="-i NAQP.adif"
+#set LOG_FILE="-i CWOPEN.csv"                 # CW Open
+#set LOG_FILE="-i STATE_QPs.csv"                 # One or more state QPs
 
 # Most of time, I'm running assited
 set ASSISTED=""

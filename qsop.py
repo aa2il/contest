@@ -40,6 +40,17 @@ COUNTIES['CT']=['FAI','HAR','LIT','MID','NHV','NLN','TOL','WIN']
 
 COUNTIES['DE']=['NDE','KDE','SDE']
 
+COUNTIES['HI']=['NII','KAU','LHN','WHN','PRL','HON','MOL','KAL','LNI','MAU','KOH','HIL','KON','VOL']
+
+COUNTIES['IA']=['ADR','ADM','ALL','APP','AUD','BEN','BKH','BOO','BRE','BUC','BNV','BTL','CAL','CAR',
+                'CAS','CED','CEG','CHE','CHI','CLR','CLA','CLT','CLN','CRF','DAL','DAV','DEC','DEL',
+                'DSM','DIC','DUB','EMM','FAY','FLO','FRA','FRE','GRE','GRU','GUT','HAM','HAN','HDN',
+                'HRS','HEN','HOW','HUM','IDA','IOW','JAC','JAS','JEF','JOH','JON','KEO','KOS','LEE',
+                'LIN','LOU','LUC','LYN','MAD','MAH','MRN','MSL','MIL','MIT','MNA','MOE','MTG','MUS',
+                'OBR','OSC','PAG','PLA','PLY','POC','POL','POT','POW','RIN','SAC','SCO','SHE','SIO',
+                'STR','TAM','TAY','UNI','VAN','WAP','WAR','WAS','WAY','WEB','WNB','WNS','WOO','WOR',
+                'WRI',]
+
 COUNTIES['ID']=['ADA','ADM','BAN','BEA','BEN','BIN','BLA','BOI','BNR','BNV','BOU','BUT','CAM','CAN',
                 'CAR','CAS','CLA','CLE','CUS','ELM','FRA','FRE','GEM','GOO','IDA','JEF','JER','KOO',
                 'LAT','LEM','LEW','LIN','MAD','MIN','NEZ','ONE','OWY','PAY','POW','SHO','TET','TWI',
@@ -66,6 +77,14 @@ COUNTIES['IN']=['INADA','INALL','INBAR','INBEN','INBLA','INBOO','INBRO','INCAR',
                 'INUNI','INVAN','INVER','INVIG','INWAB','INWRN','INWRK','INWAS','INWAY','INWEL',
                 'INWHT','INWHL']
 
+COUNTIES['KS']=['ALL','AND','ATC','BAR','BRT','BOU','BRO','BUT','CHS','CHT','CHE','CHY','CLK','CLY','CLO',
+	        'COF','COM','COW','CRA','DEC','DIC','DON','DOU','EDW','ELK','ELL','ELS','FIN','FOR','FRA',
+	        'GEA','GOV','GRM','GRT','GRY','GLY','GRE','HAM','HPR','HVY','HAS','HOG','JAC','JEF','JEW',
+	        'JOH','KEA','KIN','KIO','LAB','LAN','LEA','LCN','LIN','LOG','LYO','MRN','MSH','MCP','MEA',
+	        'MIA','MIT','MGY','MOR','MTN','NEM','NEO','NES','NOR','OSA','OSB','OTT','PAW','PHI','POT',
+	        'PRA','RAW','REN','REP','RIC','RIL','ROO','RUS','RSL','SAL','SCO','SED','SEW','SHA','SHE',
+	        'SMN','SMI','STA','STN','STE','SUM','THO','TRE','WAB','WAL','WAS','WIC','WIL','WOO','WYA']
+
 COUNTIES['ME']=['AND','ARO','CUM','FRA','HAN','KEN','KNO','LIN','OXF','PEN',
                 'PIS','SAG','SOM','WAL','WAS','YOR']
 
@@ -82,17 +101,52 @@ COUNTIES['NH']=['BEL','CAR','CHE','COO','GRA','HIL','MER','ROC','STR','SUL']
 COUNTIES['NV'] = ['CAR','CHU','CLA','DOU','ELK','ESM','EUR','HUM','LAN','LIN','LYO','MIN','NYE','PER',
                   'STO','WAS','WHI']
 
+COUNTIES['NJ']=['ATLA','BERG','BURL','CAPE','CMDN','CUMB','ESSE','GLOU','HUDS','HUNT','MERC','MID',
+                'MONM','MORR','OCEA','PASS','SALE','SOME','SUSS','UNIO','WRRN']
+
 COUNTIES['NY'] = ['ALB','ALL','BRX','BRM','CAT','CAY','CHA','CHE','CGO','CLI','COL','COR','DEL',
                   'DUT','ERI','ESS','FRA','FUL','GEN','GRE','HAM','HER','JEF','KIN','LEW','LIV',
                   'MAD','MON','MTG','NAS','NEW','NIA','ONE','ONO','ONT','ORA','ORL','OSW','OTS',
                   'PUT','QUE','REN','ROC','RIC','SAR','SCH','SCO','SCU','SEN','STL','STE','SUF',
                   'SUL','TIO','TOM','ULS','WAR','WAS','WAY','WES','WYO','YAT']
 
+COUNTIES['OH'] = ['ADAM','ALLE','ASHL','ASHT','ATHE','AUGL','BELM','BROW','BUTL','CARR','CHAM','CLAR',
+                  'CLER','CLIN','COLU','COSH','CRAW','CUYA','DARK','DEFI','DELA','ERIE','FAIR','FAYE',
+                  'FRAN','FULT','GALL','GEAU','GREE','GUER','HAMI','HANC','HARD','HARR','HENR','HIGH',
+                  'HOCK','HOLM','HURO','JACK','JEFF','KNOX','LAKE','LAWR','LICK','LOGA','LORA','LUCA',
+                  'MADI','MAHO','MARI','MEDI','MEIG','MERC','MIAM','MONR','MONT','MORG','MORR','MUSK',
+                  'NOBL','OTTA','PAUL','PERR','PICK','PIKE','PORT','PREB','PUTN','RICH','ROSS','SAND',
+                  'SCIO','SENE','SHEL','STAR','SUMM','TRUM','TUSC','UNIO','VANW','VINT','WARR','WASH',
+                  'WAYN','WILL','WOOD','WYAN']
+
 COUNTIES['OR'] = ['BAK','BEN','CLK','CLT','COL','COO','CRO','CUR','DES','DOU','GIL','GRA','HAR',
                   'HOO','JAC','JEF','JOS','KLA','LAK','LAN','LCN','LNN','MAL','MAR','MOR','MUL',
                   'POL','SHE','TIL','UMA','UNI','WAL','WCO','WSH','WHE','YAM']
 
 COUNTIES['RI']=['BRI','KEN','NEW','PRO','WAS']
+
+COUNTIES['TX']=['ANDE','ANDR','ANGE','ARAN','ARCH','ARMS','ATAS','AUST','BAIL','BAND','BAST','BAYL',
+                'BEE','BELL','BEXA','BLAN','BORD','BOSQ','BOWI','BZIA','BZOS','BREW','BRIS','BROO',
+                'BROW','BURL','BURN','CALD','CALH','CALL','CMRN','CAMP','CARS','CASS','CAST','CHAM',
+                'CHER','CHIL','CLAY','COCH','COKE','COLE','COLN','COLW','COLO','COML','COMA','CONC',
+                'COOK','CORY','COTT','CRAN','CROC','CROS','CULB','DALM','DALS','DAWS','DSMI','DELT',
+                'DENT','DEWI','DICK','DIMM','DONL','DUVA','EAST','ECTO','EDWA','EPAS','ELLI','ERAT',
+                'FALL','FANN','FAYE','FISH','FLOY','FOAR','FBEN','FRAN','FREE','FRIO','GAIN','GALV',
+                'GARZ','GILL','GLAS','GOLI','GONZ','GRAY','GRSN','GREG','GRIM','GUAD','HALE','HALL',
+                'HAMI','HANS','HDMN','HRDN','HARR','HRSN','HART','HASK','HAYS','HEMP','HEND','HIDA',
+                'HILL','HOCK','HOOD','HOPK','HOUS','HOWA','HUDS','HUNT','HUTC','IRIO','JACK','JKSN',
+                'JASP','JDAV','JEFF','JHOG','JWEL','JOHN','JONE','KARN','KAUF','KEND','KENY','KENT',
+                'KERR','KIMB','KING','KINN','KLEB','KNOX','LAMA','LAMB','LAMP','LSAL','LAVA','LEE',
+                'LEON','LIBE','LIME','LIPS','LIVO','LLAN','LOVI','LUBB','LYNN','MADI','MARI','MART',
+                'MASO','MATA','MAVE','MCUL','MLEN','MMUL','MEDI','MENA','MIDL','MILA','MILL','MITC',
+                'MONT','MGMY','MOOR','MORR','MOTL','NACO','NAVA','NEWT','NOLA','NUEC','OCHI','OLDH',
+                'ORAN','PPIN','PANO','PARK','PARM','PECO','POLK','POTT','PRES','RAIN','RAND','REAG',
+                'REAL','RRIV','REEV','REFU','ROBE','RBSN','ROCK','RUNN','RUSK','SABI','SAUG','SJAC',
+                'SPAT','SSAB','SCHL','SCUR','SHAC','SHEL','SHMN','SMIT','SOME','STAR','STEP','STER',
+                'STON','SUTT','SWIS','TARR','TAYL','TERL','TERY','THRO','TITU','TGRE','TRAV','TRIN',
+                'TYLE','UPSH','UPTO','UVAL','VVER','VZAN','VICT','WALK','WALL','WARD','WASH','WEBB',
+                'WHAR','WHEE','WICH','WILB','WILY','WMSN','WLSN','WINK','WISE','WOOD','YOAK','YOUN',
+                'ZAPA','ZAVA']
 
 COUNTIES['UT'] = ['BEA','BOX','CAC','CAR','DAG','DAV','DUC','EME','GAR','GRA','IRO','JUA','KAN',
                   'MIL','MOR','PIU','RIC','SAL','SNJ','SNP','SEV','SUM','TOO','UIN','UTA','WST',
@@ -101,9 +155,14 @@ COUNTIES['UT'] = ['BEA','BOX','CAC','CAR','DAG','DAV','DUC','EME','GAR','GRA','I
 COUNTIES['VT']=['ADD','BEN','CAL','CHI','ESS','FRA','GRA','LAM','ORA','ORL',
                 'RUT','WAS','WNH','WND']
 
-COUNTIES['WA'] = ['ADA','ASO','BEN','CHE','CLL','CLR','COL','COW','DOU','FER','FRA','GAR','GRN',
+# There is a different set of abbrevs for the 7QP and Salman RUn (State QP)
+COUNTIES['WA7QP'] = ['ADA','ASO','BEN','CHE','CLL','CLR','COL','COW','DOU','FER','FRA','GAR','GRN',
                   'GRY','ISL','JEF','KLI','KNG','KTP','KTT','LEW','LIN','MAS','OKA','PAC','PEN',
                   'PIE','SAN','SKG','SKM','SNO','SPO','STE','THU','WAH','WAL','WHA','WHI','YAK']
+
+COUNTIES['WA'] = ['ADA','ASO','BEN','CHE','CLAL','CLAR','COL','COW','DOU','FER','FRA','GAR','GRAN',
+                  'GRAY','ISL','JEFF','KING','KITS','KITT','KLI','LEW','LIN','MAS','OKA','PAC',
+                  'PEND','PIE','SAN','SKAG','SKAM','SNO','SPO','STE','THU','WAH','WAL','WHA','WHI','YAK']
 
 COUNTIES['WY'] = ['ALB','BIG','CAM','CAR','CON','CRO','FRE','GOS','HOT','JOH','LAR','LIN','NAT',
                   'NIO','PAR','PLA','SHE','SUB','SWE','TET','UIN','WAS','WES']
@@ -114,13 +173,20 @@ COUNTIES['WY'] = ['ALB','BIG','CAM','CAR','CON','CRO','FRE','GOS','HOT','JOH','L
 class QSOP_SCORING(CONTEST_SCORING):
  
     def __init__(self,P,MODE,STATE):
-        CONTEST_SCORING.__init__(self,P,STATE+'-QSO-PARTY',mode=MODE)
+
+        if STATE=='WA':
+            contest_name=STATE+'-SALMON-RUN'
+        else:
+            contest_name=STATE+'-QSO-PARTY'
+        
+        CONTEST_SCORING.__init__(self,P,contest_name,mode=MODE)
         print('State QSO Party Scoring - ',STATE)
 
         self.MY_CALL     = P.SETTINGS['MY_CALL']
         self.MY_STATE    = P.SETTINGS['MY_STATE']
 
         self.STATE       = STATE
+        """
         if STATE=='NY':
             self.date0 = datetime.datetime.strptime( "20221015 1400" , "%Y%m%d %H%M")  # NYQP
             self.date1 = self.date0 + datetime.timedelta(hours=12)
@@ -129,7 +195,9 @@ class QSOP_SCORING(CONTEST_SCORING):
             self.date0 = datetime.datetime.strptime( "20221016 1700" , "%Y%m%d %H%M")  # ILQP
             self.date1 = self.date0 + datetime.timedelta(hours=8)
             self.COUNTIES=IL_COUNTIES
-        elif STATE in ['W1','W7','DE','ID','IN','VA']:
+        elif STATE in ['W1','W7','DE','HI','IA','ID','IN','NJ','KS','NH','OH','TX','VA','WA']:
+        """
+        if 1:
             self.date0 = datetime.datetime.strptime( "20230101 0000" , "%Y%m%d %H%M")  # Whole year
             self.date1 = self.date0 + datetime.timedelta(days=365)
             self.COUNTIES=[]
@@ -140,7 +208,7 @@ class QSOP_SCORING(CONTEST_SCORING):
             elif STATE=='W7':
                 # 7th call area
                 self.contest='7QP'
-                for s in ['AZ','ID','MT','NV','OR','UT','WA','WY']:
+                for s in ['AZ','ID','MT','NV','OR','UT','WA7QP','WY']:
                     for c in COUNTIES[s]:
                         self.COUNTIES.append(s+c)
             elif STATE=='W1':
@@ -151,9 +219,9 @@ class QSOP_SCORING(CONTEST_SCORING):
                         self.COUNTIES.append(c+s)
             else:
                 self.COUNTIES=COUNTIES[STATE]
-        else:
-            print('QSOP_SCORING: Unknown state party -',STATE)
-            sys.exit(0)
+        #else:
+        #    print('QSOP_SCORING: Unknown state party -',STATE)
+        #    sys.exit(0)
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros((len(self.BANDS)),dtype=int)
@@ -229,6 +297,7 @@ class QSOP_SCORING(CONTEST_SCORING):
                         #self.sec_cnt[idx1,idx2] = 1
                 else:
                     print('Consider adding list of counties for this party!\t',qth)
+                    sys,exit(0)
             except Exception as e: 
                 print( str(e) )
                 print('\n$$$$$$$$$$$$$$$$$$$$$$')
@@ -245,12 +314,22 @@ class QSOP_SCORING(CONTEST_SCORING):
                 self.EXCHANGES[call].append(exch_in)
             else:
                 self.EXCHANGES[call]=[exch_in]
-                
-        line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
-            (freq_khz,mode,date_off,time_off, \
-             self.MY_CALL,'599',self.MY_STATE,
-             call,'599',qth)
-        #print line
+
+        line=[]
+        qth2=qth.split('/')
+        for qth1 in qth2:
+            line.append(
+                'QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
+                (freq_khz,mode,date_off,time_off, \
+                self.MY_CALL,'599',self.MY_STATE,
+                 call,'599',qth1))
+        """
+        print(line)
+        print(type(line))
+        print(len(line))
+        print(len(line[0]))
+        sys.exit(0)
+        """
 
         # Check against history - REVISIT!!!!
         if call in keys and False:
@@ -295,5 +374,6 @@ class QSOP_SCORING(CONTEST_SCORING):
         print('\nBand\tQSOs')
         for i in range(len(self.BANDS)):
             print(self.BANDS[i],'\t',self.band_cnt[i])
-        print('Mults           =',mults,'  =  ',int(sum(mults)))
+        print('QSOs            =',self.nqsos1)
+        print('Mults           =',mults,'  =  ',sum(mults))
         print('Claimed score=',sum(mults)*self.nqsos2*pts_per_qso)
