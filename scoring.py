@@ -149,6 +149,9 @@ class CONTEST_SCORING:
             band2 = rec2["band"]
             mode2 = rec2["mode"]
 
+            #print(self.contest)
+            #sys.exit(0)
+
             if self.contest[0:8]=='ARRL-VHF':
                 if mode in ['FT8','FT4']:
                     grid  = rec["gridsquare"]
@@ -179,18 +182,32 @@ class CONTEST_SCORING:
                     print(rec2)
                     sys.exit(0)
                 
+            elif self.contest=='CA-QSO-PARTY':
+                qth   = rec["qth"]
+                qth2  = rec2["qth"]
+                dupe  = call==call2 and band==band2 and qth==qth2
             else:
                 dupe  = call==call2 and band==band2
+                
             if dupe:
                 if i-j<=2:
                     print("\n*** WARNING - RAPID Dupe",call,band,' ***')
-                    rapid = True
+                    if self.contest=='CA-QSO-PARTY':
+                        srx   = rec["srx_string"]
+                        srx2  = rec2["srx_string"]
+                        print(srx)
+                        print(srx2)
+                        rapid = (srx==srx2)
+                        print(rapid)
+                    else:
+                        rapid = True
                 else:
                     print("\n*** WARNING - Dupe",call,band,' ***')
                 print(j,rec2)
                 print(i,rec)
                 print(" ")
                 duplicate = True
+                #self.ndupes += 1
 
         return (duplicate,rapid)
 
@@ -269,7 +286,30 @@ class CONTEST_SCORING:
             exchs=self.EXCHANGES[call]
             if len(exchs)>1:
                 print(call,'\t',len(exchs),'\t',exchs[0])
-            mismatch = exchs.count(exchs[0]) != len(exchs)
+                #print(exchs,type(exchs[0]))
+                #sys.exit(0)
+
+            if type(exchs[0]) is str:
+                # Simple fixed item - make sure all the same
+                mismatch = exchs.count(exchs[0]) != len(exchs)
+            elif type(exchs[0]) is dict:
+                # Multiple items in exchange
+                mismatch=False
+                for key in exchs[0].keys():
+                    items=[]
+                    for exch in exchs:
+                        items.append(exch[key])
+                    #print(key,items)
+                    if key=='NR':
+                        # Serial No. - make sure its increasing
+                        same=sorted(items) == items
+                    else:
+                        # Simple fixed item - make sure all the same
+                        same=items.count(items[0]) == len(items)
+                    #print(same)
+                    mismatch |= not same
+                #sys.exit(0)
+                
             if mismatch:
                 if not problem:
                     nproblems+=1

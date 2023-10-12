@@ -148,6 +148,16 @@ class SST_SCORING(CONTEST_SCORING):
             self.list_all_qsos(call,qsos)
             self.list_similar_calls(call,qsos)
 
+        # Info for multi-qsos
+        exch_in=name+' '+qth
+        if call in self.EXCHANGES.keys():
+            self.EXCHANGES[call].append(exch_in)
+        else:
+            self.EXCHANGES[call]=[exch_in]
+                        
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST)
+                
         line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
             (freq_khz,mode,date_off,time_off,
              self.MY_CALL,self.MY_NAME,self.MY_STATE,
@@ -260,5 +270,7 @@ class SST_SCORING(CONTEST_SCORING):
               '\t(',self.total_points_all,')')
         print('Claimed score    =',self.total_points*sum(mults),\
               '\t(',self.total_points_all*sum(mults),')')
+        print('\n# CWops=',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
     
         

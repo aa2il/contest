@@ -394,7 +394,7 @@ class PARAMS:
             #fname = MY_CALL2+'_2021.adif'    # Testing
             DIR_NAME = '~/'+MY_CALL1+'/'
             fname = MY_CALL2+'.adif'
-            DIR_NAME = '../pyKeyer/CQP_2022/'
+            DIR_NAME = '../pyKeyer/CQP/'      # 2022
             fname = 'CQP.csv'
             fname = 'CQP.adif'
             

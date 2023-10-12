@@ -116,12 +116,15 @@ class CWT_SCORING(CONTEST_SCORING):
 
     # Scoring routine for CW Ops Mini Tests
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2=None):
-        #print 'rec=',rec
+        #print('rec=',rec)
         keys=list(HIST.keys())
 
         # Pull out relavent entries
         call = rec["call"].upper()
-        qth  = rec["qth"].upper()
+        if 'qth' in rec:
+            qth  = rec["qth"].upper()
+        else:
+            qth=''
         if len(qth)>2:
             qth = reverse_cut_numbers(qth)
         name = rec["name"].upper()
@@ -196,6 +199,9 @@ class CWT_SCORING(CONTEST_SCORING):
         else:
             self.EXCHANGES[call]=[exch_in]
                         
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST)
+                
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #                              -----info sent------ -----info rcvd------
@@ -219,3 +225,5 @@ class CWT_SCORING(CONTEST_SCORING):
         mults = len(self.calls)
         print('mults=',mults)
         print('\nClaimed score =',mults*self.nqsos2,'\t(',mults*self.nqsos1,')')
+        print('\n# CWops=',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')

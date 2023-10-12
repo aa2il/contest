@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # cqp.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring Commie-fornia QSO Party.
 #
@@ -26,13 +26,15 @@ from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
 from fileio import parse_adif
-from utilities import reverse_cut_numbers
+from utilities import reverse_cut_numbers,Oh_Canada
 
 ############################################################################################
 
-CQP_VE_CALL_AREAS =   ['MR','QC','ON','MB','SK','AB','BC','NT']
-CQP_MULTS  = STATES + CQP_VE_CALL_AREAS
-CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','NT']
+#CQP_VE_CALL_AREAS =   ['MR','QC','ON','MB','SK','AB','BC','NT']    # B4 2023
+#CQP_MULTS  = STATES + CQP_VE_CALL_AREAS
+#CQP_STATES = STATES + PROVINCES + CA_COUNTIES + ['MR','NT']
+CQP_MULTS  = STATES + PROVINCES
+CQP_STATES = STATES + PROVINCES + CA_COUNTIES
 CQP_COUNTRIES=['United States','Canada','Alaska','Hawaii'] 
 
 TRAP_ERRORS = False
@@ -124,7 +126,10 @@ class CQP_SCORING(CONTEST_SCORING):
         # Pull out relavent entries
         call = rec["call"].upper()
         rx   = rec["srx_string"].strip().upper()
-        my_call = rec["station_callsign"].strip().upper()
+        if "station_callsign" in rec:
+            my_call = rec["station_callsign"].strip().upper()
+        else:
+            my_call = self.MY_CALL
         tx   = rec["stx_string"].strip().upper()
 
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
@@ -138,7 +143,7 @@ class CQP_SCORING(CONTEST_SCORING):
         b    = tx.split(',')
         num_out = int( reverse_cut_numbers( b[0] ) )
         qth_out = b[1]
-        
+
         # Begin error checking process
         if '?' in rx+call:
             print('\n$$$$$$$$$$$$$ Questionable RX Entry $$$$$$$$$$$$$$')
@@ -152,7 +157,12 @@ class CQP_SCORING(CONTEST_SCORING):
             self.list_all_qsos(call,qsos)
             if TRAP_ERRORS:
                 sys.exit(0)
-
+            else:
+                qth_in = qth_in.replace('?','')
+                a[0] = a[0].replace('?','')
+                if 'qth' in rec:
+                    rec['qth'] = rec['qth'].replace('?','')
+                    
         if 'qth' in rec:
             if qth_in != rec['qth']:
                 print('@@@@@@@@@@@@@ QTH Mismatch @@@@@@@@@@@@@')
@@ -166,9 +176,10 @@ class CQP_SCORING(CONTEST_SCORING):
                     sys.exit(0)
                 
         try:
-            num_in = int( reverse_cut_numbers( a[0].replace('?','') ) )
+            num_in = int( reverse_cut_numbers( a[0] ) )
         except:
             print('Cant find serial number!!!!')
+            print('a0=',a[0])
             print('rec=',rec)
             print('Problem with serial:',a)
             if TRAP_ERRORS:
@@ -176,6 +187,14 @@ class CQP_SCORING(CONTEST_SCORING):
             else:
                 num_in=0
 
+        if num_in<=0:
+            print('Bad serial number!!!!')
+            print('num_in=',num_in,'\ta0=',a[0])
+            print('rec=',rec)
+            print('Problem with serial:',a)
+            if TRAP_ERRORS:
+                sys.exit(0)
+                
         self.check_serial_out(num_out,rec,TRAP_ERRORS)
         
         if MY_MODE=='CW':
@@ -200,7 +219,9 @@ class CQP_SCORING(CONTEST_SCORING):
             qth='CA'
             idx1 = CA_COUNTIES.index(qth_in)
             self.county_cnt[idx1] += 1
-        elif qth_in in ['NB', 'NL', 'NS', 'PE','MAR']:
+        elif qth_in in ['NB', 'NL', 'NS', 'PE','MAR'] and False:
+            # Canada secs prior to 2023 - no longer used but keeping this
+            # stuff around in case they change their minds!
             print('*** WARNING *** Changing QTH from',qth_in,'to MR')
             print('call     =',call)
             print('rec=',rec)
@@ -212,7 +233,10 @@ class CQP_SCORING(CONTEST_SCORING):
         idx1 = self.BANDS.index(band)
         self.band_cnt[idx1] += 1
             
-        if not dupe:
+        if dupe:
+            self.ndupes += 1;
+            pass
+        else:
             self.nqsos2 += 1;
             self.calls.append(call)
             
@@ -233,13 +257,15 @@ class CQP_SCORING(CONTEST_SCORING):
         
         # Error checking
         if country=='Canada':
-            qth2=oh_canada2(dx_station)
+            #qth2=oh_canada2(dx_station)    # B4 2023
+            qth2,secs2=Oh_Canada(dx_station)
             if qth2!=qth_in and TRAP_ERRORS:
                 print('Oh Canada: qth_in=',qth_in,'\tqth2=',qth2)
                 sys.exit(0)
         
-        if( country not in CQP_COUNTRIES and qth_in!='DX') or \
-          ( country in CQP_COUNTRIES and qth_in not in CQP_STATES):
+        if( call not in ['N8VV'] and
+            (country not in CQP_COUNTRIES and qth_in!='DX') or \
+            (country in CQP_COUNTRIES and qth_in not in CQP_STATES) ):
             pprint(vars(dx_station))
             print('rec     =',rec)
             print('call    =',call)
@@ -255,7 +281,7 @@ class CQP_SCORING(CONTEST_SCORING):
 
         # Compare to history
         call2  = dx_station.homecall
-        if call2 in keys2 and call2 not in ['WB2RPW','WU6X','N6IE']:
+        if call2 in keys2 and call2 not in []:   # ['WB2RPW','WU6X','N6IE']:
             qth2=HIST2[call2]
             if qth_in!=qth2:
                 print('\n$-$-$-$-$-$-$-$-$-$ Difference from history2 $-$-$-$-$-$-$-$-$-$-$')
@@ -291,12 +317,16 @@ class CQP_SCORING(CONTEST_SCORING):
             #sys.exit(0)
         
         # Info for multi-qsos
-        exch_in=qth_in
+        #exch_in=qth_in
+        exch_in={'NR':num_in,'QTH':qth_in}
         if call in self.EXCHANGES.keys():
             self.EXCHANGES[call].append(exch_in)
         else:
             self.EXCHANGES[call]=[exch_in]
                         
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST)
+                
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #                              -----info sent------ -----info rcvd------
@@ -343,9 +373,12 @@ class CQP_SCORING(CONTEST_SCORING):
 
         print('\nNo. raw QSOS (nqsos1)    =\t',self.nqsos1)
         print('No. unique QSOS (nqsos2) =\t',self.nqsos2)
+        print('No. Dupes                =\t',self.ndupes)
         print('Multipiers               =\t',mults)
         print('Claimed Score            =\t',3*mults*self.nqsos2)
         print('No. flagged QSOS         =\t',self.nq)
+        print('\nNo. CWops=',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
 
         # They did this in 2020
         if False:
@@ -423,12 +456,12 @@ class CQP_SCORING(CONTEST_SCORING):
         return HIST2
 
 
-
+"""
 
 # Routine to give QTH of a Canadian station
 def oh_canada2_OLD(dx_station):
 
-    """ Prefixes	Province/Territory
+    Prefixes	Province/Territory
     VE1 VA1	Nova Scotia
     VE2 VA2	Quebec	
     VE3 VA3	Ontario	
@@ -448,7 +481,7 @@ def oh_canada2_OLD(dx_station):
     CY0***	Sable Is.[16]	
     CY9***	St-Paul Is.[16]	
 
-    For the CQP:
+    For the CQP b4 2023:
     MR      Maritimes
     QC      Quebec
     ON      Ontario
@@ -456,15 +489,17 @@ def oh_canada2_OLD(dx_station):
     SK      Saskatchewan
     AB      Alberta
     BC      British Columbia
-    NT """
+    NT
 
-    # For Cali QSO Party:
+    # For Cali QSO Party prior to 2023:
     # MR = Maritime provinces plus Newfoundland and Labrador (NB, NL, NS, PE)
 
     qth=''
     #print('Oh Canada ... 1')
     #pprint(vars(dx_station))
     if dx_station.country=='Canada':
+        print('OH CANADA2 - Dont do this anymoe!!!')
+        sys.exit(0)
         if dx_station.prefix in ['VO2','VY2','VE9']:
             qth='MR'
         elif dx_station.prefix in ['VY1']:
@@ -479,6 +514,7 @@ def oh_canada2_OLD(dx_station):
                       dx_station.call,dx_station.call_number,num)
 
     else:
-        print('I dont know what I am doing here')
+        print('OH CANADA2 - I dont know what I am doing here')
         
     return qth
+"""

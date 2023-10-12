@@ -249,5 +249,6 @@ class MST_SCORING(CONTEST_SCORING):
         mults = len(self.calls)
         print('mults=',mults)
         print('total score=',mults*self.nqsos2)
-        print('\n# CWops=',self.num_cwops,' =',int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('\n# CWops=',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
                         
