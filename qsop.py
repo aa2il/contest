@@ -186,11 +186,13 @@ class QSOP_SCORING(CONTEST_SCORING):
         self.MY_STATE    = P.SETTINGS['MY_STATE']
 
         self.STATE       = STATE
-        """
+        self.MULTS       = []
+
+        self.QSO_POINTS=[1,1,1]            # CW, PHONE, DIGI
         if STATE=='NY':
-            self.date0 = datetime.datetime.strptime( "20221015 1400" , "%Y%m%d %H%M")  # NYQP
-            self.date1 = self.date0 + datetime.timedelta(hours=12)
-            self.COUNTIES=NY_COUNTIES
+            self.QSO_POINTS=[2,1,1]
+            
+        """
         elif STATE=='IL':
             self.date0 = datetime.datetime.strptime( "20221016 1700" , "%Y%m%d %H%M")  # ILQP
             self.date1 = self.date0 + datetime.timedelta(hours=8)
@@ -281,8 +283,14 @@ class QSOP_SCORING(CONTEST_SCORING):
             print('DX contact - skipping')
             return
 
+        
+        if dupe:
+            print('\nDUPE!!!! rec=',rec)
+            #sys.exit(1)
+        
+
         if not dupe:
-            self.nqsos2 += 1;
+            #self.nqsos2 += 1;
 
             try:
                 idx2 = self.BANDS.index(band)
@@ -290,16 +298,18 @@ class QSOP_SCORING(CONTEST_SCORING):
                 if len(self.COUNTIES)>0:
                     qth2=qth.split('/')
                     for qth1 in qth2:
+                        self.nqsos2 += 1;
                         if self.STATE=='W7' and len(qth2)>1 and len(qth1)==3:
                             qth1=qth2[0][0:2] + qth1
                         idx1 = self.COUNTIES.index(qth1)
                         self.sec_cnt[idx1] = 1
+                        self.MULTS.append(qth1)
                         #self.sec_cnt[idx1,idx2] = 1
                 else:
                     print('Consider adding list of counties for this party!\t',qth)
                     sys,exit(0)
             except Exception as e: 
-                print( str(e) )
+                print( 'QSO SCORING - ERROR:',str(e) )
                 print('\n$$$$$$$$$$$$$$$$$$$$$$')
                 print('call=',call,'\tqth=',qth,' not found in list of Counties')
                 print(self.COUNTIES)
@@ -360,8 +370,11 @@ class QSOP_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
 
+        self.MULTS = list( set( self.MULTS ))
         mults = self.sec_cnt
-        if self.STATE=='W7':
+        if self.STATE in ['IL','NY']:
+            pts_per_qso=2
+        elif self.STATE=='W7':
             pts_per_qso=3
         elif self.STATE=='W1':
             pts_per_qso=2
@@ -374,6 +387,7 @@ class QSOP_SCORING(CONTEST_SCORING):
         print('\nBand\tQSOs')
         for i in range(len(self.BANDS)):
             print(self.BANDS[i],'\t',self.band_cnt[i])
-        print('QSOs            =',self.nqsos1)
-        print('Mults           =',mults,'  =  ',sum(mults))
+        print('\nQSOs            =',self.nqsos2)
+        print('Mults           =',sum(mults),'\t',self.MULTS,
+              '\t',len(self.MULTS),'/',len(self.COUNTIES))
         print('Claimed score=',sum(mults)*self.nqsos2*pts_per_qso)

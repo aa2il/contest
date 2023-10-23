@@ -91,6 +91,9 @@ class SST_SCORING(CONTEST_SCORING):
             print(rec)
             return
             sys.exit(0)
+        if qth in ['BOND','CHAM','MADN'] and False:
+            qth='IL'
+            
         name = rec["name"].upper()
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
 
