@@ -80,6 +80,7 @@ class PARAMS:
                               nargs='*',type=int,default=None)
         arg_proc.add_argument('-sst', action='store_true',help='Slow Speed Mini-Test')
         arg_proc.add_argument('-rac', action='store_true',help='RAC Winter Contest')
+        arg_proc.add_argument('-ocdx', action='store_true',help='Oceania DX CW')
         arg_proc.add_argument('-call',help='All QSOs with a Specific Call(s)',
                               nargs='*',type=str,default=None)
         arg_proc.add_argument('-cols13', action='store_true',help='13 Colonies Special Event')
@@ -256,12 +257,15 @@ class PARAMS:
             sc = ARRL_SS_SCORING(P)
             self.sc=sc
             
-            fname = 'AA2IL_2021.adif'
-            fname = 'AA2IL.adif'
+            fname = 'AA2IL_2022.adif'
             DIR_NAME = '~/AA2IL'
 
+            fname = 'AA2IL.adif'
+            DIR_NAME = '~/Python/pyKeyer'
+
+            fname = 'SS.csv'
             fname='SS.adif'
-            DIR_NAME = '../pyKeyer/SS'
+            DIR_NAME = '~/Python/pyKeyer/SS'
             
             self.history = HIST_DIR2+'/SSCW-2023.txt'
             #self.history = 'HIST_DIR/SSCW-2021-LAST-2.txt'
@@ -398,15 +402,21 @@ class PARAMS:
             fname = 'CQP.csv'
             fname = 'CQP.adif'
             
-        elif args.rac:
+        elif args.rac or args.ocdx:
 
-            # RAC Winter Contest
+            # RAC Winter Contest or OC DX
+            if args.ocdx:
+                P.TXT='OCDX'
+            else:
+                P.TXT='CANADA-WINTER'
+            
             sc = RAC_SCORING(P)
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
-            fname = MY_CALL+'.adif'
-            DIR_NAME = '~/'+MY_CALL+'/'
+            #fname = MY_CALL+'.adif'
+            #DIR_NAME = '~/'+MY_CALL+'/'
+            DIR_NAME='./'
 
         elif args.sst:
 

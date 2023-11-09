@@ -2,7 +2,7 @@
 ############################################################################################
 #
 # arrl_ss.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring ARRL CW Sweepstakes contest.
 #
@@ -51,7 +51,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         # Contest occurs on 1st full weekend of November
         now = datetime.datetime.utcnow()
         year=now.year
-        #year=2021               # Testing
+        #year=2022               # Testing
         
         day1=datetime.date(year,11,1).weekday()                        # Day of week of 1st of month 0=Monday, 6=Sunday
         sat2=1 + ((5-day1) % 7)                                        # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
@@ -175,7 +175,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
 
             try:
                 idx1 = ARRL_SECS.index(sec)
-                self.sec_cnt[idx1] = 1
+                self.sec_cnt[idx1] += 1
             except Exception as e: 
                 print('\n$$$$$$$$$$$$$$$$$$$$$$')
                 print( str(e) )

@@ -29,27 +29,53 @@ from utilities import reverse_cut_numbers
 import numpy as np
 
 ############################################################################################
+
+VERBOSITY=0
+TRAP_ERRORS = False
+TRAP_ERRORS = True
     
-# Scoring class for CWops mini tests - Inherits the base contest scoring class
+############################################################################################
+    
+# Scoring class for RAC & OC DX - Inherits the base contest scoring class
 class RAC_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        super().__init__(P,'CANADA-WINTER',mode='CW')
+        super().__init__(P,P.TXT,mode='CW')
 
         # NOTE - RAC also has CANADA-DAY contest in the summer, same deal
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int)
         self.sec_cnt  = np.zeros((len(self.BANDS),len(PROVINCES)),dtype=np.int)
+        self.contest_name = P.TXT
+        self.RAC  = False
+        self.OCDX = False
+        self.PREFIXES = []
+        self.nq          = 0
 
-        # Determine contest time -Contest occurs on 3rd? full weekend of Dec
+        # Determine contest time 
         now = datetime.datetime.utcnow()
         year=now.year
-        day1=datetime.date(year,12,1).weekday()                            # Day of week of 1st of month 0=Monday, 6=Sunday
-        sat2=1 + ((5-day1) % 7) + 2*7                                      # Day no. for 3rd Saturday = 1 since day1 is the 1st of the month
-                                                                           # No. days until 3rd Saturday (day 5) + 14 more days 
-        self.date0=datetime.datetime(year,12,sat2,0)                   # Contest starts at 0000 UTC on Saturday (Friday night local) ...
-        self.date1 = self.date0 + datetime.timedelta(hours=48)         # ... and ends at 1200 UTC on Sunday
+
+        if self.contest_name=='CANADA-WINTER':
+            # RAC Winter Contest occurs on 3rd? full weekend of Dec
+            day1=datetime.date(year,12,1).weekday()                            # Day of week of 1st of month 0=Monday, 6=Sunday
+            sat2=1 + ((5-day1) % 7) + 2*7                                      # Day no. for 3rd Saturday = 1 since day1 is the 1st of the month
+                                                                               # No. days until 3rd Saturday (day 5) + 14 more days 
+            self.date0=datetime.datetime(year,12,sat2,0)                       # Contest starts at 0000 UTC on Saturday (Friday night local) ...
+            self.date1 = self.date0 + datetime.timedelta(hours=48)             # ... and ends at 1200 UTC on Sunday
+            self.RAC  = True
+        elif self.contest_name=='OCDX':
+            # OC DX Contest occurs on 2n? full weekend of Oct
+            day1=datetime.date(year,10,1).weekday()                            # Day of week of 1st of month 0=Monday, 6=Sunday
+            sat2=1 + ((5-day1) % 7) + 1*7                                      # Day no. for 3rd Saturday = 1 since day1 is the 1st of the month
+                                                                               # No. days until 3rd Saturday (day 5) + 14 more days 
+            self.date0=datetime.datetime(year,10,sat2,6)                       # Contest starts at 0600 UTC on Saturday (Friday night local) ...
+            self.date1 = self.date0 + datetime.timedelta(hours=24)             # ... and ends at 0600 UTC on Sunday
+            self.OCDX = True
+        else:
+            print('RAC SCORING - Unknown contest')
+            sys.exit(0)
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
 
         # Playing with dates
@@ -73,6 +99,14 @@ class RAC_SCORING(CONTEST_SCORING):
         #print('\nrec=',rec)
         keys=list(HIST.keys())
 
+        # Check for correct contest
+        id   = rec["contest_id"].upper()
+        if self.contest_name=='OCDX' and id!='OCDX-QSO-PARTY':
+            if VERBOSITY>0:
+                print('contest=',self.contest,id)
+                print('QSO not part of OC DX contest')
+            return
+        
         # Pull out relavent entries
         call = rec["call"].upper()
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
@@ -91,29 +125,47 @@ class RAC_SCORING(CONTEST_SCORING):
             print('Invalid mode',MY_MODE)
             sys.exit(1)
 
-        # Check country - Canadian stations are worth many more pts
+        # Begin error checking process
+        if '?' in "".join(rx)+call:
+            print('\n$$$$$$$$$$$$$ Questionable RX Entry $$$$$$$$$$$$$$')
+            self.nq+=1
+            print('Call   =',call)
+            print('rx string =',rx)
+            print('Date   =',rec["qso_date_off"])
+            print('Time   =',rec["time_off"])
+            print('rec=',rec)
+            self.list_all_qsos(call,qsos)
+            if TRAP_ERRORS:
+                sys.exit(0)
+
+        # Check country - Canadian stations are worth many more pts in RAC contests
         dx_station = Station(call)
         if False:
             pprint(vars(dx_station))
             sys.exit(0)
         country    = dx_station.country
+        continent  = dx_station.continent
+        prefix     = dx_station.prefix
         
         # There was a lot of inconsistencies where I stored the exchange bx I was developing
         # the keyer code for this contest on the fly
         rst_in='599'
         if rx[0]=='5NN':
-            if country=='Canada':
+            if self.RAC and country=='Canada':
                 qth = rx[1].upper()
             else:
                 qth = reverse_cut_numbers( rx[1] )
         else:                
-            if country=='Canada':
+            if self.RAC and country=='Canada':
                 if 'qth' in rec:
                     qth = rec["qth"].upper()
                 else:
                     qth = rx[0]
             else:
                 qth = reverse_cut_numbers( rx[0] )
+
+        if self.OCDX and continent=='OC':
+            self.PREFIXES.append(prefix)
 
         rst_out='599'
         if tx[0]=='5NN':
@@ -122,7 +174,7 @@ class RAC_SCORING(CONTEST_SCORING):
             serial_out = reverse_cut_numbers( tx[0] )
 
         # Error checking
-        if country=='Canada':
+        if self.RAC and country=='Canada':
             qth2=oh_canada3(dx_station)
             if qth2!=qth:
                 print('\nrec=',rec)
@@ -130,7 +182,7 @@ class RAC_SCORING(CONTEST_SCORING):
                 sys.exit(0)
         
         # Determine point value for this QSO
-        if country=='Canada':
+        if self.RAC and country=='Canada':
             if 'RAC' in call:
                 qso_points = 20
             else:
@@ -145,7 +197,10 @@ class RAC_SCORING(CONTEST_SCORING):
             self.sec_cnt[idx1,idx2] = 1
                 
         else:
-            qso_points = 2
+            if self.RAC:
+                qso_points = 2
+            else:
+                qso_points = 1
 
         self.total_points_all += qso_points
         if not dupe:
@@ -194,6 +249,9 @@ class RAC_SCORING(CONTEST_SCORING):
         print('Mults            =',total_mults)
         print('Claimed score    =',self.total_points*total_mults,\
               '\t(',self.total_points_all*mults,')')
+
+        if self.OCDX:
+            print('\n************** Scoring routine for OCDX not complete !!!! ******************\n')
     
         
 

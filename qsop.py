@@ -123,7 +123,20 @@ COUNTIES['OR'] = ['BAK','BEN','CLK','CLT','COL','COO','CRO','CUR','DES','DOU','G
                   'HOO','JAC','JEF','JOS','KLA','LAK','LAN','LCN','LNN','MAL','MAR','MOR','MUL',
                   'POL','SHE','TIL','UMA','UNI','WAL','WCO','WSH','WHE','YAM']
 
-COUNTIES['RI']=['BRI','KEN','NEW','PRO','WAS']
+COUNTIES['PA'] = ['ADA','ALL','ARM','BEA','BED','BER','BLA','BRA','BUX','BUT','CMB','CRN','CAR','CEN',
+                  'CHE','CLA','CLE','CLI','COL','CRA','CUM','DAU','DCO','ELK','ERI','FAY','FUL','FOR',
+                  'FRA','GRE','HUN','INN','JEF','JUN','LAC','LAN','LAW','LEB','LEH','LUZ','LYC','MCK',
+                  'MER','MIF','MOE','MGY','MTR','NHA','NUM','PER','PHI','PIK','POT','SCH','SNY','SOM',
+                  'SUL','SUS','TIO','UNI','VEN','WAR','WAS','WAY','WES','WYO','YOR']
+
+COUNTIES['RI'] = ['BRI','KEN','NEW','PRO','WAS']
+
+COUNTIES['SD'] = ['AURO','BEAD','BENN','BONH','BROO','BRUL','BRWN','BUFF','BUTT','CAMP','CHAR',
+                  'CLAY','CLRK','CODI','CORS','CUST','DAVI','DAY','DEUE','DEWY','DGLS','EDMU',
+                  'FALL','FAUL','GRAN','GREG','HAAK','HAML','HAND','HNSN','HRDG','HUGH','HUTC',
+                  'HYDE','JERA','JKSN','JONE','KING','LAKE','LAWR','LINC','LYMA','MCOO','MCPH',
+                  'MEAD','MELL','MINE','MINN','MOOD','MRSH','PENN','PERK','POTT','ROBE','SANB',
+                  'OGLA','SPIN','STAN','SULL','TODD','TRIP','TURN','UNIO','WALW','YANK','ZIEB']
 
 COUNTIES['TX']=['ANDE','ANDR','ANGE','ARAN','ARCH','ARMS','ATAS','AUST','BAIL','BAND','BAST','BAYL',
                 'BEE','BELL','BEXA','BLAN','BORD','BOSQ','BOWI','BZIA','BZOS','BREW','BRIS','BROO',
@@ -189,41 +202,31 @@ class QSOP_SCORING(CONTEST_SCORING):
         self.MULTS       = []
 
         self.QSO_POINTS=[1,1,1]            # CW, PHONE, DIGI
+            
+        self.date0 = datetime.datetime.strptime( "20230101 0000" , "%Y%m%d %H%M")  # Whole year
+        self.date1 = self.date0 + datetime.timedelta(days=365)
+        self.COUNTIES=[]
+        
         if STATE=='NY':
             self.QSO_POINTS=[2,1,1]
-            
-        """
-        elif STATE=='IL':
-            self.date0 = datetime.datetime.strptime( "20221016 1700" , "%Y%m%d %H%M")  # ILQP
-            self.date1 = self.date0 + datetime.timedelta(hours=8)
-            self.COUNTIES=IL_COUNTIES
-        elif STATE in ['W1','W7','DE','HI','IA','ID','IN','NJ','KS','NH','OH','TX','VA','WA']:
-        """
-        if 1:
-            self.date0 = datetime.datetime.strptime( "20230101 0000" , "%Y%m%d %H%M")  # Whole year
-            self.date1 = self.date0 + datetime.timedelta(days=365)
-            self.COUNTIES=[]
-            if STATE=='DE':
-                # DE happens on the same weekend as New England and W7 QPs so the counties are a bit goofy
-                for c in COUNTIES['DE']:
-                    self.COUNTIES.append('DE'+c)
-            elif STATE=='W7':
-                # 7th call area
-                self.contest='7QP'
-                for s in ['AZ','ID','MT','NV','OR','UT','WA7QP','WY']:
-                    for c in COUNTIES[s]:
-                        self.COUNTIES.append(s+c)
-            elif STATE=='W1':
-                # New England
-                self.contest='NEQP'
-                for s in ['CT','ME','MA','NH','RI','VT']:
-                    for c in COUNTIES[s]:
-                        self.COUNTIES.append(c+s)
-            else:
-                self.COUNTIES=COUNTIES[STATE]
-        #else:
-        #    print('QSOP_SCORING: Unknown state party -',STATE)
-        #    sys.exit(0)
+        elif STATE=='DE':
+            # DE happens on the same weekend as New England and W7 QPs so the counties are a bit goofy
+            for c in COUNTIES['DE']:
+                self.COUNTIES.append('DE'+c)
+        elif STATE=='W7':
+            # 7th call area
+            self.contest='7QP'
+            for s in ['AZ','ID','MT','NV','OR','UT','WA7QP','WY']:
+                for c in COUNTIES[s]:
+                    self.COUNTIES.append(s+c)
+        elif STATE=='W1':
+            # New England
+            self.contest='NEQP'
+            for s in ['CT','ME','MA','NH','RI','VT']:
+                for c in COUNTIES[s]:
+                    self.COUNTIES.append(c+s)
+        else:
+            self.COUNTIES=COUNTIES[STATE]
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros((len(self.BANDS)),dtype=int)
