@@ -222,7 +222,7 @@ class MST_SCORING(CONTEST_SCORING):
             self.EXCHANGES[call]=[exch_in]
 
         # Count no. of CWops guys worked
-        self.count_cwops(call,HIST)
+        self.count_cwops(call,HIST,rec)
                 
 #000000000111111111122222222223333333333444444444455555555556666666666777777777788
 #123456789012345678901234567890123456789012345678901234567890123456789012345678901
@@ -249,6 +249,11 @@ class MST_SCORING(CONTEST_SCORING):
         mults = len(self.calls)
         print('mults=',mults)
         print('total score=',mults*self.nqsos2)
-        print('\n# CWops=',self.num_cwops,' =',
+
+        print('\n# CWops Members =',self.num_cwops,' =',
               int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('# QSOs Running  =',self.num_running,' =',
+              int( (100.*self.num_running)/self.nqsos1+0.5),'%')
+        print('# QSOs S&P      =',self.num_sandp,' =',
+              int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
                         

@@ -204,7 +204,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             self.EXCHANGES[call]=[exch_in]
             
         # Count no. of CWops guys worked
-        self.count_cwops(call,HIST)
+        self.count_cwops(call,HIST,rec)
                 
 #QSO:  3799 PH 2000-10-26 0711 AA1ZZZ          59  05     K9QZO         59  04     0
         line='QSO: %5d %2s %10s %4s %-13s %3d %2.2d %-13s %3d %2.2d  0' % \
@@ -393,7 +393,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
                 self.EXCHANGES[call]=[exch_in]
                         
         # Count no. of CWops guys worked
-        self.count_cwops(call,HIST)
+        self.count_cwops(call,HIST,rec)
                 
 #QSO: 14073 RY 2008-09-27 0005 HC8N 599 10 DX WC2C   599 05 NY 
         line='QSO: %5d RY %10s %4s %-13s 599 %2.2d %-2s %-13s 599 %2.2d %-3s  0' % \
@@ -491,8 +491,14 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         print(dxccs)
         #for i in range(len(dxccs)):
         #    print('   ',dxccs[i])
-        print('\n# CWops=',self.num_cwops,' =',int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
 
+        print('\n# CWops Members =',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('# QSOs Running  =',self.num_running,' =',
+              int( (100.*self.num_running)/self.nqsos1+0.5),'%')
+        print('# QSOs S&P      =',self.num_sandp,' =',
+              int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
+        
         """
         print('\nnqsos         =',self.nqsos2,nqsos3)
         print('qso points    =',self.total_points)

@@ -68,6 +68,8 @@ class CONTEST_SCORING:
         self.rec_prev    = []
         self.TRAP_ERRORS = False
         self.num_cwops   = 0
+        self.num_running = 0
+        self.num_sandp   = 0
 
         # History file
         self.history = os.path.expanduser( '~/Python/history/data/master.csv' )
@@ -89,12 +91,20 @@ class CONTEST_SCORING:
 
         
     # Function to count the no. of CWops memebrs worked in this contest
-    def count_cwops(self,call,HIST):
+    # Also counts no. qsos made while running
+    def count_cwops(self,call,HIST,rec):
         if call in HIST.keys():
             num=HIST[call]['cwops']
             if num.isdigit():
                 self.num_cwops += 1
-            #print('COUNT CWOPS:',call,num,self.num_cwops)        
+            #print('COUNT CWOPS:',call,num,self.num_cwops)
+
+        #print(rec['running'])
+        if 'running' in rec:
+            if rec['running']=='1':
+                self.num_running += 1
+            else:
+                self.num_sandp   += 1
         
         
     # Routine to group modes according to cw, digi or phone

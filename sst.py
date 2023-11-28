@@ -27,7 +27,7 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 
 ############################################################################################
     
-# Scoring class for CWops mini tests - Inherits the base contest scoring class
+# Scoring class for slow-speed mini tests - Inherits the base contest scoring class
 class SST_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
@@ -159,7 +159,7 @@ class SST_SCORING(CONTEST_SCORING):
             self.EXCHANGES[call]=[exch_in]
                         
         # Count no. of CWops guys worked
-        self.count_cwops(call,HIST)
+        self.count_cwops(call,HIST,rec)
                 
         line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
             (freq_khz,mode,date_off,time_off,
@@ -273,7 +273,12 @@ class SST_SCORING(CONTEST_SCORING):
               '\t(',self.total_points_all,')')
         print('Claimed score    =',self.total_points*sum(mults),\
               '\t(',self.total_points_all*sum(mults),')')
-        print('\n# CWops=',self.num_cwops,' =',
+
+        print('\n# CWops Members =',self.num_cwops,' =',
               int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('# QSOs Running  =',self.num_running,' =',
+              int( (100.*self.num_running)/self.nqsos1+0.5),'%')
+        print('# QSOs S&P      =',self.num_sandp,' =',
+              int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
     
         

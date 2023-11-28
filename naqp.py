@@ -175,7 +175,7 @@ class NAQP_SCORING(CONTEST_SCORING):
                 self.EXCHANGES[call]=[exch_in]
                 
             # Count no. of CWops guys worked
-            self.count_cwops(call,HIST)
+            self.count_cwops(call,HIST,rec)
                 
 #                              ----------info sent----------- ----------info rcvd----------- 
 #QSO: freq  mo date       time call            ex1        ex2 call            ex1        ex2 t
@@ -229,4 +229,11 @@ class NAQP_SCORING(CONTEST_SCORING):
             print(self.BANDS[i],'\t',self.band_cnt[i],'\t',mults[i])
         print('\nTotals:\t',sum(self.band_cnt),'\t',sum(mults))
         print('Claimed score=',sum(mults)*self.nqsos2)
-        print('\n# CWops=',self.num_cwops,' =',int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+
+        print('\n# CWops Members =',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('# QSOs Running  =',self.num_running,' =',
+              int( (100.*self.num_running)/self.nqsos1+0.5),'%')
+        print('# QSOs S&P      =',self.num_sandp,' =',
+              int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
+                        
