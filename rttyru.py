@@ -51,9 +51,11 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         elif self.ten_m:
             self.secs = TEN_METER_SECS
         elif self.cq160m:
-            self.secs = STATES + PROVINCES 
+            self.secs = STATES + PROVINCES2 
+        elif self.ft8ru:
+            self.secs = FTRU_SECS
         else:
-            self.secs = RU_SECS
+            self.secs = RTTYRU_SECS
         self.sec_cnt  = np.zeros(len(self.secs),dtype=int)
         self.band_cnt = np.zeros(len(CONTEST_BANDS),dtype=int)
         
@@ -138,6 +140,13 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         fp.write('LOCATION: %s\n' % self.MY_STATE)
         fp.write('ARRL-SECTION: %s\n' % self.MY_SECTION)
 
+    # Function to search ALL.TXT file
+    def search_ALL_TXT(self,call):
+        cmd='fgrep -i '+call+' ALL.TXT | fgrep '+self.MY_CALL
+        print('\ncmd=',cmd)
+        os.system(cmd)
+        print(' ')
+
     # Convert RST to 5x9 format since some ops don't set contest mode correctly
     def convert_rst(self,rst):
         # WSJT RST mapping:  (emperically determined from ALL.TXT - only partially determined)
@@ -149,7 +158,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         # -8 ... -15  ---> 549
         # -16  ---> 539
 
-        print('CONVERT_RST:',rst)
+        #print('CONVERT_RST:',rst)
         rst=int(rst)
         if rst>=18:
             return '599'
@@ -201,7 +210,9 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             country = dx_station.country
         #print(country)
 
+        #print('HEY1')
         if country in ['USA','United States','Canada']:
+            #print('HEY2')
             try:
                 if 'state' in rec:
                     qth = rec["state"]
@@ -212,13 +223,16 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 print('\n',call,"*** EXPECTING STATE/PROVINCE ***")
                 if TRAP_ERRORS:
                     print(rec)
+                    self.search_ALL_TXT(call)
                     sys.exit(0)
                 else:
                     return
                 
-        elif 'state' in rec :
+        elif 'state' in rec and len(rec["state"])>0:
+            #print('HEY3')
             qth = rec["state"]
         elif self.ft8ru:
+            #print('HEY4')
             try:
                 qth = rec["srx"]
             except:
@@ -226,6 +240,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                       ' - cant determine QTH.')
                 print('rec=',rec)
                 if TRAP_ERRORS:
+                    self.search_ALL_TXT(call)
                     sys.exit(0)
                 else:
                     return 
@@ -238,6 +253,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         elif int(RST_IN)<111:
             print('\n',call,"*** EXPECTING 5xx RST ***")
             if TRAP_ERRORS:
+                self.search_ALL_TXT(call)
                 print(rec)
                 sys.exit(0)
             else:
@@ -246,6 +262,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         else:
             print('\n',call,"*** CAN'T DETERMIINE QTH ***")
             if TRAP_ERRORS:
+                self.search_ALL_TXT(call)
                 print(rec)
                 sys.exit(0)
             else:
@@ -289,6 +306,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 print('\n*** ERROR *** qth=',qth,' not found in list of Sections - call=',call,country)
                 print('\nrec=',rec)
                 if TRAP_ERRORS:
+                    self.search_ALL_TXT(call)
                     sys.exit(0)
             else:
                 self.countries.add(country)
@@ -296,9 +314,12 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 try:
                     qth=reverse_cut_numbers( qth )
                     val=int(qth)
-                except:
-                    print('Invalid serial for DX',qth)
+                except Exception as e: 
+                    print(e)
+                    print('Invalid serial for DX: qth=',qth,'\t',self.ft8ru)
+                    print('\nrec=',rec)
                     if TRAP_ERRORS:
+                        self.search_ALL_TXT(call)
                         sys.exit(0)
                     
         if not dupe:
@@ -326,12 +347,18 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         if not self.check_rst(RST_OUT):
             print('\nInvalid RST_OUT field for call',call,band,mode,RST_OUT)
             print('rec=',rec)
-            if TRAP_ERRORS:
-                sys.exit(0)
+            RST_OUT2=self.convert_rst(RST_OUT)
+            print('Recorded RST OUT=',RST_OUT,'\tConverted RST OUT=',RST_OUT2)
+            if not self.ft8ru and not self.ten_m and dx:
+                RST_OUT='599'
+            elif TRAP_ERRORS:
+                RST_OUT=RST_OUT2
+                if RST_OUT=='?':
+                    sys.exit(0)
         
         if not self.check_rst(RST_IN):
-            print('\nInvalid RST_IN field for call',call,band,mode,RST_IN)
-            print('rec=',rec)
+            print('\nInvalid RST_IN field for call',call,'\tband=',band,'\tmode=',mode,'\tRTS IN=',RST_IN)
+            #print('rec=',rec)
             RST_IN2=self.convert_rst(RST_IN)
             print('Recorded RST=',RST_IN,'\tConverted RST=',RST_IN2)
             if not self.ft8ru and not self.ten_m and dx:
@@ -353,7 +380,23 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 print('*** WARNING ***',call,'\tBad RST IN:',RST_IN)
                 #sys.exit(0)
 
-        
+        # Info for multi-qsos
+        #print('INFO:',call,dx)
+        if self.ft8ru:
+            if dx:
+                exch_in={'TRUE RST':RST_IN,'NR':qth}
+            else:
+                exch_in={'TRUE RST':RST_IN,'QTH':qth}
+        else:
+            exch_in={'RST':RST_IN,'QTH':qth}
+        if call in self.EXCHANGES.keys():
+            self.EXCHANGES[call].append(exch_in)
+        else:
+            self.EXCHANGES[call]=[exch_in]
+                        
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST,rec)
+                        
 #                              --------info sent------- -------info rcvd--------
 #QSO: freq  mo date       time call          rst exch   call          rst exch  
 #QSO: ***** ** yyyy-mm-dd nnnn ************* nnn ****** ************* nnn ******
@@ -371,8 +414,10 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             state = HIST[call]['state']
             if state=='':
                 state = HIST[call]['sec']
+            if len(state)==3 and state[1:] in ['TX','PA']:
+                state='TX'
             #print call,qth,state
-            if qth!=state and not dx:
+            if qth!=state and not dx and state!='':
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
                 print(rec)
                 print(line)
@@ -389,49 +434,6 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         #sys,exit(0)
         
         return line
-
-    # Routine to sift through station we had multiple contacts with to identify any discrepancies
-    def check_multis_OLD(self,qsos):
-
-        print('There were multiple qsos with the following stations:')
-        qsos2=qsos.copy()
-        qsos2.sort(key=lambda x: x['call'])
-        calls=[]
-        for rec in qsos2:
-            calls.append(rec['call'])
-        #print(calls)
-        uniques = list(set(calls))
-        uniques.sort()
-        #print('uniques=',uniques)
-
-        for call in uniques:
-            #print(call,calls.count(call))
-            qth_old=''
-            if calls.count(call)>1:
-                for rec in qsos:
-                    if rec['call']==call:
-                        mode = rec["mode"]
-                        band = rec["band"]
-                        if 'state' in rec:
-                            qth  = rec["state"].upper()
-                        else:
-                            try:
-                                qth  = rec["srx"]
-                            except:
-                                print('\nWHOOOPS!')
-                                print(rec)
-                                if TRAP_ERRORS:
-                                      sys.exit(0)
-
-                        flag=''
-                        if qth_old=='':
-                            qth_old=qth
-                        elif qth_old!=qth:
-                            flag='******************'
-                            
-                        print(call,'\t',band,'\t',mode,'\t',qth,'\t',flag)
-                print(' ')
-                        
 
     # Summary & final tally
     def summary(self):
@@ -470,6 +472,9 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             print('No. CW QSOs     =\t',self.cw_qsos)
         print('Multipliers     =\t',mults)
         print('Claimed Score   =\t',self.total_points*mults)
+
+        print('\n# CWops Members =',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
 
     #######################################################################################
 

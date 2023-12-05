@@ -161,13 +161,16 @@ class PARAMS:
 
         elif args.ftru:
 
-            # FT Round-up in Decembet
+            # FT Round-up in December
             sc = ARRL_RTTY_RU_SCORING(P,'FT8-RU')
             self.sc=sc
             
             self.history = HIST_DIR+'master.csv'
             fname = 'wsjtx_log.adi'
             DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
+            fname = 'FTRU_2023.csv'
+            fname = 'FTRU_2023.adif'
+            DIR_NAME = './'
     
         elif args.ten:
 

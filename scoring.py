@@ -311,22 +311,34 @@ class CONTEST_SCORING:
                 for key in exchs[0].keys():
                     items=[]
                     for exch in exchs:
-                        items.append(exch[key])
+                        if key in 'NR':
+                            items.append(int(exch[key]))
+                        else:
+                            items.append(exch[key])
+                        #if call=='OA4DOS':
+                        #    print(call,key,exch[key],items)
                     #print(key,items)
-                    if key=='NR':
+                    if key=='TRUE RST':
+                        # Actual RST - do nothing
+                        same = True
+                        #print('TRUE RST ALWAYS OK')
+                    elif key=='NR':
                         # Serial No. - make sure its increasing
                         same=sorted(items) == items
+                        if not same:
+                            print(call,'SERIAl No. NOT increasing:',same,sorted(items),items)
                     else:
                         # Simple fixed item - make sure all the same
                         same=items.count(items[0]) == len(items)
+                        #print('FIXED ITEMS:',items.count(items[0]),len(items))
                     #print(same)
                     mismatch |= not same
                 #sys.exit(0)
                 
             if mismatch:
-                if not problem:
+                if not problem or True:
                     nproblems+=1
-                    print('There are discrepancies with multiple qsos with the following stations:')
+                    print('There are discrepancies with multiple qsos with the following station:')
                 print('call=',call,'\texchanges=',exchs)
                 problem=True
                 

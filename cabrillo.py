@@ -347,10 +347,13 @@ for i in range(len(qsos)):
         
         # Check for rapid dupes - this often happens with FT4/8
         dupe,rapid = P.sc.check_dupes(rec,qsos,i,istart)
-        if rapid and (P.sc.contest!='FT8-RU' or False):
-            print('<<<<<<<<<<< RAPID dupe skipped >>>>>>>>>>>>>>\n')
-            P.sc.nskipped+=1
-            continue
+        if rapid:
+            if P.sc.contest!='FT8-RU' or False:
+                print('<<<<<<<<<<< RAPID dupe skipped >>>>>>>>>>>>>>\n')
+                P.sc.nskipped+=1
+                continue
+            else:
+                print('<<<<<<<<<<< RAPID ***NOT*** skipped for this contest >>>>>>>>>>>>>>\n')
 
         # Check for operating time limit - NAQP has this (as do others)
         if op_time>P.TIME_LIMIT:
@@ -383,6 +386,7 @@ for i in range(len(qsos)):
             if L==line:
                 if line:
                     print('@@@@@@@@@@@@@@@@@@@@@@@@ Duplicate line found\n',line)
+                    print('@@@@@@@@@@@@@@@@@@@@@@@@    Line will be skipped')
                 dupe=True
         if line!=None and not dupe:
             # Some QSOs give multiple credits, e.g. State QP from a county line

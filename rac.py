@@ -21,7 +21,7 @@
 
 import sys
 import datetime
-from rig_io.ft_tables import PROVINCES
+from rig_io.ft_tables import PROVINCES2
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station
 from pprint import pprint
@@ -46,7 +46,7 @@ class RAC_SCORING(CONTEST_SCORING):
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int)
-        self.sec_cnt  = np.zeros((len(self.BANDS),len(PROVINCES)),dtype=np.int)
+        self.sec_cnt  = np.zeros((len(self.BANDS),len(PROVINCES2)),dtype=np.int)
         self.contest_name = P.TXT
         self.RAC  = False
         self.OCDX = False
@@ -189,7 +189,7 @@ class RAC_SCORING(CONTEST_SCORING):
                 qso_points = 10
 
             try:
-                idx2 = PROVINCES.index(qth)
+                idx2 = PROVINCES2.index(qth)
             except:
                 print('\n',rec)
                 print(qth,'not in list of of PROVINCES - call=',call)
@@ -238,9 +238,9 @@ class RAC_SCORING(CONTEST_SCORING):
             mults = np.sum(secs)
             total_mults+=mults
             print(self.BANDS[i],'\t',self.band_cnt[i],'\t',mults,'\t',end='')
-            for j in range(len(PROVINCES)):
+            for j in range(len(PROVINCES2)):
                 if secs[j]>0:
-                    print(' ',PROVINCES[j],end='')
+                    print(' ',PROVINCES2[j],end='')
             print(' ')
         print('Total:\t',sum(self.band_cnt),'\t',total_mults)
             
