@@ -314,10 +314,10 @@ for i in range(len(qsos)):
             if j==i:
                 gap_min = (date_off - qsos[i-1]['time_stamp']).total_seconds() / 60.0
                 if P.sc.contest!='Specific Call':
-                    print('Time gap:',gap_min,'minutes')
+                    print('\nTime gap:',gap_min,'minutes')
                 if gap_min>30:
                     cum_gap += gap_min
-                    print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Time Gap %%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+                    print('\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Time Gap %%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
                     print(date_off,rec['call'],qsos[i-1]['call'])
 
             #print('t1=',t1)
@@ -378,6 +378,7 @@ for i in range(len(qsos)):
         else:
             # This is how things should be for all contests
             # Added arg HIST2 for CQP
+            #print('\nCABRILLO MAIN: rec=',rec,nqsos)
             line = P.sc.qso_scoring(rec,dupe,qsos,HIST,P.sc.my_mode,P.HIST2)
             
         #print(line)

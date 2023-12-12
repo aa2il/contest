@@ -52,7 +52,7 @@ set CONTEST=""
 #set CONTEST="cols13"             # 13 colonies special event - worked in 2021
 #set CONTEST="sats"               # Satellites worked  - worked in 2021
 #set CONTEST="ftru"               # FT Round-up - December
-#set CONTEST="ten"                 # ARRL 10-meter 
+set CONTEST="ten"                 # ARRL 10-meter 
 #set CONTEST="rac"                 # RAC Winter Contest
 #set CONTEST="ocdx"                 # Oceania DX CW
 
@@ -114,11 +114,4 @@ $EXE -$CONTEST $SESSION  $TIME_LIMIT $ASSISTED $LOG_FILE
 #popd
 
 # cabrillo.py -cqp -hist lotwreport.adi
-
-# ARRL 10 meter
-#cabrillo.py -ten
-
-# Makroten
-#cabrillo.py -mak
-
 

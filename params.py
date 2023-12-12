@@ -177,6 +177,7 @@ class PARAMS:
             # ARRL 10m contest
             sc = ARRL_RTTY_RU_SCORING(P,'ARRL-10')
             self.sc=sc
+            self.history = HIST_DIR+'master.csv'
             
             fname = 'AA2IL_2021.adif'
             fname = 'AA2IL.adif'

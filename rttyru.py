@@ -206,6 +206,7 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         if 'country' in rec :
             country = rec["country"]
         else:
+            #print('QSO SCORING: call=',call)
             dx_station = Station(call)
             country = dx_station.country
         #print(country)
@@ -223,7 +224,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 print('\n',call,"*** EXPECTING STATE/PROVINCE ***")
                 if TRAP_ERRORS:
                     print(rec)
-                    self.search_ALL_TXT(call)
+                    if self.ft8ru:
+                        self.search_ALL_TXT(call)
                     sys.exit(0)
                 else:
                     return
@@ -240,7 +242,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                       ' - cant determine QTH.')
                 print('rec=',rec)
                 if TRAP_ERRORS:
-                    self.search_ALL_TXT(call)
+                    if self.ft8ru:
+                        self.search_ALL_TXT(call)
                     sys.exit(0)
                 else:
                     return 
@@ -253,7 +256,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         elif int(RST_IN)<111:
             print('\n',call,"*** EXPECTING 5xx RST ***")
             if TRAP_ERRORS:
-                self.search_ALL_TXT(call)
+                if self.ft8ru:
+                    self.search_ALL_TXT(call)
                 print(rec)
                 sys.exit(0)
             else:
@@ -262,7 +266,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
         else:
             print('\n',call,"*** CAN'T DETERMIINE QTH ***")
             if TRAP_ERRORS:
-                self.search_ALL_TXT(call)
+                if self.ft8ru:
+                    self.search_ALL_TXT(call)
                 print(rec)
                 sys.exit(0)
             else:
@@ -306,7 +311,8 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 print('\n*** ERROR *** qth=',qth,' not found in list of Sections - call=',call,country)
                 print('\nrec=',rec)
                 if TRAP_ERRORS:
-                    self.search_ALL_TXT(call)
+                    if self.ft8ru:
+                        self.search_ALL_TXT(call)
                     sys.exit(0)
             else:
                 self.countries.add(country)
@@ -314,12 +320,15 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
                 try:
                     qth=reverse_cut_numbers( qth )
                     val=int(qth)
-                except Exception as e: 
-                    print(e)
+                except Exception as e:
+                    print('\n',e)
                     print('Invalid serial for DX: qth=',qth,'\t',self.ft8ru)
-                    print('\nrec=',rec)
+                    print('call     =',call)
+                    print('time off =',time_off)
+                    print('rec=',rec)
                     if TRAP_ERRORS:
-                        self.search_ALL_TXT(call)
+                        if self.ft8ru:
+                            self.search_ALL_TXT(call)
                         sys.exit(0)
                     
         if not dupe:
@@ -419,10 +428,11 @@ class ARRL_RTTY_RU_SCORING(CONTEST_SCORING):
             #print call,qth,state
             if qth!=state and not dx and state!='':
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
-                print(rec)
-                print(line)
+                #print(rec)
+                #print(line)
                 print('CALL:',call,'\t Rx:',qth,'\t Hist:',state)
-                print(HIST[call])
+                print('time off =',time_off)
+                #print(HIST[call])
                 #sys,exit(0)
                 
         elif False:
