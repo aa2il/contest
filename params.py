@@ -412,16 +412,19 @@ class PARAMS:
             if args.ocdx:
                 P.TXT='OCDX'
             else:
-                P.TXT='CANADA-WINTER'
+                P.TXT='CANADA-WINTER'              # Dont change - this is what RAC wants!
             
             sc = RAC_SCORING(P)
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
-            #fname = MY_CALL+'.adif'
-            #DIR_NAME = '~/'+MY_CALL+'/'
-            DIR_NAME='./'
+            fname = MY_CALL+'.adif'
+            #fname = MY_CALL+'_2022.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
 
+            fname = 'RAC.csv'
+            DIR_NAME='./'
+            
         elif args.sst:
 
             # K1USN SST

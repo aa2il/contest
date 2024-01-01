@@ -120,8 +120,10 @@ class SST_SCORING(CONTEST_SCORING):
             idx1 = SST_SECS.index(qth)
             #idx2 = self.BANDS.index(band)
         except:
-            print('\n',rec)
-            print(qth,'not in list of of SST Sections - call=',call)
+            print('\n*************** WHOOOOOOOPS !!!!!!!!!!!!!!!!!!!!')
+            print('\nrec=',rec)
+            print('\n',qth,'not in list of of SST Sections - call=',call)
+            print('Giving up!\n')
             sys.exit(0)
         self.sec_cnt[idx1,idx] = 1
         #self.sec_cnt[idx1,idx2] = 1

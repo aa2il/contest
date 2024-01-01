@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # rac.py - Rev 1.0
-# Copyright (C) 2022 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2022-3 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring RAC winter contest
 #
@@ -25,7 +25,7 @@ from rig_io.ft_tables import PROVINCES2
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station
 from pprint import pprint
-from utilities import reverse_cut_numbers
+from utilities import reverse_cut_numbers,Oh_Canada
 import numpy as np
 
 ############################################################################################
@@ -52,19 +52,35 @@ class RAC_SCORING(CONTEST_SCORING):
         self.OCDX = False
         self.PREFIXES = []
         self.nq          = 0
+        self.ncdn        = 0
+        self.nrac        = 0
+        self.ndx         = 0
 
         # Determine contest time 
         now = datetime.datetime.utcnow()
         year=now.year
+        #year=2022           # Debug
 
         if self.contest_name=='CANADA-WINTER':
-            # RAC Winter Contest occurs on 3rd? full weekend of Dec
+            
+            # RAC Winter Contest occurs in Dec - not sure of which weekend - 3rd or 4th full weekend?
+            # Or perhaps its last full weekend in Dec? Let's go with that ...
             day1=datetime.date(year,12,1).weekday()                            # Day of week of 1st of month 0=Monday, 6=Sunday
-            sat2=1 + ((5-day1) % 7) + 2*7                                      # Day no. for 3rd Saturday = 1 since day1 is the 1st of the month
-                                                                               # No. days until 3rd Saturday (day 5) + 14 more days 
+            sat2=1 + ((5-day1) % 7) + 4*7                                      # Day no. for 5th Saturday = 1 since day1 is the 1st of the month
+                                                                               # No. days until 5th Saturday (day 5) + 14 more days
+            if sat2+1>31:
+                print('\nRAC SCORING - need to make some adjustments!')
+                print('sat2=',sat2)
+                sat2-=7                                                        # Note a full weekend - role back to 4th Saturday
+                print('sat2=',sat2)
+            if sat2 in [24,25]:
+                sat2-=7                                                        # I don't think they'd hold on Christmas?!
+                #sys.exit(0)
+                
             self.date0=datetime.datetime(year,12,sat2,0)                       # Contest starts at 0000 UTC on Saturday (Friday night local) ...
             self.date1 = self.date0 + datetime.timedelta(hours=48)             # ... and ends at 1200 UTC on Sunday
             self.RAC  = True
+            
         elif self.contest_name=='OCDX':
             # OC DX Contest occurs on 2n? full weekend of Oct
             day1=datetime.date(year,10,1).weekday()                            # Day of week of 1st of month 0=Monday, 6=Sunday
@@ -79,12 +95,10 @@ class RAC_SCORING(CONTEST_SCORING):
         print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
 
         # Playing with dates
-        if False:
-            print(now)
-            print(now.day,now.weekday())
-            print(today)
-            print(self.date0)
-            print(self.date1)
+        if True:
+            print('\nnow=',now,'\tday=',now.day,now.weekday())
+            print('date0=',self.date0)
+            print('date1=',self.date1)
             #sys.exit(0)
 
         # Name of output file
@@ -100,11 +114,23 @@ class RAC_SCORING(CONTEST_SCORING):
         keys=list(HIST.keys())
 
         # Check for correct contest
-        id   = rec["contest_id"].upper()
+        if "contest_id" in rec:
+            id   = rec["contest_id"].upper()
+        else:
+            print('\nWarning - missing contest id')
+            print(rec)
+            print(self.contest_name)
+            id=''
+            #sys.exit(0)
         if self.contest_name=='OCDX' and id!='OCDX-QSO-PARTY':
             if VERBOSITY>0:
                 print('contest=',self.contest,id)
                 print('QSO not part of OC DX contest')
+            return
+        elif self.contest_name=='CANADA-WINTER' and id!='RAC-QSO-PARTY':
+            if VERBOSITY>=0:
+                print('contest=',self.contest,id)
+                print('QSO not part of RAC contest')
             return
         
         # Pull out relavent entries
@@ -175,18 +201,22 @@ class RAC_SCORING(CONTEST_SCORING):
 
         # Error checking
         if self.RAC and country=='Canada':
-            qth2=oh_canada3(dx_station)
+            qth2,junk=Oh_Canada(dx_station)
             if qth2!=qth:
+                print("\n$$$$$$$$$$$$$ Province doesn't match callsign $$$$$$$$$$$$$$")
                 print('\nrec=',rec)
                 print('Oh Canada: qth=',qth,'\tqth2=',qth2)
-                sys.exit(0)
+                if TRAP_ERRORS and False:
+                    sys.exit(0)
         
         # Determine point value for this QSO
         if self.RAC and country=='Canada':
             if 'RAC' in call:
                 qso_points = 20
+                self.nrac+=1
             else:
                 qso_points = 10
+                self.ncdn+=1
 
             try:
                 idx2 = PROVINCES2.index(qth)
@@ -197,6 +227,7 @@ class RAC_SCORING(CONTEST_SCORING):
             self.sec_cnt[idx1,idx2] = 1
                 
         else:
+            self.ndx+=1
             if self.RAC:
                 qso_points = 2
             else:
@@ -230,7 +261,7 @@ class RAC_SCORING(CONTEST_SCORING):
         print('\nNo. QSOs         =',self.nqsos2,\
               '\t(',self.nqsos1,')')
 
-        print('Band\tQSOs\tMults\tProvinces')
+        print('\nBand\tQSOs\tMults\tProvinces')
         total_mults=0
         for i in range(len(self.BANDS)):
             secs=self.sec_cnt[i]
@@ -244,95 +275,16 @@ class RAC_SCORING(CONTEST_SCORING):
             print(' ')
         print('Total:\t',sum(self.band_cnt),'\t',total_mults)
             
-        print('\tQSO Points       =',self.total_points,\
+        print('\nQSO Points       =',self.total_points,\
               '\t(',self.total_points_all,')')
         print('Mults            =',total_mults)
         print('Claimed score    =',self.total_points*total_mults,\
-              '\t(',self.total_points_all*mults,')')
+              '\t(',self.total_points_all*total_mults,')')
 
+        print('Cdn:',self.ncdn,'\tRAC:',self.nrac,'\tDX:',self.ndx,'\tMults:',total_mults,'\tScore:',self.total_points*total_mults)
+        
         if self.OCDX:
             print('\n************** Scoring routine for OCDX not complete !!!! ******************\n')
     
-        
-
-
-# Routine to give QTH of a Canadian station
-def oh_canada3_old(dx_station):
-
-    """
-    Prefixes	Province/Territory
-    --------    ------------------
-    VE1 VA1	Nova Scotia
-    VE2 VA2	Quebec	
-    VE3 VA3	Ontario	
-    VE4 VA4	Manitoba	
-    VE5 VA5	Saskatchewan	
-    VE6 VA6	Alberta	
-    VE7 VA7	British Columbia	
-    VE8	        Northwest Territories	
-    VE9	        New Brunswick	
-    VE0*	International Waters
-    VO1	        Newfoundland
-    VO2	        Labrador
-    VY1	        Yukon	
-    VY2	        Prince Edward Island
-    VY9**	Government of Canada
-    VY0	        Nunavut	
-    CY0***	Sable Is.[16]	
-    CY9***	St-Paul Is.[16]	
-
-    For the CQP:
-    MR      Maritime provinces plus Newfoundland and Labrador (NB, NL, NS, PE)
-    QC      Quebec
-    ON      Ontario
-    MB      Manitoba
-    SK      Saskatchewan
-    AB      Alberta
-    BC      British Columbia
-    NT 
-    """
-
-    qth=''
-    #print('Oh Canada ... 1')
-    #pprint(vars(dx_station))
-    if dx_station.country=='Canada':
-        prefix=dx_station.call_prefix +dx_station.call_number
-        if prefix in ['VE1','VA1']:
-            qth='NS'
-        elif prefix in ['VE2','VA2']:
-            qth='QC'
-        elif prefix in ['VE3','VA3']:
-            qth='ON'
-        elif prefix in ['VE4','VA4']:
-            qth='MB'
-        elif prefix in ['VE5','VA5']:
-            qth='SK'
-        elif prefix in ['VE6','VA6']:
-            qth='AB'
-        elif prefix in ['VE7','VA7']:
-            qth='BC'
-        elif prefix in ['VE8']:
-            qth='NT'
-        elif prefix in ['VE9']:
-            qth='NB'
-        elif prefix in ['VO1','VO2']:
-            qth='NL'
-        elif prefix in ['VY0']:
-            qth='NU'
-        elif prefix in ['VY1']:
-            qth='YT'
-        elif prefix in ['VY2']:
-            qth='PE'
-        else:
-            print('OH CANADA3 - Hmmmm',prefix)
-            pprint(vars(dx_station))
-            sys.exit(0)
-            
-    else:
-        print('I dont know what I am doing here')
-        
-    return qth
-
-################################################################################
     
         
