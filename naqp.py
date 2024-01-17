@@ -148,7 +148,7 @@ class NAQP_SCORING(CONTEST_SCORING):
                 sys.exit(0)
 
         # Misc fix-ups
-        if qth=='PY':
+        if qth in ['PY','ZL']:
             qth='DX'
 
         if not dupe:
@@ -193,7 +193,7 @@ class NAQP_SCORING(CONTEST_SCORING):
             state=HIST[call]['state']
             if state=='':
                 sec  =HIST[call]['sec']
-                if sec in STATES+PROVINCES:
+                if sec in STATES+PROVINCES2:
                     state=sec
             name9=HIST[call]['name']
             #print call,qth,state

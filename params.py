@@ -300,14 +300,11 @@ class PARAMS:
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
-            #print('fname=',fname)
-            if fname==None:
-                fname = MY_CALL+'.adif'
-                DIR_NAME = '~/'+MY_CALL+'/'
-            else:
-                DIR_NAME = '.'
-            print('fname=',fname)
-            #sys.exit(0)
+
+            #DIR_NAME = '../pyKeyer/NAQP/'    
+            DIR_NAME = './'    
+            fname = 'NAQP.csv'
+            #fname = 'NAQP.adif'
 
         elif args.state:
 
