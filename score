@@ -52,7 +52,7 @@ set CONTEST=""
 #set CONTEST="cols13"             # 13 colonies special event - worked in 2021
 #set CONTEST="sats"               # Satellites worked  - worked in 2021
 #set CONTEST="ftru"               # FT Round-up - December
-set CONTEST="ten"                 # ARRL 10-meter 
+#set CONTEST="ten"                 # ARRL 10-meter 
 #set CONTEST="rac"                 # RAC Winter Contest
 #set CONTEST="ocdx"                 # Oceania DX CW
 
