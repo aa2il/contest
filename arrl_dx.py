@@ -1,9 +1,9 @@
 ############################################################################################
 #
 # arrl_dx.py - Rev 1.0
-# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
 #
-# Routines for scoring ARRL Internation DX contests.
+# Routines for scoring ARRL International DX contests.
 #
 ############################################################################################
 #
@@ -23,7 +23,7 @@ import sys
 import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
-from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
+from dx import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
 from utilities import reverse_cut_numbers
 
@@ -104,10 +104,12 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
+        if not TRAP_ERRORS and '?' in qth:
+            qth=qth.replace('?','')
         pwr=reverse_cut_numbers(qth)
         if pwr in ['KW','K','1K']:
             pwr='1000'
-        elif pwr=='599':
+        elif  TRAP_ERRORS and pwr=='599':
             print('WOOOOOPS!',pwr)
             sys.exit(0)
         pwr=int(pwr)
@@ -126,7 +128,12 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
                 qso_points=3
             self.total_points += qso_points
             self.POINTS[band] += qso_points
-            self.dxccs[band].add(dx_station.country)
+            if dx_station.country:
+                self.dxccs[band].add(dx_station.country)
+            else:
+                print('Problem with country: call=',call,dx_station.country)
+                if TRAP_ERRORS:
+                    sys,exit(0)
             
         if MY_MODE=='CW':
             mode='CW'
@@ -146,6 +153,9 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
         else:
             self.EXCHANGES[call]=[exch_in]
             
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST,rec)
+                
 #QSO:  3799 PH 2000-10-26 0711 AA1ZZZ          59  05     K9QZO         59  04     0
         line='QSO: %5d %2s %10s %4s %-13s %3d %2s %-13s %3d %4s' % \
             (freq_khz,mode,date_off,time_off,self.MY_CALL,rst_out,self.MY_STATE,call,rst_in,pwr)
@@ -183,6 +193,10 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
             print('\n',b,'# QSOs=',self.NQSOS[b])
             nqsos3+=self.NQSOS[b]
             
+            #print(self.dxccs[b])
+            #for x in self.dxccs[b]:
+            #    print(x)
+            
             d = list( self.dxccs[b] )
             d.sort()
             print(b,' DXCCs :',d,len(d))
@@ -201,3 +215,10 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
         print('\nNo. unique DXCCs =',len(dxccs))
         print(dxccs)
 
+        print('\nNo. CWops Members =',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('No. QSOs Running  =',self.num_running,' =',
+              int( (100.*self.num_running)/self.nqsos1+0.5),'%')
+        print('No. QSOs S&P      =',self.num_sandp,' =',
+              int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
+        

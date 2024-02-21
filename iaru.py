@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # iaru.py - Rev 1.0
-# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring IARU HF contest.
 #
@@ -244,6 +244,8 @@ class IARU_HF_SCORING(CONTEST_SCORING):
             else:
                 self.EXCHANGES[call]=[exch_in]
             
+            # Count no. of CWops guys worked
+            self.count_cwops(call,HIST,rec)
             
 #                              --------info sent------- -------info rcvd--------
 #QSO: freq  mo date       time call          rst exch   call          rst exch  
@@ -334,8 +336,10 @@ class IARU_HF_SCORING(CONTEST_SCORING):
         print('No. Multipliers =',nmults)
         print('Claimed Score   =',self.total_points*nmults)
         
-# From log submission        
-#QSOs in Log:	163
-#Raw Score: 431 Qpts x 55 Mults = 23,705 (161 QSOs)
-
-
+        print('\nNo. CWops Members =',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('No. QSOs Running  =',self.num_running,' =',
+              int( (100.*self.num_running)/self.nqsos1+0.5),'%')
+        print('No. QSOs S&P      =',self.num_sandp,' =',
+              int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
+        

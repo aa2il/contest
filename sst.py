@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # sst.py - Rev 1.0
-# Copyright (C) 2021 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring K1USN Slow Speed Mini Tests (SSTs).
 #
@@ -31,12 +31,11 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 class SST_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
-        #CONTEST_SCORING.__init__(self,P,'Slow Speed Mini-Test',mode='CW')
         super().__init__(P,'Slow Speed Mini-Test',mode='CW')
-        
+
+        # Inits
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
         self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int)
-        #self.sec_cnt  = np.zeros(len(SST_SECS))
         self.sec_cnt = np.zeros((len(SST_SECS),len(self.BANDS)),dtype=np.int)
 
         # Determine contest time - assumes this is dones within a few hours of the contest
@@ -118,7 +117,6 @@ class SST_SCORING(CONTEST_SCORING):
 
         try:
             idx1 = SST_SECS.index(qth)
-            #idx2 = self.BANDS.index(band)
         except:
             print('\n*************** WHOOOOOOOPS !!!!!!!!!!!!!!!!!!!!')
             print('\nrec=',rec)
@@ -126,7 +124,6 @@ class SST_SCORING(CONTEST_SCORING):
             print('Giving up!\n')
             sys.exit(0)
         self.sec_cnt[idx1,idx] = 1
-        #self.sec_cnt[idx1,idx2] = 1
         
         self.total_points_all += qso_points
         if not dupe:
@@ -167,76 +164,6 @@ class SST_SCORING(CONTEST_SCORING):
             (freq_khz,mode,date_off,time_off,
              self.MY_CALL,self.MY_NAME,self.MY_STATE,
              call,name,qth)
-        
-        return line
-                        
-    # Scoring routine for Slow Speed Mini Tests
-    def qso_scoring_old(self,rec,dupe,qsos,HIST,MY_MODE):
-        #print 'rec=',rec
-        keys=list(HIST.keys())
-
-        # Pull out relavent entries
-        call = rec["call"].upper()
-        qth  = rec["qth"].upper()
-        name = rec["name"].upper()
-        freq_khz = int( 1000*float(rec["freq"]) +0.5 )
-        band = rec["band"]
-        date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
-        time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
-        if MY_MODE=='CW':
-            mode='CW'
-        else:
-            print('Invalid mode',MY_MODE)
-            sys.exit(1)
-
-        dx_station = Station(call)
-        #print(dx_station)
-        country    = dx_station.country
-        self.countries.add(country)
-        continent  = dx_station.continent
-        if country=='United States':
-            qso_points = 10
-        elif continent=='NA':
-            qso_points = 20
-        else:
-            qso_points = 30
-        print(country,continent,qso_points)
-
-        try:
-            idx1 = SST_SECS.index(qth)
-        except:
-            print('\n',rec)
-            print(qth,'not in list of of SST Sections - call=',call)
-            sys.exit(0)
-        self.sec_cnt[idx1] = 1
-        
-        self.total_points_all += qso_points
-        if not dupe:
-            self.nqsos2 += 1;
-            self.total_points += qso_points
-        else:
-            print('??????????????? Dupe?',call)
-        #print call,self.nqsos2
-
-        # Check against history
-        if call in keys:
-            #print 'hist=',HIST[call]
-            state=HIST[call]['state']
-            name9=HIST[call]['name']
-            #print call,qth,state
-            if qth!=state or name!=name9:
-                print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
-                print(call,':  Current:',qth,name,' - History:',state,name9)
-                self.list_all_qsos(call,qsos)
-                print(' ')
-
-        else:
-            print('\n++++++++++++ Warning - no history for call:',call)
-            self.list_all_qsos(call,qsos)
-            self.list_similar_calls(call,qsos)
-
-        line='QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
-            (freq_khz,mode,date_off,time_off,MY_CALL,MY_NAME,MY_STATE,call,name,qth)
         
         return line
                         
