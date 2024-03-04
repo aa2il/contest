@@ -320,7 +320,7 @@ class PARAMS:
         elif args.arrl_dx:
 
             # ARRL Internationl DX 
-            sc = ARRL_INTL_DX_SCORING(P,'CW')
+            sc = ARRL_INTL_DX_SCORING(P)
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'

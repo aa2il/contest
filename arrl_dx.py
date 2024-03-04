@@ -30,14 +30,22 @@ from utilities import reverse_cut_numbers
 ############################################################################################
 
 TRAP_ERRORS = False
-#TRAP_ERRORS = True
+TRAP_ERRORS = True
 
 ############################################################################################
     
 # Scoring class for CQ WW - Inherits the base contest scoring class
 class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
  
-    def __init__(self,P,MODE):
+    def __init__(self,P):
+        # Determine which mode we are using
+        now = datetime.datetime.utcnow()
+        month=now.month
+        if month==2:
+            MODE='CW'
+        else:
+            MODE='SSB'
+        
         CONTEST_SCORING.__init__(self,P,'ARRL-DX-'+MODE,MODE)
         print('ARRL Internation DX Scoring Init')
 
@@ -51,13 +59,15 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
             self.POINTS[b]=0
         self.dxccs = OrderedDict(dxccs)
 
-        # Determine start & end dates/times - occurs on third full weekend in Feb,
-        month=2
-        now = datetime.datetime.utcnow()
+        # Determine start & end dates/times
+        #      CW occurs on third full weekend in Feb.
+        #      SSB occurs on first full weekend in March
         year=now.year
-
-        day1=datetime.date(year,month,1).weekday()                         # Day of week of 1st of month - 0=Monday, 6=Sunday
-        sat2=1 + ((5-day1) % 7) + 14                                   # Day no. for 3rd Saturday = 1 since day1 is the 1st of the month
+        day1=datetime.date(year,month,1).weekday()                     # Day of week of 1st of month - 0=Monday, 6=Sunday
+        if month==2:
+            sat2=1 + ((5-day1) % 7) + 14                               # Day no. for 3rd Saturday = 1 since day1 is the 1st of the month
+        else:
+            sat2=1 + ((5-day1) % 7) + 0                                # Day no. for 1st Saturday = 1 since day1 is the 1st of the month
                                                                        #    no. days until 1st Saturday (day 5) + 7 more days 
         
         self.date0=datetime.datetime(year,month,sat2,0) 
@@ -141,6 +151,7 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
             rst_in=599
         elif MY_MODE=='SSB':
             mode='PH'
+            rst_out=59
             rst_in=59
         else:
             print('Unknown my Mode',MY_MODE)
