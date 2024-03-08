@@ -2,7 +2,7 @@
 ################################################################################
 #
 # Params.py - Rev 1.0
-# Copyright (C) 2022-3 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2022-4 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Command line param parser for contest scorer.
 #
@@ -71,6 +71,7 @@ class PARAMS:
         arg_proc.add_argument('-fall50', action='store_true',help='SE VHF Soc. 50 MHz Fall Sprint')
         arg_proc.add_argument('-namss', action='store_true',help='NA Meteor Scatter Sprint')
         arg_proc.add_argument('-fd', action='store_true',help='ARRL Field Day')
+        arg_proc.add_argument('-sprint', action='store_true',help='NS and NCJ Sprint')
         arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
         arg_proc.add_argument('-cwt',help='CW Ops Mini-Test',
                               nargs='*',type=int,default=None)
@@ -426,6 +427,16 @@ class PARAMS:
 
             # K1USN SST
             sc = SST_SCORING(P)
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+            fname = MY_CALL+'.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
+
+        elif args.sprint:
+
+            # NS and NCJ sprint
+            sc = SST_SCORING(P,'SPRINT')
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'

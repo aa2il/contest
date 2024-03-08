@@ -80,18 +80,18 @@ set ASSISTED="-assisted"
 
 # Figure out if we're in a weekly practice contests
 echo " "
-set d=`date`
-echo d=$d
-echo d1=$d[1]
+set day  = `date +"%a"`
+set hour = `date +"%H"`
+echo day=$day             hour=$hour
 if( X$CONTEST != "X" )then
     echo CONTEST=$CONTEST
-else if( X$CONTEST == "X" && ( $d[1] == "Mon" || $d[1] == "Tue" ) )then
+else if( X$CONTEST == "X" && ( $day == "Mon" || $day == "Tue" ) )then
     set CONTEST="mst"
-#    set SESSION=""                   
-else if( X$CONTEST == "X" && ( $d[1] == "Wed" || $d[1] == "Thu" ) )then
+else if( X$CONTEST == "X" && ( $day == "Thu" && $hour >= 19 ) )then
+    set CONTEST="sprint"
+else if( X$CONTEST == "X" && ( $day == "Wed" || $day == "Thu" ) )then
     set CONTEST="cwt"
-#    set SESSION=""                   
-else if( X$CONTEST == "X" && ($d[1] == "Fri" || $d[1] == "Sat" || $d[1] == "Sun"))then
+else if( X$CONTEST == "X" && ($day == "Fri" || $day == "Sat" || $day == "Sun"))then
     set CONTEST="sst"
     set SESSION=""                   
 else

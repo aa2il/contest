@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # rttyru.py - Rev 1.0
-# Copyright (C) 2021-3 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring ARRL RTTY ROUNDUP, ARRL 10m, CQ 160m and FT8 ROUNDUP.
 #

@@ -4,6 +4,7 @@
 # Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring K1USN Slow Speed Mini Tests (SSTs).
+# Also for NS and NCJ Sprints.
 #
 ############################################################################################
 #
@@ -30,8 +31,9 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 # Scoring class for slow-speed mini tests - Inherits the base contest scoring class
 class SST_SCORING(CONTEST_SCORING):
  
-    def __init__(self,P):
-        super().__init__(P,'Slow Speed Mini-Test',mode='CW')
+    def __init__(self,P,contest):
+        super().__init__(P,contest,mode='CW')
+        #super().__init__(P,'Slow Speed Mini-Test',mode='CW')
 
         # Inits
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
@@ -42,7 +44,10 @@ class SST_SCORING(CONTEST_SCORING):
         # Working on relaxing this restriction because I'm lazy sometimes!
         now = datetime.datetime.utcnow()
         weekday = now.weekday()
-        if weekday in [1,2,3]:
+        print('now=',now,'\tweekday=',weekday,'\tcontest=',contest)
+        if contest=='SPRINT':
+            pass
+        elif weekday in [1,2,3]:
             # If we finally getting around to running this on Tuesday, Weds or Thurs, roll back date to Monday
             now = now - datetime.timedelta(hours=24*weekday)
         elif weekday in [5,6]:
@@ -51,21 +56,30 @@ class SST_SCORING(CONTEST_SCORING):
 
         weekday = now.weekday()
         today = now.strftime('%A')
-        if today == 'Friday':
-            start_time=20
+        if contest=='SPRINT':
+            start_hour= 2
+            start_min = 30
+            duration  = 0.5
+        elif today == 'Friday':
+            start_hour= 20
+            start_min = 0
+            duration  = 1
         else:
-            start_time=0
-        self.date0=datetime.datetime(now.year,now.month,now.day,start_time)
-        self.date1 = self.date0 + datetime.timedelta(hours=1+1./60.)
+            start_hour= 0
+            start_min = 0
+            duration  = 1            
+        self.date0=datetime.datetime(now.year,now.month,now.day,start_hour,start_min)
+        self.date1 = self.date0 + datetime.timedelta(hours=duration+1./60.)
 
         # Playing with dates
         if False:
+            print('weekday=',weekday)
             print(now)
             print(now.day,now.weekday())
             print(today)
-            print(self.date0)
-            print(self.date1)
-            #sys.exit(0)
+            print('Start:',self.date0)
+            print('End:',self.date1)
+            sys.exit(0)
 
         # Name of output file
         self.output_file = self.MY_CALL+'.LOG'
