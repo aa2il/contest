@@ -426,7 +426,7 @@ class PARAMS:
         elif args.sst:
 
             # K1USN SST
-            sc = SST_SCORING(P)
+            sc = SST_SCORING(P,'SST')
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
