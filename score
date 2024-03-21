@@ -80,27 +80,53 @@ set ASSISTED="-assisted"
 
 # Figure out if we're in a weekly practice contests
 echo " "
-set day  = `date +"%a"`
-set hour = `date +"%H"`
-echo day=$day             hour=$hour
-if( X$CONTEST != "X" )then
-    echo CONTEST=$CONTEST
-else if( X$CONTEST == "X" && ( $day == "Mon" || $day == "Tue" ) )then
-    set CONTEST="mst"
-else if( X$CONTEST == "X" && ( $day == "Thu" && $hour >= 19 ) )then
-    set CONTEST="sprint"
-else if( X$CONTEST == "X" && ( $day == "Wed" || $day == "Thu" ) )then
-    set CONTEST="cwt"
-else if( X$CONTEST == "X" && ($day == "Fri" || $day == "Sat" || $day == "Sun"))then
-    set CONTEST="sst"
-    set SESSION=""                   
-else
-    echo " "
-    echo "--- Can't figure out which contest to score ---"
-    echo " "
-    exit
+set d=`date -u +"%a %H"`
+if( X$CONTEST == "X" )then
+    set day  = $d[1]
+    set hour = $d[2]
+    echo day=$day             hour=$hour
+    if( $day == "Mon" )then
+        echo Hey 1
+        if ( (($hour >= 12) && ($hour <= 18)) || (($hour >= 18) && ($hour <= 23)) )then
+            set CONTEST="mst"
+        else if( $hour <= 12 )then
+            set CONTEST="sst"
+        endif
+    else if( $day == "Tue" )then
+        echo Hey 2
+        if ( ($hour >= 2) && ($hour <= 23) )then
+            set CONTEST="mst"
+        endif
+    else if( $day == "Wed" )then
+        echo Hey 3
+        if( (($hour >= 12) && ($hour <= 18)) || (($hour >= 18) && ($hour <= 23)) )then
+            set CONTEST="cwt"
+        endif
+    else if( $day == "Thu" )then
+        echo Hey 4
+        if( (($hour >= 2) && ($hour <= 6)) || (($hour >= 6) && ($hour <= 23)) )then
+            set CONTEST="cwt"
+        endif
+    else if( ($day == "Fri") && ($hour >= 1) && ($hour <= 12) )then
+        echo Hey 5
+        set CONTEST="sprint"
+    else if( ($day == "Fri") && ($hour >= 13) && ($hour <= 23) )then
+        echo Hey 6
+        set CONTEST="sst"
+    else if( ($day == "Sat") && ($hour >= 23) )then
+        echo Hey 7
+        set CONTEST="sst"
+    endif
+    echo Hey 99
+endif
+if( X$CONTEST == "X" )then
+        echo " "
+        echo "--- Can't figure out contest - Giving up !!!! ---"
+        echo " "
+        exit 1
 endif
 echo CONTEST=$CONTEST     SESSION=$SESSION
+#exit 0
 
 ################################################################################
 
