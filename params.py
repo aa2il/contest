@@ -46,6 +46,7 @@ from rac import *
 from colonies import *
 from satellites import *
 from call import *
+from foc import *
 
 ################################################################################
 
@@ -80,6 +81,7 @@ class PARAMS:
         arg_proc.add_argument('-mst',help='Medium  Speed Mini-Test',
                               nargs='*',type=int,default=None)
         arg_proc.add_argument('-sst', action='store_true',help='Slow Speed Mini-Test')
+        arg_proc.add_argument('-foc', action='store_true',help='FOC BW')
         arg_proc.add_argument('-rac', action='store_true',help='RAC Winter Contest')
         arg_proc.add_argument('-ocdx', action='store_true',help='Oceania DX CW')
         arg_proc.add_argument('-call',help='All QSOs with a Specific Call(s)',
@@ -437,6 +439,16 @@ class PARAMS:
 
             # NS and NCJ sprint
             sc = SST_SCORING(P,'SPRINT')
+            self.sc=sc
+
+            self.history = HIST_DIR+'master.csv'
+            fname = MY_CALL+'.adif'
+            DIR_NAME = '~/'+MY_CALL+'/'
+
+        elif args.foc:
+
+            # FOC BW
+            sc = FOCBW_SCORING(P,'SPRINT')
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
