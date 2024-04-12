@@ -28,6 +28,11 @@ from dx.spot_processing import Station  #, Spot, WWV, Comment, ChallengeData
 
 ############################################################################################
     
+TRAP_ERRORS = False
+TRAP_ERRORS = True
+
+############################################################################################
+    
 # Scoring class for slow-speed mini tests - Inherits the base contest scoring class
 class SST_SCORING(CONTEST_SCORING):
  
@@ -146,6 +151,13 @@ class SST_SCORING(CONTEST_SCORING):
         else:
             print('??????????????? Dupe?',call)
         #print call,self.nqsos2
+
+        # Sometimes, I'll put a "?" to indicate that I need to review
+        if '?' in call+name+qth:
+            print('\n??? Check this one again: ???')
+            print('call=',call,'\t\tname=',name,'\t\tqth=',qth,'\ttime=',time_off)
+            if TRAP_ERRORS:
+                sys.exit(0)
 
         # Check against history
         if call in keys:

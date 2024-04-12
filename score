@@ -33,7 +33,7 @@ set CONTEST=""
 #set CONTEST="naqprtty"           # North American QSO Party RTTY
 #set CONTEST="cq160m"             # CQ 160m CW
 #set CONTEST="arrl_dx"            # ARRL Intl DX - both CW & SSB versions
-set CONTEST="foc"                # FOC BW
+#set CONTEST="foc"                # FOC BW
 
 #set CONTEST="cwopen"             # CWops CW Open
 #set CONTEST="cqwwcw"             # CQ WW CW
