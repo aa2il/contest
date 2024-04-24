@@ -92,6 +92,7 @@ class PARAMS:
         arg_proc.add_argument('-naqprtty', action='store_true',help='NAQP RTTY')
         arg_proc.add_argument('-state', help='State QSO Party',\
                               type=str,default=None)
+        arg_proc.add_argument('-cqmm', action='store_true',help='CQMM')
         arg_proc.add_argument('-wpxcw', action='store_true',help='CQ WPX CW')
         arg_proc.add_argument('-wpxrtty', action='store_true',help='CQ WPX RTTY')
         arg_proc.add_argument('-iaru', action='store_true',help='IARU HF')
@@ -358,21 +359,25 @@ class PARAMS:
             #fname = 'cqwwrtty_2022.adif'
             fname = 'cqww_rtty_2023.adif'
 
-        elif args.wpxcw or  args.wpxrtty:
+        elif args.cqmm or args.wpxcw or args.wpxrtty:
             
             # CQ WPX
-            if args.wpxcw:
+            if args.cqmm:
                 MODE='CW'
+                NAME='CQMM'
+            elif args.wpxcw:
+                MODE='CW'
+                NAME='WPX'
             else:
                 MODE='RTTY'
-            sc = CQ_WPX_SCORING(P,MODE)
+                NAME='WPX'
+            sc = CQ_WPX_SCORING(P,MODE,NAME)
             self.sc=sc
-
+            self.history = HIST_DIR+'master.csv'
+            
             if MODE=='CW':
                 DIR_NAME = '~/Python/pyKeyer/'
                 fname = 'AA2IL.adif'
-                DIR_NAME = './'
-                fname = 'WPX.adif'
             else:
                 DIR_NAME = '../../logs/fllog/'
                 fname = 'cq_wpx_rtty_2019.adif'
@@ -567,8 +572,7 @@ class PARAMS:
             print('Need to specify a single contest')
             sys.exit(0)
 
-        #print(fnames)
-        #print(type(fnames))
+        print('DIR_NAME=',DIR_NAME,'\tfnames=',fnames,'\t',type(fnames))
         if type(fnames) == list:   
             self.input_files  = fnames
         else:

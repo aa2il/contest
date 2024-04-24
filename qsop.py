@@ -85,6 +85,12 @@ COUNTIES['KS']=['ALL','AND','ATC','BAR','BRT','BOU','BRO','BUT','CHS','CHT','CHE
 	        'PRA','RAW','REN','REP','RIC','RIL','ROO','RUS','RSL','SAL','SCO','SED','SEW','SHA','SHE',
 	        'SMN','SMI','STA','STN','STE','SUM','THO','TRE','WAB','WAL','WAS','WIC','WIL','WOO','WYA']
 
+COUNTIES['LA']=['ACAD','ALLE','ASCE','ASSU','AVOY','BEAU','BIEN','BOSS','CADD','CALC','CALD','CAME','CATA',
+                'CLAI','CONC','DESO','EBR','ECAR','EFEL','EVAN','FRAN','GRAN','IBER','IBVL','JACK','JEFF',
+                'JFDV','LASA','LAFA','LAFO','LINC','LIVI','MADI','MORE','NATC','ORLE','OUAC','PLAQ','PCP',
+                'RAPI','REDR','RICH','SABI','SBND','SCHL','SHEL','SJAM','SJB','SLAN','SMT','SMAR','STAM',
+                'TANG','TENS','TERR','UNIO','VERM','VERN','WASH','WEBS','WBR','WCAR','WFEL','WINN']
+
 COUNTIES['ME']=['AND','ARO','CUM','FRA','HAN','KEN','KNO','LIN','OXF','PEN',
                 'PIS','SAG','SOM','WAL','WAS','YOR']
 
@@ -95,6 +101,23 @@ COUNTIES['MT']=['BEA','BIG','BLA','BRO','CRB','CRT','CAS','CHO','CUS','DAN','DAW
                 'FLA','GAL','GAR','GLA','GOL','GRA','HIL','JEF','JUD','LAK','LEW','LIB','LIN','MAD',
                 'MCC','MEA','MIN','MIS','MUS','PAR','PET','PHI','PON','PWD','PWL','PRA','RAV','RIC',
                 'ROO','ROS','SAN','SHE','SIL','STI','SWE','TET','TOO','TRE','VAL','WHE','WIB','YEL']
+
+COUNTIES['MO']=['ADR','AND','ATC','AUD','BAR','BTN','BAT','BEN','BOL','BOO','BUC','BTR','CWL','CAL',
+	        'CAM','CPG','CRL','CAR','CAS','CED','CHN','CHR','CLK','CLA','CLN','COL','COP','CRA',
+                'DAD','DAL','DVS','DEK','DEN','DGL','DUN','FRA','GAS','GEN','GRN','GRU','HAR','HEN',
+                'HIC','HLT','HOW','HWL','IRN','JAC','JAS','JEF','JON','KNX','LAC','LAF','LAW','LEW',
+                'LCN','LIN','LIV','MAC','MAD','MRE','MAR','MCD','MER','MIL','MIS','MNT','MON','MGM',
+                'MOR','NMD','NWT','NOD','ORE','OSA','OZA','PEM','PER','PET','PHE','PIK','PLA','POL',
+                'PUL','PUT','RAL','RAN','RAY','REY','RIP','SAL','SCH','SCT','SCO','SHA','SHL','STC',
+                'SCL','STF','STG','STL','SLC','STD','STN','SUL','TAN','TEX','VRN','WAR','WAS','WAY',
+                'WEB','WOR','WRT']
+
+COUNTIES['MS']=['ADA','ALC','AMI','ATT','BEN','BOL','CHI','CHO','CAL','CLB','CLA','CLK','COA','COP',
+                'COV','CAR','DES','FOR','FRA','GEO','GRN','GRE','HAN','HAR','HIN','HOL','HUM','ISS',
+                'ITA','JEF','JON','KEM','LAF','LAM','LAU','LAW','LEA','LEE','LEF','LIN','LOW','MRN',
+                'MAD','MGY','MON','MAR','NES','NEW','NOX','OKT','PAN','PER','PIK','PEA','PON','PRE',
+                'QUI','RAN','SMI','STO','SUN','TAL','TAT','TIP','TIS','TUN','UNI','WAL','WAS','WAY',
+                'WEB','WIN','WIL','WAR','YAL','YAZ']
 
 COUNTIES['NH']=['BEL','CAR','CHE','COO','GRA','HIL','MER','ROC','STR','SUL']
 
@@ -202,8 +225,12 @@ class QSOP_SCORING(CONTEST_SCORING):
         self.MULTS       = []
 
         self.QSO_POINTS=[1,1,1]            # CW, PHONE, DIGI
+
+        now = datetime.datetime.utcnow()
+        year = now.strftime('%Y').upper()
+        print('year=',year)
             
-        self.date0 = datetime.datetime.strptime( "20230101 0000" , "%Y%m%d %H%M")  # Whole year
+        self.date0 = datetime.datetime.strptime( year+"0101 0000" , "%Y%m%d %H%M")  # Whole year
         self.date1 = self.date0 + datetime.timedelta(days=365)
         self.COUNTIES=[]
         

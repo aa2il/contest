@@ -127,8 +127,7 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
         warning=False
         problem=False
 
-        # Error checking
-        
+        # Error checking        
         if not dupe:
             self.nqsos2 += 1;
             self.NQSOS[band]+=1
