@@ -249,7 +249,8 @@ last_rec = None
 gap_min0 = 0
 for i in range(len(qsos)):
     rec=qsos[i]
-    #print('\n',i,rec)
+    if i==0:
+        print('\n',i,rec)
     #date_off = datetime.datetime.strptime( rec["qso_date_off"]+" "+rec["time_off"] , "%Y%m%d %H%M%S")
     date_off = rec['time_stamp']
 
