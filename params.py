@@ -378,6 +378,8 @@ class PARAMS:
             if MODE=='CW':
                 DIR_NAME = '~/Python/pyKeyer/'
                 fname = 'AA2IL.adif'
+                fname = 'WPX.csv'
+                DIR_NAME='./'
             else:
                 DIR_NAME = '../../logs/fllog/'
                 fname = 'cq_wpx_rtty_2019.adif'

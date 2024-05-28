@@ -36,9 +36,10 @@ TRAP_ERRORS = True
     
 # Scoring class for CQ WPX and CQMM contests - Inherits the base contest scoring class
 class CQ_WPX_SCORING(CONTEST_SCORING):
- 
     def __init__(self,P,MODE,CONTEST):
 
+        self.prev_num_out=0
+        
         if CONTEST=='WPX':
             CONTEST_NAME='CQ-WPX-'+MODE
             self.WPX=True
@@ -119,7 +120,8 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
 
         # Pull out relavent entries
         id = rec["contest_id"].upper()
-        if id not in ['CQMM']:
+        if id not in ['CQMM','CQ-WPX-CW']:
+            print(id)
             return
         
         call = rec["call"].upper()
@@ -166,7 +168,15 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
             else:
                 num_out = 'NA'     # b[1]
         else:
-            rst_out = rec["rst_sent"].strip().upper()
+            if True:
+                rst_out = rec["rst_sent"].strip().upper()
+            else:
+                # If the format as string ? box isn't checked in libreoffice,
+                # it will hose up "599,100" and return 599100 - ugh!
+                rst_out=599
+                tx   = rec["stx"].strip().upper()
+                b    = tx.split(',')
+                
             if self.WPX:
                 num_out = reverse_cut_numbers( b[0] )
             else:
@@ -191,7 +201,21 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
             print('\n*** ERROR *** NUM IN =',num_in)
             print('rec=',rec,'\n')
             if TRAP_ERRORS:
+                print('call     =',call)
+                print('date     =',date_off)
+                print('time     =',time_off)
                 sys.exit(0)
+
+        if int(num_out)!=self.prev_num_out+1:
+            print('\n*** WARNING *** NUM OUT =',num_out,' not consecutive, ',
+                  'prev=',self.prev_num_out)
+            print('call     =',call)
+            print('date     =',date_off)
+            print('time     =',time_off)
+            if int(num_out)<=0 and TRAP_ERRORS:
+                sys.exit(0)
+        self.prev_num_out=int(num_out)
+
 
         # Determine multipliers
         dx_station = Station(call)
@@ -318,22 +342,23 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
             print(b,'\t',self.sec_cnt[i],'\t',len(pre),'\t',pre)
             mults+=len(pre)
 
+        print('\nDXCCs =',sorted( self.dxccs ),len(self.dxccs))
         if self.WPX:
-            print('\tPrefixes         =',sorted( self.calls ))
+            print('\nPrefixes         =',sorted( self.calls ),len(self.calls))
             mults = len(self.calls)
         else:
-            print('\nDXCCs =',sorted( self.dxccs ),len(self.dxccs))
             mults += len(self.dxccs)
             
-        print('\nQSO Points       =',self.total_points)
+        print('\nNo. QSOs         =',self.nqsos2)
+        print('QSO Points       =',self.total_points)
         print('Mults            =',mults)
         print('Claimed score    =',self.total_points*mults)
 
-        print('\n# CWops Members =',self.num_cwops,' =',
+        print('\nNo. CWops Members =',self.num_cwops,' =',
               int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
-        print('# QSOs Running  =',self.num_running,' =',
+        print('No. QSOs Running  =',self.num_running,' =',
               int( (100.*self.num_running)/self.nqsos1+0.5),'%')
-        print('# QSOs S&P      =',self.num_sandp,' =',
+        print('No. QSOs S&P      =',self.num_sandp,' =',
               int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
         
         

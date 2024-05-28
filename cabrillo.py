@@ -223,6 +223,10 @@ for rec in qsos2:
             print('************ WARNING *** Extra QSO(s) found after contest end *********')
             print('***********************************************************************\n')
             first_time=False
+            if False:
+                print(rec)
+                print('date_off=',date_off,P.sc.date1)
+                sys.exit(0)
         
 qsos.sort(key=lambda x: x['time_stamp'])
 
