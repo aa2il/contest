@@ -244,12 +244,14 @@ class PARAMS:
             
             # Need to merge FT8 and CW logs
             fnames=[]
-            #DIR_NAME = '~/logs/'
+            DIR_NAME = '~/logs/'
             DIR_NAME = '~/Python/pyKeyer/Field_Day'
             fnames=[]
-            #for fname in ['AA2IL.adif','contest_wsjtx_log.adi']:
-            for fname in ['FD.csv','FTx.csv']:
+            #for fname in ['AA2IL.adif']:
             #for fname in ['FD.csv']:
+            #for fname in ['AA2IL.adif','wsjtx_log.adi']:
+            for fname in ['FD.csv','wsjtx_log.adi']:
+            #for fname in ['FD.csv','FTx.csv']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
                 fnames.append(f)
     
@@ -378,8 +380,8 @@ class PARAMS:
             if MODE=='CW':
                 DIR_NAME = '~/Python/pyKeyer/'
                 fname = 'AA2IL.adif'
-                fname = 'WPX.csv'
-                DIR_NAME='./'
+                #fname = 'WPX.csv'
+                #DIR_NAME='./'
             else:
                 DIR_NAME = '../../logs/fllog/'
                 fname = 'cq_wpx_rtty_2019.adif'

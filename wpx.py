@@ -197,24 +197,26 @@ class CQ_WPX_SCORING(CONTEST_SCORING):
             print('*** WARNING *** RST in =',rst_in)
             if TRAP_ERRORS:
                 sys.exit(0)
-        if self.WPX and not num_in.isdigit():
-            print('\n*** ERROR *** NUM IN =',num_in)
-            print('rec=',rec,'\n')
-            if TRAP_ERRORS:
+                
+        if self.WPX:
+            if not num_in.isdigit():
+                print('\n*** ERROR *** NUM IN =',num_in)
+                print('rec=',rec,'\n')
+                if TRAP_ERRORS:
+                    print('call     =',call)
+                    print('date     =',date_off)
+                    print('time     =',time_off)
+                    sys.exit(0)
+
+            if int(num_out)!=self.prev_num_out+1:
+                print('\n*** WARNING *** NUM OUT =',num_out,' not consecutive, ',
+                      'prev=',self.prev_num_out)
                 print('call     =',call)
                 print('date     =',date_off)
                 print('time     =',time_off)
-                sys.exit(0)
-
-        if int(num_out)!=self.prev_num_out+1:
-            print('\n*** WARNING *** NUM OUT =',num_out,' not consecutive, ',
-                  'prev=',self.prev_num_out)
-            print('call     =',call)
-            print('date     =',date_off)
-            print('time     =',time_off)
-            if int(num_out)<=0 and TRAP_ERRORS:
-                sys.exit(0)
-        self.prev_num_out=int(num_out)
+                if int(num_out)<=0 and TRAP_ERRORS:
+                    sys.exit(0)
+            self.prev_num_out=int(num_out)
 
 
         # Determine multipliers

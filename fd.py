@@ -141,7 +141,7 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             print('call=',call)
             print('\nReceived section '+sec_in+' not recognized - srx=',rx)
             print('call=',call)
-            print('History=',HIST[call])
+            #print('History=',HIST[call])
             print('rec=',rec)
             if TRAP_ERRORS:
                 sys.exit(0)
@@ -160,7 +160,7 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         if dx_station.country=='Canada':
             qth2,valid_secs=Oh_Canada(dx_station)
             if sec_in not in valid_secs:
-                print('Oh Canada - call/section mismatch: call=',call,'\tsec_in=',sec_in,'\tshould be',valid_secs)
+                print('Call/section mismatch: call=',call,'\tsec_in=',sec_in,'\tshould be',valid_secs)
                 #pprint(vars(dx_station))
                 if TRAP_ERRORS:
                     sys.exit(0)        
@@ -191,7 +191,13 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             self.total_points += qso_points
 
             # Just for fun, keep a count of each section by badn and mode
-            idx1 = FD_SECS.index(sec_in)
+            try:
+                idx1 = FD_SECS.index(sec_in)
+            except:
+                idx1=0
+                if TRAP_ERRORS:
+                    print('Wooooops!')
+                    sys.exit(0)
             idx2 = self.MODES.index(mode)
             idx3 = self.BANDS.index(band)
             self.sec_cnt[idx1,idx2,idx3]   = 1
