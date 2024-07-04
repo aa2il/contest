@@ -417,11 +417,11 @@ class PARAMS:
             
         elif args.rac or args.ocdx:
 
-            # RAC Winter Contest or OC DX
+            # RAC Contests or OC DX
             if args.ocdx:
                 P.TXT='OCDX'
             else:
-                P.TXT='CANADA-WINTER'              # Dont change - this is what RAC wants!
+                P.TXT='RAC'
             
             sc = RAC_SCORING(P)
             self.sc=sc

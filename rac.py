@@ -21,7 +21,7 @@
 
 import sys
 import datetime
-from rig_io.ft_tables import PROVINCES2
+from rig_io.ft_tables import PROVINCES2,THIRTEEN_COLONIES
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station
 from pprint import pprint
@@ -40,6 +40,16 @@ TRAP_ERRORS = True
 class RAC_SCORING(CONTEST_SCORING):
  
     def __init__(self,P):
+        # Determine contest 
+        now = datetime.datetime.utcnow()
+        month=now.month
+        year=now.year
+        if P.TXT=='RAC':
+            if month==12:
+                P.TXT='CANADA-WINTER'              # Dont change - this is what RAC wants!
+            else:
+                P.TXT='CANADA-DAY'              # Dont change - this is what RAC wants!
+
         super().__init__(P,P.TXT,mode='CW')
 
         # NOTE - RAC also has CANADA-DAY contest in the summer, same deal
@@ -56,12 +66,14 @@ class RAC_SCORING(CONTEST_SCORING):
         self.nrac        = 0
         self.ndx         = 0
 
-        # Determine contest time 
-        now = datetime.datetime.utcnow()
-        year=now.year
-        #year=2022           # Debug
-
-        if self.contest_name=='CANADA-WINTER':
+        if self.contest_name=='CANADA-DAY':
+            
+            # RAC Canada Day Contest occurs on July 1
+            self.date0=datetime.datetime(year,7,1,0)                          # Contest starts at 0000 UTC on July 1
+            self.date1 = self.date0 + datetime.timedelta(hours=24)             # ... and ends at 2359
+            self.RAC  = True
+            
+        elif self.contest_name=='CANADA-WINTER':
             
             # RAC Winter Contest occurs in Dec - not sure of which weekend - 3rd or 4th full weekend?
             # Or perhaps its last full weekend in Dec? Let's go with that ...
@@ -82,6 +94,7 @@ class RAC_SCORING(CONTEST_SCORING):
             self.RAC  = True
             
         elif self.contest_name=='OCDX':
+            
             # OC DX Contest occurs on 2n? full weekend of Oct
             day1=datetime.date(year,10,1).weekday()                            # Day of week of 1st of month 0=Monday, 6=Sunday
             sat2=1 + ((5-day1) % 7) + 1*7                                      # Day no. for 3rd Saturday = 1 since day1 is the 1st of the month
@@ -92,13 +105,14 @@ class RAC_SCORING(CONTEST_SCORING):
         else:
             print('RAC SCORING - Unknown contest')
             sys.exit(0)
-        print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
 
         # Playing with dates
         if True:
-            print('\nnow=',now,'\tday=',now.day,now.weekday())
+            print('\nContest Name=',self.contest_name)
+            print('nnow=',now,'\tday=',now.day,now.weekday())
             print('date0=',self.date0)
             print('date1=',self.date1)
+            #print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
             #sys.exit(0)
 
         # Name of output file
@@ -127,22 +141,18 @@ class RAC_SCORING(CONTEST_SCORING):
                 print('contest=',self.contest,id)
                 print('QSO not part of OC DX contest')
             return
-        elif self.contest_name=='CANADA-WINTER' and id!='RAC-QSO-PARTY':
+        elif self.contest_name[0:7]=='CANADA' and id!='RAC-QSO-PARTY':
             if VERBOSITY>=0:
                 print('contest=',self.contest,id)
                 print('QSO not part of RAC contest')
             return
-        
+
         # Pull out relavent entries
         call = rec["call"].upper()
         freq_khz = int( 1000*float(rec["freq"]) +0.5 )
         rx   = rec["srx_string"].strip().upper().split(',')
         tx   = rec["stx_string"].strip().upper().split(',')
 
-        band = rec["band"]
-        idx1 = self.BANDS.index(band)
-        self.band_cnt[idx1] += 1
-        
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
         if MY_MODE=='CW':
@@ -164,6 +174,11 @@ class RAC_SCORING(CONTEST_SCORING):
             if TRAP_ERRORS:
                 sys.exit(0)
 
+        elif self.contest_name=='CANADA-DAY' and call in THIRTEEN_COLONIES and True:
+            print('call=',call)
+            print('QSO not part of RAC contest - skipped')
+            return
+                
         # Check country - Canadian stations are worth many more pts in RAC contests
         dx_station = Station(call)
         if False:
@@ -174,13 +189,22 @@ class RAC_SCORING(CONTEST_SCORING):
         prefix     = dx_station.prefix
         
         # There was a lot of inconsistencies where I stored the exchange bx I was developing
-        # the keyer code for this contest on the fly
+        # the keyer code for this contest on the fly - should all be conistent now
         rst_in='599'
-        if rx[0]=='5NN':
+        if rx[0]=='5NN' or True:
             if self.RAC and country=='Canada':
                 qth = rx[1].upper()
             else:
                 qth = reverse_cut_numbers( rx[1] )
+                if not qth.isdigit():
+                    print('\n*** ERROR *** NUM IN =',qth)
+                    print('rec=',rec,'\n')
+                    if TRAP_ERRORS:
+                        print('call     =',call)
+                        print('date     =',date_off)
+                        print('time     =',time_off)
+                        sys.exit(0)
+
         else:                
             if self.RAC and country=='Canada':
                 if 'qth' in rec:
@@ -208,6 +232,11 @@ class RAC_SCORING(CONTEST_SCORING):
                 print('Oh Canada: qth=',qth,'\tqth2=',qth2)
                 if TRAP_ERRORS and False:
                     sys.exit(0)
+
+        # Keep track of band counts
+        band = rec["band"]
+        idx1 = self.BANDS.index(band)
+        self.band_cnt[idx1] += 1
         
         # Determine point value for this QSO
         if self.RAC and country=='Canada':
@@ -241,6 +270,17 @@ class RAC_SCORING(CONTEST_SCORING):
             print('??????????????? Dupe?',call)
         #print call,self.nqsos2
 
+        # Info for multi-qsos
+        if self.RAC and country=='Canada':
+            exch_in=rst_in+' '+qth
+            if call in self.EXCHANGES.keys():
+                self.EXCHANGES[call].append(exch_in)
+            else:
+                self.EXCHANGES[call]=[exch_in]
+                        
+        # Count no. of CWops guys worked
+        self.count_cwops(call,HIST,rec)
+                
 #         --------info sent------- -------info rcvd------
 # freq mo date time call rst exch call rst exch
 #00000000011111111112222222222333333333344444444445555555555666666666677777777778
@@ -286,5 +326,9 @@ class RAC_SCORING(CONTEST_SCORING):
         if self.OCDX:
             print('\n************** Scoring routine for OCDX not complete !!!! ******************\n')
     
-    
-        
+        print('\nNo. CWops Members =',self.num_cwops,' =',
+              int( (100.*self.num_cwops)/self.nqsos1+0.5),'%')
+        print('No. QSOs Running  =',self.num_running,' =',
+              int( (100.*self.num_running)/self.nqsos1+0.5),'%')
+        print('No. QSOs S&P      =',self.num_sandp,' =',
+              int( (100.*self.num_sandp)/self.nqsos1+0.5),'%')
