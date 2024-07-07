@@ -33,7 +33,7 @@ BONUS_STATIONS=['WM3PEN','GB13COL','TM13COL']
 ############################################################################################
     
 # Scoring class for 13 Colonies - Inherits the base contest scoring class
-class THIRTEEN_COLONIES(CONTEST_SCORING):
+class THIRTEEN_COLONIES_SES(CONTEST_SCORING):
  
     def __init__(self,P):
         CONTEST_SCORING.__init__(self,P,'13 Colonies Special Event',mode='MIXED')

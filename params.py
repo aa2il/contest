@@ -515,7 +515,7 @@ class PARAMS:
         elif args.cols13:
 
             # 13 Colonies special event
-            sc=THIRTEEN_COLONIES(P)
+            sc=THIRTEEN_COLONIES_SES(P)
             self.sc=sc
 
             #contest=sc.contest
