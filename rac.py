@@ -55,8 +55,8 @@ class RAC_SCORING(CONTEST_SCORING):
         # NOTE - RAC also has CANADA-DAY contest in the summer, same deal
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int)
-        self.sec_cnt  = np.zeros((len(self.BANDS),len(PROVINCES2)),dtype=np.int)
+        self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int32)
+        self.sec_cnt  = np.zeros((len(self.BANDS),len(PROVINCES2)),dtype=np.int32)
         self.contest_name = P.TXT
         self.RAC  = False
         self.OCDX = False

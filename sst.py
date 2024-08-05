@@ -42,8 +42,8 @@ class SST_SCORING(CONTEST_SCORING):
 
         # Inits
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int)
-        self.sec_cnt = np.zeros((len(SST_SECS),len(self.BANDS)),dtype=np.int)
+        self.band_cnt = np.zeros(len(self.BANDS),dtype=np.int32)
+        self.sec_cnt = np.zeros((len(SST_SECS),len(self.BANDS)),dtype=np.int32)
 
         # Determine contest time - assumes this is dones within a few hours of the contest
         # Working on relaxing this restriction because I'm lazy sometimes!

@@ -27,7 +27,7 @@ from scoring import CONTEST_SCORING
 ############################################################################################
     
 TRAP_ERRORS = False
-TRAP_ERRORS = True
+#TRAP_ERRORS = True
 
 ############################################################################################
     
@@ -43,8 +43,8 @@ class NAQP_SCORING(CONTEST_SCORING):
         self.MY_STATE    = P.SETTINGS['MY_STATE']
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.band_cnt = np.zeros((len(self.BANDS)),dtype=np.int)
-        self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)),dtype=np.int)
+        self.band_cnt = np.zeros((len(self.BANDS)),dtype=np.int32)
+        self.sec_cnt = np.zeros((len(NAQP_SECS),len(self.BANDS)),dtype=np.int32)
         self.TRAP_ERRORS = TRAP_ERRORS
         self.checked = []
 

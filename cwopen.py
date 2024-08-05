@@ -41,7 +41,7 @@ class CWOPEN_SCORING(CONTEST_SCORING):
         CONTEST_SCORING.__init__(self,P,'CW-OPEN',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
-        self.sec_cnt = np.zeros((len(self.BANDS)),dtype=np.int)
+        self.sec_cnt = np.zeros((len(self.BANDS)),dtype=np.int32)
         self.calls=set([])
         self.last_num_out=0
 
