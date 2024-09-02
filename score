@@ -63,6 +63,7 @@ set SESSION=""
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
 #set SESSION=3                    # CW Open Session 1, 2 or 3
+#set SESSION="TN"                  # State QSO party
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
@@ -74,7 +75,6 @@ set LOG_FILE=""
 #set LOG_FILE="-i CWOPEN.csv"                       # CW Open
 if( X$CONTEST == "Xstate" )then
     set LOG_FILE="-i STATE_QPs.csv"                 # One or more state QPs
-    set SESSION="W7"                                # State QSO party
 endif    
 
 # Most of time, I'm running assited
@@ -90,38 +90,30 @@ if( X$CONTEST == "X" )then
     set hour = $d[2]
     echo day=$day             hour=$hour
     if( $day == "Mon" )then
-        echo Hey 1
         if ( (($hour >= 12) && ($hour <= 18)) || (($hour >= 18) && ($hour <= 23)) )then
             set CONTEST="mst"
         else if( $hour <= 12 )then
             set CONTEST="sst"
         endif
     else if( $day == "Tue" )then
-        echo Hey 2
         if ( ($hour >= 2) && ($hour <= 23) )then
             set CONTEST="mst"
         endif
     else if( $day == "Wed" )then
-        echo Hey 3
         if( (($hour >= 12) && ($hour <= 18)) || (($hour >= 18) && ($hour <= 23)) )then
             set CONTEST="cwt"
         endif
     else if( $day == "Thu" )then
-        echo Hey 4
         if( (($hour >= 2) && ($hour <= 6)) || (($hour >= 6) && ($hour <= 23)) )then
             set CONTEST="cwt"
         endif
     else if( ($day == "Fri") && ($hour >= 1) && ($hour <= 12) )then
-        echo Hey 5
         set CONTEST="sprint"
     else if( ($day == "Fri") && ($hour >= 13) && ($hour <= 23) )then
-        echo Hey 6
         set CONTEST="sst"
     else if( ($day == "Sat") && ($hour >= 23) )then
-        echo Hey 7
         set CONTEST="sst"
     endif
-    echo Hey 99
 endif
 if( X$CONTEST == "X" )then
         echo " "

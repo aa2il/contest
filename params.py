@@ -129,8 +129,7 @@ class PARAMS:
         self.HIST2=None
 
         MY_CALL = self.SETTINGS['MY_CALL']
-        MY_CALL2 = self.SETTINGS['MY_CALL'].split('/')[0]
-        HIST_DIR = os.path.expanduser('~/'+MY_CALL2+'/')
+        HIST_DIR = os.path.expanduser('~/Python/data/')
         HIST_DIR2 = os.path.expanduser('~/Python/history/data/')
         self.output_file = args.o.replace('MY_CALL',MY_CALL)
 

@@ -102,7 +102,7 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         else:
             print('\nQSO-SCORING - Whoops!  Cant figure out contest exchange')
             print('rec=',rec)
-            cmd = 'fgrep "'+self.MY_CALL+' '+call+'" $HOME/logs/ALL_ft8_contest.TXT'
+            cmd = 'fgrep "'+self.MY_CALL+' '+call+'" $HOME/logs/ALL_ft8_contest.CBR'
             #print('cmd=',cmd)
             os.system(cmd)
             sys.exit(0)

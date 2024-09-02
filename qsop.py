@@ -96,7 +96,7 @@ class QSOP_SCORING(CONTEST_SCORING):
             self.date1 = self.date0 + datetime.timedelta(hours=12)
         
         # Name of output file - stupid web uploader doesn't recognize .LOG extenion!
-        self.output_file = self.MY_CALL+'_'+STATE+'QP_'+MODE+'_'+str(self.date0.year)+'.TXT'
+        self.output_file = self.MY_CALL+'_'+STATE+'QP_'+MODE+'_'+str(self.date0.year)+'.CBR'
         #sys.exit(0)
 
     # Contest-dependent header stuff

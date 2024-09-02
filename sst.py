@@ -140,9 +140,12 @@ class SST_SCORING(CONTEST_SCORING):
             print('\n*************** WHOOOOOOOPS !!!!!!!!!!!!!!!!!!!!')
             print('\nrec=',rec)
             print('\n',qth,'not in list of of SST Sections - call=',call)
-            print('Giving up!\n')
-            sys.exit(0)
-        self.sec_cnt[idx1,idx] = 1
+            idx1=None
+            if TRAP_ERRORS:
+                print('Giving up!\n')
+                sys.exit(0)
+        if idx1!=None:
+            self.sec_cnt[idx1,idx] = 1
         
         self.total_points_all += qso_points
         if not dupe:
