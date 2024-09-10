@@ -59,11 +59,15 @@ set CONTEST=""
 #set CONTEST="ocdx"                 # Oceania DX CW
 
 # Select specific CWT/MST sessions or State QSO party here
-set SESSION=""                   
+set SESSION=""
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
 #set SESSION=3                    # CW Open Session 1, 2 or 3
 #set SESSION="TN"                  # State QSO party
+
+# Select input file
+set INPUT=""
+#set INPUT="-i CWOPEN.csv"
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
@@ -129,11 +133,8 @@ echo CONTEST=$CONTEST     SESSION=$SESSION
 echo " "
 set EXE="~/Python/contest/cabrillo.py"
 pwd
-echo $EXE -$CONTEST $SESSION $TIME_LIMIT $ASSISTED $LOG_FILE
-$EXE -$CONTEST $SESSION  $TIME_LIMIT $ASSISTED $LOG_FILE
-#python $EXE -$CONTEST $SESSION $TIME_LIMIT $ASSISTED $LOG_FILE
-
-#popd
+echo $EXE $INPUT -$CONTEST $SESSION $TIME_LIMIT $ASSISTED $LOG_FILE
+$EXE $INPUT -$CONTEST $SESSION  $TIME_LIMIT $ASSISTED $LOG_FILE
 
 # cabrillo.py -cqp -hist lotwreport.adi
 
