@@ -34,7 +34,7 @@ TRAP_ERRORS = True
 
 ############################################################################################
     
-# Scoring class for CWops mini tests - Inherits the base contest scoring class
+# Scoring class for FOC BW test - Inherits the base contest scoring class
 class FOCBW_SCORING(CONTEST_SCORING):
 
     def __init__(self,P,session=None):
@@ -52,16 +52,23 @@ class FOCBW_SCORING(CONTEST_SCORING):
         self.MY_STATE   = P.SETTINGS['MY_STATE']
         self.MY_SECTION = P.SETTINGS['MY_SEC']
         
-        # Determine contest time
+        # Determine contest time - contest is held twice per year
         now = datetime.datetime.utcnow()
-        day1=datetime.date(now.year,3,1).weekday()            # Day of week of 1st of month 0=Monday, 6=Sunday
-        sat2=1 + ((5-day1) % 7) + 3*7                         # Day no. for 4th Saturday = 1 since day1 is the 1st of the month
+        if now.month in [3,9]:
+            day1=datetime.date(now.year,now.month,1).weekday()            # Day of week of 1st of month 0=Monday, 6=Sunday
+            if now.month==3:
+                sat2=1 + ((5-day1) % 7) + 3*7                         # Day no. for 4th Saturday = 1 since day1 is the 1st of the month
+            else:
+                sat2=1 + ((5-day1) % 7) + 1*7                         # Day no. for 2nd Saturday = 1 since day1 is the 1st of the month
+        else:
+            print('Whoops!',now.month)
+            sys.exit(0)
 
-        self.date0=datetime.datetime(now.year,3,sat2,0)                # Contest starts at 0000 UTC on Saturday (Friday night local) ...
+        self.date0=datetime.datetime(now.year,now.month,sat2,0)                # Contest starts at 0000 UTC on Saturday (Friday night local) ...
         self.date1 = self.date0 + datetime.timedelta(hours=24)     # ... and ends at 0000 UTC on Sunday
         
         if False:
-            print('now=',now)
+            print('now=',now,now.year,now.month)
             print('date0=',self.date0)
             print('date1=',self.date1)
             sys.exit(0)
@@ -179,9 +186,9 @@ class FOCBW_SCORING(CONTEST_SCORING):
     # Summary & final tally
     def summary(self):
         
-        print('\nUnique calls =',self.calls)
-        print('\nFOC Member Calls =',self.calls1)
-        print('\nNon-Member Calls =',self.calls2)
+        print('\nUnique calls =',self.calls,len(self.calls))
+        print('\nFOC Member Calls =',self.calls1,len(self.calls1))
+        print('\nNon-Member Calls =',self.calls2,len(self.calls2))
         print('\nnqsos1=',self.nqsos1)
         print('nqsos2=',self.nqsos2)
         print('\nBand\tQSOs')
