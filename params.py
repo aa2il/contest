@@ -355,10 +355,10 @@ class PARAMS:
 
             self.history = HIST_DIR+'master.csv'
             
-            DIR_NAME = '~/logs/'
-            #fname = 'cqww_rtty_2019.adif'
-            #fname = 'cqwwrtty_2022.adif'
-            fname = 'cqww_rtty_2023.adif'
+            #DIR_NAME = '~/logs/'
+            #fname = 'cqww_rtty_2023.adif'
+            DIR_NAME = '~/AA2IL/'
+            fname = 'AA2IL.adif'
 
         elif args.cqmm or args.wpxcw or args.wpxrtty:
             

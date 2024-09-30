@@ -235,12 +235,19 @@ class CQ_WW_SCORING(CONTEST_SCORING):
     def qso_scoring_rtty(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
         #print ' '
         #print rec
+        problem=False
 
         # Pull out relavent entries
         call = rec["call"]
         freq_khz = int( 1000*float(rec["freq"]) + 0.0 )
         band = rec["band"]
-        
+
+        srx    = rec['srx_string'].split(',')
+        rst_in = reverse_cut_numbers( srx[0] )
+        zone   = int( srx[1] )
+        state  = srx[2]
+
+        """
         if 'name' in rec :
             name = rec["name"]
         else:
@@ -261,12 +268,10 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         else:
             country = ''
 
-        """
         if 'state' in rec :
             state = rec["state"]
         else:
             state = ''
-        """
         
         if 'rst_rcvd' in rec :
             rst_in = reverse_cut_numbers( rec['rst_rcvd'] )
@@ -304,7 +309,8 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             print('qth=',qth,qth.isdigit())
             print('cqz=',cqz)
             print('country=',country)
-            print('rec=',rec)
+            #print('rec=',rec)
+            zone=None
             problem=True
 
         if rst_in!='599':
@@ -312,14 +318,33 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             print('call=',call)
             print('rst=',rst_in)
             problem=True
-
+        """
 
         dx_station = Station(call)
         date_off = datetime.datetime.strptime( rec["qso_date_off"] , "%Y%m%d").strftime('%Y-%m-%d')
         time_off = datetime.datetime.strptime( rec["time_off"] , '%H%M%S').strftime('%H%M')
 
+        if problem:
+            print('\nrec=',rec)
+
+            print(dx_station)
+            pprint(vars(dx_station))
+            
+            print('Call =',call)
+            print('Freq =',freq_khz)
+            print('Band =',band)
+            print('Zone =',zone,dx_station.cqz)
+            print('State=',state)
+            print('Date =',date_off)
+            print('Time =',time_off)
+            
+            print(line)
+            if problem and TRAP_ERRORS:
+                sys,exit(0)
+
         # Minor corrections
-        if state=='' or zone in [1,31] or dx_station.country in ['Puerto Rico']:
+        #if state in ['','JPN','FRA'] or zone in [1,31] or dx_station.country in ['Puerto Rico']:
+        if not dx_station.country in ['United States','Canada']:
             state='DX'
 
         warning=False
@@ -339,8 +364,8 @@ class CQ_WW_SCORING(CONTEST_SCORING):
            ( not (state in STATES) and zone!=dx_station.cqz):
             print('*** Zone Mismatch ***')
             print('call=',call)
-            print('zone=',zone)
-            print('state=',state)
+            print('zone=',zone,CQ_ZONES[state],dx_station.cqz )
+            print('state=',state, state in STATES)
             warning=True;
             self.warnings += 1
             if TRAP_ERRORS:
