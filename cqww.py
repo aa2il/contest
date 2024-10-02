@@ -5,8 +5,8 @@
 #
 # Routines for scoring CQ WW contests.
 #
-# To Do: There is a lot of overlap between the RTTY & CW contests so we should be able to
-# combine the two scoring routines at some point.
+# To Do: There is a lot of overlap between the RTTY & CW contests so we should 
+# be able to combine the two scoring routines at some point.
 #
 ############################################################################################
 #
@@ -242,12 +242,15 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         freq_khz = int( 1000*float(rec["freq"]) + 0.0 )
         band = rec["band"]
 
+        # This is where thins are stored when we use pyKeyer
         srx    = rec['srx_string'].split(',')
         rst_in = reverse_cut_numbers( srx[0] )
         zone   = int( srx[1] )
         state  = srx[2]
 
         """
+        # If we use fldigi as the logger, there are some inconsistencies where
+        # things are stored.  Keep this around for now in case we go back to that
         if 'name' in rec :
             name = rec["name"]
         else:

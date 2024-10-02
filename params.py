@@ -128,8 +128,9 @@ class PARAMS:
         self.SETTINGS=P.SETTINGS
         self.HIST2=None
 
-        MY_CALL = self.SETTINGS['MY_CALL']
-        HIST_DIR = os.path.expanduser('~/Python/data/')
+        MY_CALL   = self.SETTINGS['MY_CALL']
+        OPERATOR  = self.SETTINGS['MY_OPERATOR']
+        HIST_DIR  = os.path.expanduser('~/Python/data/')
         HIST_DIR2 = os.path.expanduser('~/Python/history/data/')
         self.output_file = args.o.replace('MY_CALL',MY_CALL)
 
@@ -477,7 +478,7 @@ class PARAMS:
 
             self.history = HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
-            DIR_NAME = '~/'+MY_CALL+'/'
+            DIR_NAME = '~/'+OPERATOR+'/'
             
         elif args.cwopen!=None:
 
