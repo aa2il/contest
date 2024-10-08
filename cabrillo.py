@@ -37,10 +37,11 @@ from params import *
 def open_output_file(P,outfile):
     fp = open(outfile, 'w')
 
-    contest = P.contest_name
-    MY_CALL = P.SETTINGS['MY_CALL']
-    MY_POWER='LOW'
-    MY_CLUB = P.SETTINGS['MY_CLUB']
+    contest  = P.contest_name
+    MY_CALL  = P.SETTINGS['MY_CALL']
+    OPERATOR = P.SETTINGS['MY_OPERATOR']
+    MY_POWER = 'LOW'
+    MY_CLUB  = P.SETTINGS['MY_CLUB']
     
     fp.write('START-OF-LOG:3.0\n')
     fp.write('CONTEST: %s\n' % contest)
@@ -87,9 +88,9 @@ def open_output_file(P,outfile):
         fp.write('CATEGORY-MODE: %s\n' % P.sc.my_mode);
     
     #fp.write('CLAIMED-SCORE: \n',);
-    MY_CALL2 = MY_CALL.split('/')[0]
-    fp.write('OPERATORS: %s\n' % MY_CALL2);
-    #MY_CLUB='SOUTHERN CALIFORNIA CONTEST CLUB'
+    #MY_CALL2 = MY_CALL.split('/')[0]
+    #fp.write('OPERATORS: %s\n' % MY_CALL2);
+    fp.write('OPERATORS: %s\n' % OPERATOR);
     fp.write('CLUB: %s\n' % MY_CLUB);
     fp.write('NAME: Joseph B. Attili\n');
     fp.write('ADDRESS: PO Box 2036\n');

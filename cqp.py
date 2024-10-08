@@ -208,7 +208,26 @@ class CQP_SCORING(CONTEST_SCORING):
             sys,exit(0)
 
         # Determine multipliers
-        if qth_in in CA_COUNTIES:
+        county_line=False
+        if '/' in qth_in:
+            # County line
+            print('County line ...',qth_in)
+            qth_in2=qth_in.split('/')
+            for qth1 in qth_in2:
+                print(qth1)
+                if qth1 in CA_COUNTIES:
+                    qth='CA'
+                    idx1 = CA_COUNTIES.index(qth1)
+                    self.county_cnt[idx1] += 1
+                    county_line=True
+                else:
+                    county_line=False
+                    if TRAP_ERRORS:
+                        print('\nI have no idea what Im doing here!')
+                        print(rec)
+                        sys.exit(0)
+            
+        elif qth_in in CA_COUNTIES:
             qth='CA'
             idx1 = CA_COUNTIES.index(qth_in)
             self.county_cnt[idx1] += 1
@@ -250,20 +269,20 @@ class CQP_SCORING(CONTEST_SCORING):
         
         # Error checking
         if country=='Canada':
-            #qth2=oh_canada2(dx_station)    # B4 2023
-            qth2,secs2=Oh_Canada(dx_station)
+            qth2,secs2=Oh_Canada(dx_station,CQP=True)
             if qth2!=qth_in and TRAP_ERRORS:
+                print('rec     =',rec)
+                print('call    =',call)
                 print('Oh Canada: qth_in=',qth_in,'\tqth2=',qth2)
                 sys.exit(0)
         
-        if( call not in ['N8VV'] and
-            (country not in CQP_COUNTRIES and qth_in!='DX') or \
-            (country in CQP_COUNTRIES and qth_in not in CQP_STATES) ):
+        if( (country not in CQP_COUNTRIES and qth_in!='DX') or \
+            (country in CQP_COUNTRIES and qth_in not in CQP_STATES and not county_line) ):
             pprint(vars(dx_station))
             print('rec     =',rec)
             print('call    =',call)
             print('Country =',country)
-            print('QTH in  =',qth_in)
+            print('QTH in  =',qth_in,county_line)
             print('Received qth '+qth_in+' not recognized - srx=',rx)
             try:
                 print('History=',HIST[call])
@@ -328,11 +347,20 @@ class CQP_SCORING(CONTEST_SCORING):
 #QSO: 28050 CW 2012-10-06 1600 K6AAA         1 SCLA W1AAA         1 ME 
 #QSO: 28450 PH 2012-10-06 1601 K6AAA         2 SCLA K6ZZZ         2 AMAD 
 
-        line='QSO: %5d %2s %10s %4s %-10s %4s %-4s %-10s %4s %-4s' % \
-            (freq_khz,mode,date_off,time_off,
-             my_call,str(num_out),qth_out,
-             call,str(num_in),qth_in.replace('?',''))
-        
+        if True:
+            line='QSO: %5d %2s %10s %4s %-10s %4s %-4s %-10s %4s %-4s' % \
+                (freq_khz,mode,date_off,time_off,
+                 my_call,str(num_out),qth_out,
+                 call,str(num_in),qth_in.replace('?',''))
+        else:
+            line=[]
+            for qth_in2 in qth_in.split('/'):
+                line.append(
+                    'QSO: %5d %2s %10s %4s %-10s %4s %-4s %-10s %4s %-4s' % \
+                    (freq_khz,mode,date_off,time_off,
+                     my_call,str(num_out),qth_out,
+                     call,str(num_in),qth_in2.replace('?','')) )
+
         return line
                         
     # Summary & final tally

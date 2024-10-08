@@ -411,9 +411,14 @@ class PARAMS:
             #fname = MY_CALL2+'_2021.adif'    # Testing
             DIR_NAME = '~/'+MY_CALL1+'/'
             fname = MY_CALL2+'.adif'
+            
             DIR_NAME = '../pyKeyer/CQP/'      # 2022
             fname = 'CQP.csv'
             fname = 'CQP.adif'
+
+            DIR_NAME = '../pyKeyer/'      # 2024
+            DIR_NAME = './'   
+            fname = 'W6A.adif'
             
         elif args.rac or args.ocdx:
 
