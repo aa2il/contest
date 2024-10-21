@@ -194,10 +194,19 @@ class CONTEST_SCORING:
                 
             #elif self.contest=='CA-QSO-PARTY':
             elif self.contest[3:]=='QSO-PARTY':
-                
-                qth   = rec["qth"]
-                qth2  = rec2["qth"]
-                dupe  = call==call2 and band==band2 and qth==qth2
+
+                try:
+                    dupe = call==call2 and band==band2
+                    if dupe:
+                        qth   = rec["qth"]
+                        qth2  = rec2["qth"]
+                        dupe  = dupe and qth==qth2
+                except:
+                    print('SCORING Dupe Check: Rut-roh - problem getting QTH??? Assuming not a dupe')
+                    print('rec =',rec)
+                    print('rec2=',rec2)
+                    dupe=False
+                    #sys.exit(0)
                 
             else:
                 dupe  = call==call2 and band==band2

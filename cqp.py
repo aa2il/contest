@@ -21,12 +21,13 @@
 
 import sys
 import datetime
-from rig_io.ft_tables import *
+#from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
 from dx.spot_processing import Station, Spot, WWV, Comment, ChallengeData
 from pprint import pprint
 from fileio import parse_adif
 from utilities import reverse_cut_numbers,Oh_Canada
+from counties import COUNTIES
 
 ############################################################################################
 
@@ -46,7 +47,7 @@ class CQP_SCORING(CONTEST_SCORING):
         self.sec_cnt     = np.zeros(len(CQP_MULTS))
         self.dx_cnt      = 0
         self.calls       = []
-        self.county_cnt  = np.zeros(len(CA_COUNTIES))
+        self.county_cnt  = np.zeros(len(COUNTIES['CA']))
         self.band_cnt    = np.zeros(len(self.BANDS))
         self.nq          = 0
 
@@ -215,9 +216,9 @@ class CQP_SCORING(CONTEST_SCORING):
             qth_in2=qth_in.split('/')
             for qth1 in qth_in2:
                 print(qth1)
-                if qth1 in CA_COUNTIES:
+                if qth1 in COUNTIES['CA']:
                     qth='CA'
-                    idx1 = CA_COUNTIES.index(qth1)
+                    idx1 = COUNTIES['CA'].index(qth1)
                     self.county_cnt[idx1] += 1
                     county_line=True
                 else:
@@ -227,9 +228,9 @@ class CQP_SCORING(CONTEST_SCORING):
                         print(rec)
                         sys.exit(0)
             
-        elif qth_in in CA_COUNTIES:
+        elif qth_in in COUNTIES['CA']:
             qth='CA'
-            idx1 = CA_COUNTIES.index(qth_in)
+            idx1 = COUNTIES['CA'].index(qth_in)
             self.county_cnt[idx1] += 1
         elif qth_in in ['NB', 'NL', 'NS', 'PE','MAR'] and False:
             # Canada secs prior to 2023 - no longer used but keeping this
@@ -382,7 +383,7 @@ class CQP_SCORING(CONTEST_SCORING):
                 tag=''
             else:
                 tag='*****'
-            print(i,'\t',CA_COUNTIES[i],'\t',int(self.county_cnt[i]),'\t',tag)
+            print(i,'\t',COUNTIES['CA'][i],'\t',int(self.county_cnt[i]),'\t',tag)
 
         print('\nRaw QSOs by Band:')
         for i in range(len(self.band_cnt)):

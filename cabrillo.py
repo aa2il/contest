@@ -150,9 +150,7 @@ P.contest_name=P.sc.contest
 # Init
 istart  = -1
 cum_gap = 0
-if P.sc.contest=='MAKROTHEN-RTTY':
-    sc = MAKROTHEN_SCORING(contest)
-elif P.sc.contest=='ARRL 10': \
+if P.sc.contest=='ARRL 10': \
     sc = ARRL_RTTY_RU_SCORING(contest)
 elif not P.sc:
     #sc = contest_scoring(contest)
@@ -259,6 +257,15 @@ for i in range(len(qsos)):
     #date_off = datetime.datetime.strptime( rec["qso_date_off"]+" "+rec["time_off"] , "%Y%m%d %H%M%S")
     date_off = rec['time_stamp']
 
+    """
+    try:
+        if rec["contest_id"].upper()=='MAKROTHEN':
+            print('\n',i,rec)
+            print('date_off=',date_off,date_off>=P.sc.date0,date_off<=P.sc.date1)
+    except:
+        continue
+    """
+    
     # Examine QSOs from a specific contest
     if P.sc.contest[2:]=='-QSO-PARTY':
         try:
@@ -274,7 +281,6 @@ for i in range(len(qsos)):
     # Ignore entries outside contest window - this is now done above so can eventually clean this up
     if date_off>=P.sc.date0 and date_off<=P.sc.date1:
         nqsos+=1
-        #print i,rec
 
         if False:
             print(rec)

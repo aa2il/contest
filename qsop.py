@@ -5,6 +5,9 @@
 #
 # Routines for scoring state QSO parties.
 #
+# Last used:
+#    Oct 2024 - NY QP
+#
 ############################################################################################
 #
 # This program is free software: you can redistribute it and/or modify
@@ -64,6 +67,7 @@ class QSOP_SCORING(CONTEST_SCORING):
         self.COUNTIES=[]
         
         if STATE=='NY':
+            self.COUNTIES=COUNTIES[STATE]
             self.QSO_POINTS=[2,1,1]
         elif STATE=='DE':
             # DE happens on the same weekend as New England and W7 QPs so the counties are a bit goofy
@@ -106,8 +110,10 @@ class QSOP_SCORING(CONTEST_SCORING):
                             
     # Scoring routine for State QSO Parties
     def qso_scoring(self,rec,dupe,qsos,HIST,MY_MODE,HIST2):
+        VERBOSITY=0
         if VERBOSITY>0:
             print('rec=',rec)
+            #sys.exit(0)
         keys=list(HIST.keys())
 
         # Check for correct contest
@@ -142,12 +148,10 @@ class QSOP_SCORING(CONTEST_SCORING):
         if qth=='DX':
             print('DX contact - skipping')
             return
-
         
         if dupe:
             print('\nDUPE!!!! rec=',rec)
             #sys.exit(1)
-        
 
         if not dupe:
             #self.nqsos2 += 1;
@@ -189,11 +193,20 @@ class QSOP_SCORING(CONTEST_SCORING):
         line=[]
         qth2=qth.split('/')
         for qth1 in qth2:
-            line.append(
-                'QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
-                (freq_khz,mode,date_off,time_off, \
-                self.MY_CALL,'599',self.MY_STATE,
-                 call,'599',qth1))
+            if qth1 in self.COUNTIES:
+                line.append(
+                    'QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
+                    (freq_khz,mode,date_off,time_off, \
+                     self.MY_CALL,'599',self.MY_STATE,
+                     call,'599',qth1))
+            else:
+                print('\n$$$$$$$$$$$$$$$$$$$$$$')
+                print( 'QSO SCORING - ERROR:' )
+                print('call=',call,'\tqth=',qth1,' not found in list of Counties')
+                print('$$$$$$$$$$$$$$$$$$$$$$')
+                if TRAP_ERRORS:
+                    sys.exit(0)
+                
         """
         print(line)
         print(type(line))
@@ -202,30 +215,32 @@ class QSOP_SCORING(CONTEST_SCORING):
         sys.exit(0)
         """
 
-        # Check against history - REVISIT!!!!
-        if call in keys and False:
+        # Check against history
+        if call in keys and True:
             state=HIST[call]['state']
             if state=='':
                 sec  =HIST[call]['sec']
-                if sec in STATES+PROVINCES:
+                if sec in STATES+PROVINCES1:
                     state=sec
-            name9=HIST[call]['name']
+            if state == self.STATE:
+                county=HIST[call]['county']
+            else:
+                county=''
             #print call,qth,state
-            if qth!=state or name!=name9:
+            if state!=self.STATE or county!=qth:
                 print('\n$$$$$$$$$$ Difference from history $$$$$$$$$$$')
-                print(call,':  Current:',qth,name,' - History:',state,name9)
-                self.list_all_qsos(call,qsos)
+                print(call,':  Current:',qth,' - History:',state,county)
+                #self.list_all_qsos(call,qsos)
                 print('hist=',HIST[call])
                 print(' ')
 
         else:
             print('\n++++++++++++ Warning - no history for call:',call)
-            self.list_all_qsos(call,qsos)
-            self.list_similar_calls(call,qsos)
-
+            #self.list_all_qsos(call,qsos)
+            #self.list_similar_calls(call,qsos)
             #print 'dist=',similar('K5WA','N5WA')
-            #sys.exit(0)
 
+        #sys.exit(0)
         return line
             
     # Summary & final tally

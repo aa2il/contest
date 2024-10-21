@@ -138,11 +138,18 @@ class PARAMS:
 
         # Contest-specific stuff
         if args.mak:
-            contest='MAKROTHEN-RTTY'
+            sc = MAKROTHEN_SCORING(P)
+            self.sc=sc
+            
+            contest=sc.contest
             MY_MODE='RTTY'
-            date0 = datetime.datetime.strptime( "20191012" , "%Y%m%d")  # Start of contest
-            date1 = date0 + datetime.timedelta(hours=48)
-            fname = 'mak_rtty_2019.adif'
+            date0=sc.date0
+            date1=sc.date1
+            history = sc.history
+            
+            #fname = 'mak_rtty_2019.adif'
+            DIR_NAME = '../pyKeyer'
+            fname = 'AA2IL.adif'
 
         elif args.rttyru:
             sc = ARRL_RTTY_RU_SCORING(P,'ARRL-RTTY')
