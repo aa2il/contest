@@ -29,16 +29,10 @@ from utilities import reverse_cut_numbers
 
 #######################################################################################
     
-TRAP_ERRORS = False
-TRAP_ERRORS = True
-
-############################################################################################
-    
 # Scoring class for ARRL CW Sweepstakes - Inherits the base contest scoring class
 class ARRL_SS_SCORING(CONTEST_SCORING):
  
-    def __init__(self,P):
-        #CONTEST_SCORING.__init__(self,P,'ARRL-SS-CW',mode='CW')
+    def __init__(self,P,TRAP_ERRORS):
         super().__init__(P,'ARRL-SS-CW',mode='CW')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m']
@@ -80,7 +74,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         keys=list(HIST.keys())
         if len(keys)==0:
             print('*** WARNING *** No History !!!! ***')
-            if TRAP_ERRORS:
+            if self.TRAP_ERRORS:
                 sys.exit(0)
 
         # Pull out relavent entries
@@ -97,7 +91,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
             if '?' in rexch:
                 print('\ncall=',call,'\trexech=',rexch)
                 print('Uncertain field(s) - need to fix ADIF entry')
-                if TRAP_ERRORS:
+                if self.TRAP_ERRORS:
                     sys.exit(0)
                 else:
                     rexch=rexch.replace('?','')
@@ -108,7 +102,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 s=reverse_cut_numbers( rexch[0] )
                 if s=='':
                     print('Invalid serial s=',s)
-                    if TRAP_ERRORS:
+                    if self.TRAP_ERRORS:
                         sys.exit(0)
                     else:
                         s=0
@@ -119,7 +113,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 
                 if rexch[3]=='':
                     print('Invalid check =',rexch[3])
-                    if TRAP_ERRORS:
+                    if self.TRAP_ERRORS:
                         sys.exit(0)
                     else:
                         rexch[3]=0
@@ -131,7 +125,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 print( str(e) )
                 print('rexch=',rexch)
                 print(rec)
-                if TRAP_ERRORS:
+                if self.TRAP_ERRORS:
                     sys.exit(0)
 
         else:
@@ -139,7 +133,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
             print("*** ERROR - Problem with record")
             print(rec)
             print(" ")
-            if TRAP_ERRORS:
+            if self.TRAP_ERRORS:
                 sys.exit(0)
 
         # Construct sent data
@@ -148,7 +142,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         except:
             print('BAD Serial Out:',rec["stx"] )
             serial_out = -1
-            if TRAP_ERRORS:
+            if self.TRAP_ERRORS:
                 print(rec)
                 sys.exit(0)
 
@@ -156,16 +150,16 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         if not prec in ['Q','A','B','U','M','S']:
             print('\n*** ERROR - Bad PREC:',prec,'\tcall=',call)
             print(rec)
-            if TRAP_ERRORS:
+            if self.TRAP_ERRORS:
                 sys,exit(0)
 
         if call!=call2:
             print('\n*** ERROR - Bad CALL:',call,'\tcall2=',call2)
             print(rec)
-            if TRAP_ERRORS:
+            if self.TRAP_ERRORS:
                 sys,exit(0)
                         
-        self.check_serial_out(serial_out,rec,TRAP_ERRORS)
+        self.check_serial_out(serial_out,rec,self.TRAP_ERRORS)
 
         idx2 = self.BANDS.index(band)
         self.band_cnt[idx2] += 1
@@ -182,7 +176,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
                 print(sec,' not found in list of ARRL sections',len(sec))
                 print(rec)
                 print('$$$$$$$$$$$$$$$$$$$$$$')
-                if TRAP_ERRORS:
+                if self.TRAP_ERRORS:
                     sys.exit(0)
     
             # Info for multi-qsos
@@ -221,7 +215,7 @@ class ARRL_SS_SCORING(CONTEST_SCORING):
         if '?' in line:
             print('Something is fishy here:')
             print(line)
-            if TRAP_ERRORS:
+            if self.TRAP_ERRORS:
                 sys,exit(0)
         
         return line

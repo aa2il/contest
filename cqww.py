@@ -156,15 +156,16 @@ class CQ_WW_SCORING(CONTEST_SCORING):
         problem=False
 
         # Error checking
-        if zone!=dx_station.cqz or zone<0 or zone>40:
-            print('*** Zone Mismatch ***')
-            print('call=',call)
-            print('zone=',zone)
-            print('state=',state)
-            warning=True;
-            self.warnings += 1
-            if TRAP_ERRORS:
-                sys.exit(0)
+        if call not in ['CF2I','TO4A','FO/NX1P']:
+            if zone!=dx_station.cqz or zone<0 or zone>40:
+                print('*** Zone Mismatch ***')
+                print('call=',call)
+                print('zone=',zone,dx_station.cqz)
+                #print('state=',state)
+                warning=True;
+                self.warnings += 1
+                if TRAP_ERRORS:
+                    sys.exit(0)
         
         if not dupe:
             self.nqsos2 += 1;
@@ -221,7 +222,7 @@ class CQ_WW_SCORING(CONTEST_SCORING):
             print('Freq =',freq_khz)
             print('Band =',band)
             print('Zone =',zone,dx_station.cqz)
-            print('State=',state)
+            #print('State=',state)
             print('Date =',date_off)
             print('Time =',time_off)
             

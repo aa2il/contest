@@ -1,4 +1,7 @@
-#! /usr/bin/python3
+#! /home/joea/miniconda3/envs/aa2il/bin/python -u
+#
+# NEW: /home/joea/miniconda3/envs/aa2il/bin/python -u
+# OLD: /usr/bin/python3 -u 
 ############################################################################################
 #
 # cabrillo.py - Rev 1.0
@@ -37,11 +40,19 @@ from params import *
 def open_output_file(P,outfile):
     fp = open(outfile, 'w')
 
-    contest  = P.contest_name
-    MY_CALL  = P.SETTINGS['MY_CALL']
-    OPERATOR = P.SETTINGS['MY_OPERATOR']
-    MY_POWER = 'LOW'
-    MY_CLUB  = P.SETTINGS['MY_CLUB']
+    contest     = P.contest_name
+    MY_CALL     = P.SETTINGS['MY_CALL']
+    OPERATOR    = P.SETTINGS['MY_OPERATOR']
+    MY_POWER    = 'LOW'
+    MY_CLUB     = P.SETTINGS['MY_CLUB']
+    MY_FULLNAME = P.SETTINGS['MY_FULLNAME']
+    MY_ADDRESS1 = P.SETTINGS['MY_ADDRESS1']
+    MY_ADDRESS2 = P.SETTINGS['MY_ADDRESS2']
+    MY_CITY     = P.SETTINGS['MY_CITY']
+    MY_STATE    = P.SETTINGS['MY_STATE']
+    MY_ZIPCODE  = P.SETTINGS['MY_ZIPCODE']
+    MY_COUNTRY  = P.SETTINGS['MY_COUNTRY']
+    MY_EMAIL    = P.SETTINGS['MY_EMAIL']
     
     fp.write('START-OF-LOG:3.0\n')
     fp.write('CONTEST: %s\n' % contest)
@@ -92,14 +103,16 @@ def open_output_file(P,outfile):
     #fp.write('OPERATORS: %s\n' % MY_CALL2);
     fp.write('OPERATORS: %s\n' % OPERATOR);
     fp.write('CLUB: %s\n' % MY_CLUB);
-    fp.write('NAME: Joseph B. Attili\n');
-    fp.write('ADDRESS: PO Box 2036\n');
-    fp.write('ADDRESS: Ramona, CA 92065\n');
-    fp.write('ADDRESS-CITY: Ramona\n');
-    fp.write('ADDRESS-STATE-PROVINCE: CA\n');
-    fp.write('ADDRESS-POSTALCODE: 92065\n');
-    fp.write('ADDRESS-COUNTRY: USA\n');
-    fp.write('EMAIL: aa2il@arrl.net\n');
+    fp.write('NAME: %s\n' % MY_FULLNAME);
+    fp.write('ADDRESS: %s\n' % MY_ADDRESS1);
+    if len(MY_ADDRESS2)>0:
+        fp.write('ADDRESS: %s\n' % MY_ADDRESS2);
+    fp.write('ADDRESS: %s, %s %s\n' % (MY_CITY,MY_STATE,MY_ZIPCODE) );
+    fp.write('ADDRESS-CITY: %s\n' % MY_CITY);
+    fp.write('ADDRESS-STATE-PROVINCE: %s\n' % MY_STATE);
+    fp.write('ADDRESS-POSTALCODE: %s\n' % MY_ZIPCODE);
+    fp.write('ADDRESS-COUNTRY: %s\n' % MY_COUNTRY);
+    fp.write('EMAIL: %s\n' % MY_EMAIL);
     fp.write('SOAPBOX:\n');
     fp.write('SOAPBOX:\n');
     fp.write('SOAPBOX:\n');

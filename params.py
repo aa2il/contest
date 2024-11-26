@@ -99,6 +99,8 @@ class PARAMS:
         arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
         arg_proc.add_argument('-nograph', action='store_true',
                               help='Dont plot rate graph')
+        arg_proc.add_argument('-trap', action='store_true',
+                              help='Trap errors')
         arg_proc.add_argument('-assisted', action='store_true',
                               help='Used assitance (cluster, etc.)')
         arg_proc.add_argument("-i", help="Input ADIF file",
@@ -121,6 +123,7 @@ class PARAMS:
 
         self.category_band ='ALL'
         self.TIME_LIMIT    = args.limit
+        self.TRAP_ERRORS   = args.trap
         self.ASSISTED      = args.assisted
         self.RATE_GRAPH    = not args.nograph
 
@@ -271,21 +274,16 @@ class PARAMS:
             fname = 'wsjtx_log.adi'
 
         elif args.cwss:
-            sc = ARRL_SS_SCORING(P)
+            sc = ARRL_SS_SCORING(P,self.TRAP_ERRORS)
             self.sc=sc
             
-            fname = 'AA2IL_2022.adif'
-            DIR_NAME = '~/AA2IL'
-
             fname = 'AA2IL.adif'
             DIR_NAME = '~/Python/pyKeyer'
 
             fname = 'SS.csv'
-            fname='SS.adif'
-            DIR_NAME = '~/Python/pyKeyer/SS'
+            DIR_NAME = '~/Python/pyKeyer/SS_2024'
             
-            self.history = HIST_DIR2+'/SSCW-2023.txt'
-            #self.history = 'HIST_DIR/SSCW-2021-LAST-2.txt'
+            self.history = HIST_DIR2+'/SSCW-2024-*.txt'
             #self.history = HIST_DIR+'master.csv'
             
         elif args.naqprtty:
