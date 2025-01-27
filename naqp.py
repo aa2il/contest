@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # naqp.py - Rev 1.0
-# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-5 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Routines for scoring NAQP CW & RTTY contests
 #
@@ -26,7 +26,7 @@ from scoring import CONTEST_SCORING
 
 ############################################################################################
     
-TRAP_ERRORS = False
+#TRAP_ERRORS = False
 #TRAP_ERRORS = True
 
 ############################################################################################
@@ -34,7 +34,7 @@ TRAP_ERRORS = False
 # Scoring class for NAQP CW & RTTY - Inherits the base contest scoring class
 class NAQP_SCORING(CONTEST_SCORING):
  
-    def __init__(self,P,MODE):
+    def __init__(self,P,MODE,TRAP_ERRORS=False):
         CONTEST_SCORING.__init__(self,P,'NAQP-'+MODE,mode=MODE)
         print('NAQP Scoring Init')
 
@@ -118,7 +118,7 @@ class NAQP_SCORING(CONTEST_SCORING):
                 print('\tqth=',qth)
                 print('\tname=',name)
                 print('\trx_string=',rx_string)
-                if TRAP_ERRORS:
+                if self.TRAP_ERRORS:
                     sys.exit(0)
             
         """
@@ -143,7 +143,7 @@ class NAQP_SCORING(CONTEST_SCORING):
             print('\n??? Check this one again: ???')
             print('call=',call,'\t\tname=',name,'\t\tqth=',qth)
             self.list_all_qsos(call,qsos)
-            if TRAP_ERRORS:
+            if self.TRAP_ERRORS:
                 print('HIST=',HIST[call.replace('?','')])
                 sys.exit(0)
 
@@ -164,7 +164,7 @@ class NAQP_SCORING(CONTEST_SCORING):
                 print(qth,' not found in list of NAQP sections',len(qth))
                 print(rec)
                 print('$$$$$$$$$$$$$$$$$$$$$$')
-                if TRAP_ERRORS:
+                if self.TRAP_ERRORS:
                     sys.exit(0)
     
             # Info for multi-qsos

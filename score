@@ -36,10 +36,10 @@ set CONTEST=""
 #set CONTEST="foc"                # FOC BW
 
 #set CONTEST="cwopen"             # CWops CW Open
-set CONTEST="cqwwcw"             # CQ WW CW
+#set CONTEST="cqwwcw"             # CQ WW CW
 #set CONTEST="cqwwrtty"           # CQ WW RTTY
 #set CONTEST="cwss"               # ARRL Sweepstakes
-#set CONTEST="fd"                 # ARRL Field Day
+set CONTEST="fd"                 # Winter or ARRL Field Day
 #set CONTEST="cqp"                # Commiefornia QSO Party
 #set CONTEST="state"              # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
@@ -101,7 +101,7 @@ if( X$CONTEST == "X" )then
             set CONTEST="sst"
         endif
     else if( $day == "Tue" )then
-        if ( ($hour >= 2) && ($hour <= 23) )then
+        if ( ($hour >= 1) && ($hour <= 23) )then
             set CONTEST="mst"
         endif
     else if( $day == "Wed" )then
@@ -122,7 +122,7 @@ if( X$CONTEST == "X" )then
 endif
 if( X$CONTEST == "X" )then
         echo " "
-        echo "--- Can't figure out contest - Giving up !!!! ---"
+        echo "--- Can't figure out contest - Giving up \!\!\! ---"
         echo " "
         exit 1
 endif

@@ -1,11 +1,21 @@
+# If necessary, activate the "sandbox:"
+#
+#  cd ~/Python/contest
+#  conda activate aa2il
+#
+# Install the required libs:
+#
 # pip3 install -r requirements.txt
 #
-# Also need the "libs" and "data" directories which are available in this
+# We also need the "libs" and "data" directories which are available in this
 # repository.
+#
 # Set the PYTHONPATH environment variable to point to where "libs" is installed,
 # e.g. for csh/tcsh:
 #
 #     setenv PYTHONPATH $HOME/Python/libs
+#
+##############################################################################
 
 matplotlib
 pyserial
@@ -15,4 +25,5 @@ pyhamtools
 numpy
 pandas
 levenshtein
+
 

@@ -1,9 +1,9 @@
 ############################################################################################
 #
 # fd.py - Rev 1.0
-# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-5 by Joseph B. Attili, aa2il AT arrl DOT net
 #
-# Routines for scoring ARRL Field Day
+# Routines for scoring Winter and ARRL Field Days
 #
 ############################################################################################
 #
@@ -23,23 +23,35 @@ import sys
 import datetime
 from rig_io.ft_tables import *
 from scoring import CONTEST_SCORING
-from dx.spot_processing import Station   #, Spot, WWV, Comment, ChallengeData
+from dx.spot_processing import Station 
 from pprint import pprint
 from utilities import Oh_Canada
 
 ############################################################################################
     
-TRAP_ERRORS = False
-TRAP_ERRORS = True
+#TRAP_ERRORS = False
+#TRAP_ERRORS = True
 
 ############################################################################################
     
-# Scoring class for ARRL Field Day - Inherits the base contest scoring class
-class ARRL_FD_SCORING(CONTEST_SCORING):
+# Scoring class for Winter and ARRL Field Day - Inherits the base contest scoring class
+class FIELD_DAY_SCORING(CONTEST_SCORING):
  
-    def __init__(self,P):
-        CONTEST_SCORING.__init__(self,P,'ARRL-FD',mode='MIXED')
-        print('FD Scoring Init')
+    def __init__(self,P,TRAP_ERRORS=False):
+        now = datetime.datetime.utcnow()
+        if now.month<6:
+            MONTH=1
+            self.EVENT='WINTER'
+            self.CATEGORIES = ['H','I','O','M']
+            CONTEST='WFD'
+        else:
+            MONTH=6
+            self.EVENT='ARRL'
+            self.CATEGORIES = ['A','B','C','D','E','F']
+            CONTEST=self.EVENT+'-FD'
+
+        CONTEST_SCORING.__init__(self,P,CONTEST,mode='MIXED')
+        print('FIELD DAY Scoring Init ...')
         
         self.BANDS = ['160m','80m','40m','20m','15m','10m','6m','2m','1.25m','70cm']
         self.MODES = ['CW','PH','DG']
@@ -56,14 +68,14 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         self.MY_SECTION = P.SETTINGS['MY_SEC']
         
         # Determine contest time - assumes this is done within a few hours of the contest
-        # Contest occurs on 4th full weekend of June
+        # Winter FD occurs on 4th full weekend of Jan
+        # ARRL FD occurs on 4th full weekend of June
         now = datetime.datetime.utcnow()
         year=now.year
-        #year=2020                                                     # Test from last time I did FD
-        day1=datetime.date(year,6,1).weekday()                         # Day of week of 1st of month 0=Monday, 6=Sunday
+        day1=datetime.date(year,MONTH,1).weekday()                         # Day of week of 1st of month 0=Monday, 6=Sunday
         sat4=1 + ((5-day1) % 7) + 21                                   # Day no. for 4th Saturday = 1 since day1 is the 1st of the month
                                                                        #    no. days until 1st Saturday (day 5) + 7 more days
-        self.date0=datetime.datetime(year,6,sat4,18) 
+        self.date0=datetime.datetime(year,MONTH,sat4,18) 
         self.date1 = self.date0 + datetime.timedelta(hours=33)         # ... and ends at 0300/0400 UTC on Monday
         print('day1=',day1,'\tsat4=',sat4,'\tdate0=',self.date0)
         #sys.exit(0)
@@ -74,7 +86,7 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             self.date1 = self.date0 + datetime.timedelta(hours=27)
 
         # Name of output file
-        self.output_file = self.MY_CALL+'_FIELD_DAY_'+str(self.date0.year)+'.LOG'
+        self.output_file = self.MY_CALL+'_'+self.EVENT+'_FIELD_DAY_'+str(self.date0.year)+'.LOG'
 
 
     # Contest-dependent header stuff
@@ -130,7 +142,7 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
             if TRAP_ERRORS:
                 sys.exit(0)
             
-        if not n.isdigit() or cat not in ['A','B','C','D','E','F']:
+        if not n.isdigit() or cat not in self.CATEGORIES:
             print('\nReceived category '+cat_in+' not recognized - srx=',rx)
             print('call=',call)
             print('rec=',rec)
@@ -277,15 +289,19 @@ class ARRL_FD_SCORING(CONTEST_SCORING):
         print('No. skipped (e.g. rapid dupe) =',self.nskipped)
         print('No. dupes                     =',self.ndupes)
         print('No. unique QSOS (nqsos2)      =',self.nqsos2)
-        mults = 2
-        print('Power Mult                    =',mults)
-        print('QSO Score (sans bonus)        =',self.total_points*mults)
-        
+
         bonus = 0
-        bonus += 100*2          # Emergency power x2 transmitters
-        bonus += 100            # Solar power
-        bonus += 100            # Copied W1AW bulletin
-        bonus += 50             # Web entry
+        if self.EVENT=='WINTER':
+            mults = 1
+        else:
+            mults = 2
+            print('Power Mult                    =',mults)
+            bonus += 100*2          # Emergency power x2 transmitters
+            bonus += 100            # Solar power
+            bonus += 100            # Copied W1AW bulletin
+            bonus += 50             # Web entry
+            
+        print('QSO Score (sans bonus)        =',self.total_points*mults)
         
         print('Bonus Points                  =',bonus)
         print('Total Claimed Score           =',self.total_points*mults + bonus)

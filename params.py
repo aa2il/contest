@@ -2,7 +2,7 @@
 ################################################################################
 #
 # Params.py - Rev 1.0
-# Copyright (C) 2022-4 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2022-5 by Joseph B. Attili, aa2il AT arrl DOT net
 #
 # Command line param parser for contest scorer.
 #
@@ -71,7 +71,7 @@ class PARAMS:
         arg_proc.add_argument('-vhfss', action='store_true',help='CW VHF Soc. Spring Sprint')
         arg_proc.add_argument('-fall50', action='store_true',help='SE VHF Soc. 50 MHz Fall Sprint')
         arg_proc.add_argument('-namss', action='store_true',help='NA Meteor Scatter Sprint')
-        arg_proc.add_argument('-fd', action='store_true',help='ARRL Field Day')
+        arg_proc.add_argument('-fd', action='store_true',help='Winter or ARRL Field Day')
         arg_proc.add_argument('-sprint', action='store_true',help='NS and NCJ Sprint')
         arg_proc.add_argument('-wwdigi', action='store_true',help='World Wide Digi DX')
         arg_proc.add_argument('-cwt',help='CW Ops Mini-Test',
@@ -99,8 +99,8 @@ class PARAMS:
         arg_proc.add_argument('-cqp', action='store_true',help='Cal QSO Party')
         arg_proc.add_argument('-nograph', action='store_true',
                               help='Dont plot rate graph')
-        arg_proc.add_argument('-trap', action='store_true',
-                              help='Trap errors')
+        arg_proc.add_argument('-notrap', action='store_true',
+                              help='Dont Trap Errors')
         arg_proc.add_argument('-assisted', action='store_true',
                               help='Used assitance (cluster, etc.)')
         arg_proc.add_argument("-i", help="Input ADIF file",
@@ -123,7 +123,7 @@ class PARAMS:
 
         self.category_band ='ALL'
         self.TIME_LIMIT    = args.limit
-        self.TRAP_ERRORS   = args.trap
+        self.TRAP_ERRORS   = not args.notrap
         self.ASSISTED      = args.assisted
         self.RATE_GRAPH    = not args.nograph
 
@@ -136,7 +136,7 @@ class PARAMS:
         HIST_DIR  = os.path.expanduser('~/Python/data/')
         HIST_DIR2 = os.path.expanduser('~/Python/history/data/')
         self.output_file = args.o.replace('MY_CALL',MY_CALL)
-
+        
         #######################################################################################
 
         # Contest-specific stuff
@@ -246,8 +246,8 @@ class PARAMS:
             
         elif args.fd:
 
-            # ARRL Field Day
-            sc = ARRL_FD_SCORING(P)
+            # Winter or ARRL Field Day
+            sc = FIELD_DAY_SCORING(P,self.TRAP_ERRORS)
             self.sc=sc
             
             self.history = HIST_DIR+'master.csv'
@@ -256,11 +256,12 @@ class PARAMS:
             fnames=[]
             DIR_NAME = '~/logs/'
             DIR_NAME = '~/Python/pyKeyer/Field_Day'
+            DIR_NAME = '~/Python/pyKeyer/WFD'
             fnames=[]
             #for fname in ['AA2IL.adif']:
-            #for fname in ['FD.csv']:
+            for fname in ['WFD.csv']:
             #for fname in ['AA2IL.adif','wsjtx_log.adi']:
-            for fname in ['FD.csv','wsjtx_log.adi']:
+            #for fname in ['FD.csv','wsjtx_log.adi']:
             #for fname in ['FD.csv','FTx.csv']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
                 fnames.append(f)
@@ -307,14 +308,17 @@ class PARAMS:
         elif args.naqpcw:
 
             # North American QSO Party CW
-            sc = NAQP_SCORING(P,'CW')
+            sc = NAQP_SCORING(P,'CW',self.TRAP_ERRORS)
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
 
+            DIR_NAME = '~/AA2IL/'
+            fname = 'AA2IL.adif'
+    
             #DIR_NAME = '../pyKeyer/NAQP/'    
             DIR_NAME = './'    
-            fname = 'NAQP.csv'
+            fname = 'NAQP2.csv'
             #fname = 'NAQP.adif'
 
         elif args.state:
