@@ -2,7 +2,7 @@
 ################################################################################
 #
 # score - Rev 1.0
-# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-5 by Joseph B. Attili, joe DOT aa2il AT gmail DOT com
 #
 # Script to run cabrillo converter/scoring code.
 #
@@ -39,7 +39,7 @@ set CONTEST=""
 #set CONTEST="cqwwcw"             # CQ WW CW
 #set CONTEST="cqwwrtty"           # CQ WW RTTY
 #set CONTEST="cwss"               # ARRL Sweepstakes
-set CONTEST="fd"                 # Winter or ARRL Field Day
+#set CONTEST="fd"                 # Winter or ARRL Field Day
 #set CONTEST="cqp"                # Commiefornia QSO Party
 #set CONTEST="state"              # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 

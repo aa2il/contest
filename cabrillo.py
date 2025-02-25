@@ -5,7 +5,7 @@
 ############################################################################################
 #
 # cabrillo.py - Rev 1.0
-# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-5 by Joseph B. Attili, joe DOT aa2il AT gmail DOT com
 #
 # Program to convert contest log to cabrillo format and compute claimed score.
 #
@@ -243,6 +243,10 @@ for rec in qsos2:
 qsos.sort(key=lambda x: x['time_stamp'])
 
 # Open output file
+if False:
+    print("P=")
+    pprint(vars(P))
+    sys.exit(0)
 print('Output File=',P.output_file)
 fp=open_output_file(P,P.output_file)
 

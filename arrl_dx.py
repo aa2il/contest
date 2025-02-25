@@ -1,9 +1,9 @@
 ############################################################################################
 #
 # arrl_dx.py - Rev 1.0
-# Copyright (C) 2021-4 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2021-5 by Joseph B. Attili, joe DOT aa2il AT gmail DOT com
 #
-# Routines for scoring ARRL International DX contests.
+# Routines for scoring ARRL International DX contest.
 #
 ############################################################################################
 #
@@ -119,10 +119,20 @@ class ARRL_INTL_DX_SCORING(CONTEST_SCORING):
         pwr=reverse_cut_numbers(qth)
         if pwr in ['KW','K','1K']:
             pwr='1000'
-        elif  TRAP_ERRORS and pwr=='599':
+        elif TRAP_ERRORS and pwr=='599':
             print('WOOOOOPS!',pwr)
             sys.exit(0)
-        pwr=int(pwr)
+
+        try:
+            pwr=int(pwr)
+        except:
+            print('\n*************** WHOOOOOOOPS - Cant convert power !!!!!!!!!!!!!!!!!!!!')
+            print('\nrec=',rec)
+            print('pwr=',pwr)
+            if dx_station.country in ['United States','Canada']:
+                pwr=0
+            else:
+                sys.exit(0)
         
         warning=False
         problem=False

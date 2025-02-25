@@ -24,15 +24,11 @@ import argparse
 from settings import CONFIG_PARAMS
 import os
 
-from cwt import *
 from scoring import *
 from fd import *
 from arrl_ss import *
 from vhf import *
 from cwopen import *
-from sst import *
-from mst import *
-from naqp import *
 from qsop import *
 from wpx import *
 from iaru import *
@@ -130,6 +126,7 @@ class PARAMS:
         P=CONFIG_PARAMS('.keyerrc')
         self.SETTINGS=P.SETTINGS
         self.HIST2=None
+        P.gui=None
 
         MY_CALL   = self.SETTINGS['MY_CALL']
         OPERATOR  = self.SETTINGS['MY_OPERATOR']
@@ -290,16 +287,16 @@ class PARAMS:
         elif args.naqprtty:
 
             # North American QSO Party RTTY
-            sc = NAQP_SCORING(P,'RTTY')
+            sc = NAQP_SCORING(P,'NAQP-RTTY',self.TRAP_ERRORS)
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
             #print('fname=',fname)
             if fname==None:
-                #DIR_NAME = '~/'+MY_CALL+'/'
-                #fname = MY_CALL+'.adif'
-                DIR_NAME = '~/logs/'
-                fname='naqp_rtty_2023.adif'
+                DIR_NAME = '~/'+MY_CALL+'/'
+                fname = MY_CALL+'.adif'
+                #DIR_NAME = '~/logs/'
+                #fname='naqp_rtty_2023.adif'
             else:
                 DIR_NAME = '.'
                 #DIR_NAME = '~/.fllog/'
@@ -308,7 +305,7 @@ class PARAMS:
         elif args.naqpcw:
 
             # North American QSO Party CW
-            sc = NAQP_SCORING(P,'CW',self.TRAP_ERRORS)
+            sc = NAQP_SCORING(P,'NAQP-CW',self.TRAP_ERRORS)
             self.sc=sc
 
             self.history = HIST_DIR+'master.csv'
