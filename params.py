@@ -126,7 +126,7 @@ class PARAMS:
         P=CONFIG_PARAMS('.keyerrc')
         self.SETTINGS=P.SETTINGS
         self.HIST2=None
-        P.gui=None
+        self.gui=None
 
         MY_CALL   = self.SETTINGS['MY_CALL']
         OPERATOR  = self.SETTINGS['MY_OPERATOR']
