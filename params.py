@@ -124,6 +124,7 @@ class PARAMS:
         self.RATE_GRAPH    = not args.nograph
 
         P=CONFIG_PARAMS('.keyerrc')
+        P.gui=None
         self.SETTINGS=P.SETTINGS
         self.HIST2=None
         self.gui=None
