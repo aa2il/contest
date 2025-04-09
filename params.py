@@ -43,6 +43,7 @@ from colonies import *
 from satellites import *
 from call import *
 from foc import *
+from dx import load_cty_info
 
 ################################################################################
 
@@ -131,10 +132,14 @@ class PARAMS:
 
         MY_CALL   = self.SETTINGS['MY_CALL']
         OPERATOR  = self.SETTINGS['MY_OPERATOR']
-        HIST_DIR  = os.path.expanduser('~/Python/data/')
-        HIST_DIR2 = os.path.expanduser('~/Python/history/data/')
+        DATA_DIR=self.SETTINGS['MY_DATA_DIR']
+        if DATA_DIR=='':
+            DATA_DIR='~/Python/data'
+        self.HIST_DIR=os.path.expanduser(DATA_DIR+'/')
+        self.HIST_DIR2 = os.path.expanduser('~/Python/history/data/')
         self.output_file = args.o.replace('MY_CALL',MY_CALL)
-        
+        load_cty_info(DIR=DATA_DIR)
+
         #######################################################################################
 
         # Contest-specific stuff
@@ -177,7 +182,7 @@ class PARAMS:
             sc = ARRL_RTTY_RU_SCORING(P,'FT8-RU')
             self.sc=sc
             
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = 'wsjtx_log.adi'
             DIR_NAME = '~/.local/share/WSJT-X - CONTEST'
             fname = 'FTRU_2023.csv'
@@ -189,7 +194,7 @@ class PARAMS:
             # ARRL 10m contest
             sc = ARRL_RTTY_RU_SCORING(P,'ARRL-10')
             self.sc=sc
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             
             fname = 'AA2IL_2021.adif'
             fname = 'AA2IL.adif'
@@ -248,7 +253,7 @@ class PARAMS:
             sc = FIELD_DAY_SCORING(P,self.TRAP_ERRORS)
             self.sc=sc
             
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             
             # Need to merge FT8 and CW logs
             fnames=[]
@@ -282,8 +287,8 @@ class PARAMS:
             fname = 'SS.csv'
             DIR_NAME = '~/Python/pyKeyer/SS_2024'
             
-            self.history = HIST_DIR2+'/SSCW-2024-*.txt'
-            #self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR2+'/SSCW-2024-*.txt'
+            #self.history = self.HIST_DIR+'master.csv'
             
         elif args.naqprtty:
 
@@ -291,7 +296,7 @@ class PARAMS:
             sc = NAQP_SCORING(P,'NAQP-RTTY',self.TRAP_ERRORS)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             #print('fname=',fname)
             if fname==None:
                 DIR_NAME = '~/'+MY_CALL+'/'
@@ -309,7 +314,7 @@ class PARAMS:
             sc = NAQP_SCORING(P,'NAQP-CW',self.TRAP_ERRORS)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
 
             DIR_NAME = '~/AA2IL/'
             fname = 'AA2IL.adif'
@@ -325,7 +330,7 @@ class PARAMS:
             sc = QSOP_SCORING(P,'CW',args.state)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             #fname = MY_CALL+'.adif'
             #DIR_NAME = '~/'+MY_CALL+'/'
             DIR_NAME='./'
@@ -336,7 +341,7 @@ class PARAMS:
             sc = ARRL_INTL_DX_SCORING(P)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
 
             DIR_NAME = '~/AA2IL/'
             fname = 'AA2IL.adif'
@@ -347,7 +352,7 @@ class PARAMS:
             sc = CQ_WW_SCORING(P,'CW')
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
 
             DIR_NAME = '~/AA2IL/'
             #fname = 'AA2IL_2021.adif'
@@ -361,7 +366,7 @@ class PARAMS:
             sc = CQ_WW_SCORING(P,'RTTY')
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             
             #DIR_NAME = '~/logs/'
             #fname = 'cqww_rtty_2023.adif'
@@ -382,7 +387,7 @@ class PARAMS:
                 NAME='WPX'
             sc = CQ_WPX_SCORING(P,MODE,NAME)
             self.sc=sc
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             
             if MODE=='CW':
                 DIR_NAME = '~/Python/pyKeyer/'
@@ -409,7 +414,7 @@ class PARAMS:
             sc = CQP_SCORING(P)
             self.sc=sc
             
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             self.HIST2=sc.read_hist2(args.hist)
             
             MY_CALL1 = self.SETTINGS['MY_CALL'].split('/')[0]
@@ -438,7 +443,7 @@ class PARAMS:
             sc = RAC_SCORING(P)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
             #fname = MY_CALL+'_2022.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
@@ -452,7 +457,7 @@ class PARAMS:
             sc = SST_SCORING(P,'SST')
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
 
@@ -462,7 +467,7 @@ class PARAMS:
             sc = SST_SCORING(P,'SPRINT')
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
 
@@ -472,7 +477,7 @@ class PARAMS:
             sc = FOCBW_SCORING(P,'SPRINT')
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
 
@@ -488,7 +493,7 @@ class PARAMS:
             sc = CWT_SCORING(self,session)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+OPERATOR+'/'
             
@@ -502,7 +507,7 @@ class PARAMS:
             sc = CWOPEN_SCORING(P,session)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             if fname==None:
                 fname = MY_CALL+'.adif'
                 DIR_NAME = '~/'+MY_CALL+'/'
@@ -520,7 +525,7 @@ class PARAMS:
             sc = MST_SCORING(P,session)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
 
@@ -580,7 +585,7 @@ class PARAMS:
             sc = SPECIFIC_CALL(P,calls)
             self.sc=sc
 
-            self.history = HIST_DIR+'master.csv'
+            self.history = self.HIST_DIR+'master.csv'
             fname = MY_CALL+'.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
             
