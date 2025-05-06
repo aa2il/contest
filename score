@@ -41,7 +41,7 @@ set CONTEST=""
 #set CONTEST="cwss"               # ARRL Sweepstakes
 #set CONTEST="fd"                 # Winter or ARRL Field Day
 #set CONTEST="cqp"                # Commiefornia QSO Party
-#set CONTEST="state"              # State (other than CA) QSO Party
+set CONTEST="state"              # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
 #set CONTEST="cqmm"                # CQMM
 #set CONTEST="wpxcw"              # CQ WPX CW
@@ -64,7 +64,7 @@ set SESSION=""
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
 #set SESSION=3                    # CW Open Session 1, 2 or 3
-#set SESSION="NY"                  # State QSO party
+set SESSION="W7"                  # State QSO party
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
@@ -78,6 +78,7 @@ set LOG_FILE=""
 #set LOG_FILE="-i ../pyKeyer/AA2IL.adif"       
 if( ("X$CONTEST" == "Xstate") && ("X${LOG_FILE}" == "X") )then
     set LOG_FILE="-i STATE_QPs.csv"                 # One or more state QPs
+    set LOG_FILE="-i STATE_QPs.adif"                 # One or more state QPs
 endif
 echo LOG_FILE=$LOG_FILE
 #exit

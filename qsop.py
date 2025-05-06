@@ -69,7 +69,7 @@ class QSOP_SCORING(CONTEST_SCORING):
         if STATE=='NY':
             self.COUNTIES=COUNTIES[STATE]
             self.QSO_POINTS=[2,1,1]
-        elif STATE=='DE':
+        elif STATE=='DE' and False:
             # DE happens on the same weekend as New England and W7 QPs so the counties are a bit goofy
             for c in COUNTIES['DE']:
                 self.COUNTIES.append('DE'+c)
@@ -164,6 +164,7 @@ class QSOP_SCORING(CONTEST_SCORING):
                     for qth1 in qth2:
                         self.nqsos2 += 1;
                         if self.STATE=='W7' and len(qth2)>1 and len(qth1)==3:
+                            print('WARNING - Fixup applied for qth1=',qth1)
                             qth1=qth2[0][0:2] + qth1
                         idx1 = self.COUNTIES.index(qth1)
                         self.sec_cnt[idx1] = 1
@@ -193,6 +194,9 @@ class QSOP_SCORING(CONTEST_SCORING):
         line=[]
         qth2=qth.split('/')
         for qth1 in qth2:
+            if self.STATE=='W7' and len(qth2)>1 and len(qth1)==3:
+                print('WARNING - Fixup applied for qth1=',qth1)
+                qth1=qth2[0][0:2] + qth1
             if qth1 in self.COUNTIES:
                 line.append(
                     'QSO: %5d %2s %10s %4s %-10s      %-10s %-3s %-10s      %-10s %-3s' % \
