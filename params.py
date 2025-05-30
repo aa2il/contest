@@ -1,4 +1,3 @@
-#! /usr/bin/python3 -u
 ################################################################################
 #
 # Params.py - Rev 1.0
@@ -30,7 +29,6 @@ from arrl_ss import *
 from vhf import *
 from cwopen import *
 from qsop import *
-from wpx import *
 from iaru import *
 from cqp import *
 from wwdigi import *
@@ -385,7 +383,7 @@ class PARAMS:
             else:
                 MODE='RTTY'
                 NAME='WPX'
-            sc = CQ_WPX_SCORING(P,MODE,NAME)
+            sc = CQ_WPX_SCORING(P,MODE,NAME,self.TRAP_ERRORS)
             self.sc=sc
             self.history = self.HIST_DIR+'master.csv'
             
