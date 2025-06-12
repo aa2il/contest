@@ -26,7 +26,6 @@ import os
 from scoring import *
 from fd import *
 from arrl_ss import *
-from vhf import *
 from cwopen import *
 from qsop import *
 from iaru import *
