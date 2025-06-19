@@ -76,6 +76,7 @@ set LOG_FILE=""
 #set LOG_FILE="-i NAQP.adif"
 #set LOG_FILE="-i CWOPEN.csv"
 #set LOG_FILE="-i ../pyKeyer/AA2IL.adif"       
+set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/logs/wsjtx_log.adi"
 if( ("X$CONTEST" == "Xstate") && ("X${LOG_FILE}" == "X") )then
     set LOG_FILE="-i STATE_QPs.csv"                 # One or more state QPs
     set LOG_FILE="-i STATE_QPs.adif"                 # One or more state QPs
@@ -110,7 +111,7 @@ if( X$CONTEST == "X" )then
             set CONTEST="cwt"
         endif
     else if( $day == "Thu" )then
-        if( (($hour >= 2) && ($hour <= 6)) || (($hour >= 6) && ($hour <= 23)) )then
+        if ( ($hour >= 0) && ($hour <= 23) )then
             set CONTEST="cwt"
         endif
     else if( ($day == "Fri") && ($hour >= 1) && ($hour <= 12) )then

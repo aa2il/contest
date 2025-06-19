@@ -24,11 +24,9 @@ from settings import CONFIG_PARAMS
 import os
 
 from scoring import *
-from fd import *
 from arrl_ss import *
 from cwopen import *
 from qsop import *
-from iaru import *
 from cqp import *
 from wwdigi import *
 from mak import *
@@ -97,8 +95,8 @@ class PARAMS:
                               help='Dont Trap Errors')
         arg_proc.add_argument('-assisted', action='store_true',
                               help='Used assitance (cluster, etc.)')
-        arg_proc.add_argument("-i", help="Input ADIF file",
-                              type=str,default=None)
+        arg_proc.add_argument("-i", help="Input ADIF file(s)",
+                              nargs='*',type=str,default=None)
         arg_proc.add_argument("-limit", help="Time Limit (Hours)",
                               type=int,default=10000)
         arg_proc.add_argument("-o", help="Output Cabrillo file",
@@ -109,8 +107,16 @@ class PARAMS:
 
         #######################################################################################
         
-        fname = args.i
-        fnames=''
+        #fname = args.i
+        #fnames=''
+        if args.i!=None and len(args.i)>0:
+            fname = args.i[0]
+        else:
+            fname=None
+        fnames = args.i
+        print('fname=',fname)
+        print('fnames=',fnames)
+        #sys.exit(0)
 
         self.history = ''
         self.sc=None
@@ -228,10 +234,11 @@ class PARAMS:
                 print('\n*** ERROR - Invalid sponser ***\n')
                 sys.exit(0)
                 
-            sc = VHF_SCORING(P,org)
+            sc = VHF_SCORING(P,org,self.TRAP_ERRORS)
             self.sc=sc
-            fname = sc.fname
-            DIR_NAME = sc.DIR_NAME
+            #fname = sc.fname
+            #DIR_NAME = sc.DIR_NAME
+            DIR_NAME = ''
 
             """
             # Need to merge FT8 and CW/Phone logs from RPi
