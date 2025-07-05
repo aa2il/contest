@@ -1,7 +1,7 @@
 ############################################################################################
 #
 # rac.py - Rev 1.0
-# Copyright (C) 2022-4 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2022-5 by Joseph B. Attili, joe DOT aa2il AT gmail DOT com
 #
 # Routines for scoring RAC winter contest
 #

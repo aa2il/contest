@@ -1,7 +1,7 @@
 ################################################################################
 #
 # Params.py - Rev 1.0
-# Copyright (C) 2022-5 by Joseph B. Attili, aa2il AT arrl DOT net
+# Copyright (C) 2022-5 by Joseph B. Attili, joe DOT aa2il AT gmail DOT com
 #
 # Command line param parser for contest scorer.
 #
@@ -256,7 +256,9 @@ class PARAMS:
             # Winter or ARRL Field Day
             sc = FIELD_DAY_SCORING(P,self.TRAP_ERRORS)
             self.sc=sc
-            
+            DIR_NAME = ''
+
+            """
             self.history = self.HIST_DIR+'master.csv'
             
             # Need to merge FT8 and CW logs
@@ -272,7 +274,8 @@ class PARAMS:
             #for fname in ['FD.csv','FTx.csv']:
                 f=os.path.expanduser( DIR_NAME+'/'+fname )
                 fnames.append(f)
-    
+            """
+            
         elif args.wwdigi:
             sc = WWDIGI_SCORING(P)
             self.sc=sc
