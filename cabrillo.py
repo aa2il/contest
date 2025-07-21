@@ -253,6 +253,7 @@ fp=open_output_file(P,P.output_file)
 # Load history file
 print('History file:',P.history,'\n')
 HIST,fname9 = load_history(P.history)
+#sys.exit(0)
 
 # Loop over all qsos
 j=-1

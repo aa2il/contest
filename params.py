@@ -236,8 +236,6 @@ class PARAMS:
                 
             sc = VHF_SCORING(P,org,self.TRAP_ERRORS)
             self.sc=sc
-            #fname = sc.fname
-            #DIR_NAME = sc.DIR_NAME
             DIR_NAME = ''
 
             """
@@ -409,7 +407,8 @@ class PARAMS:
         elif args.iaru:
 
             # IARU HF Champs
-            sc = IARU_HF_SCORING(P)
+            #sc = IARU_HF_SCORING(P)
+            sc = IARU_HF_SCORING(self)
             self.sc=sc
             self.history = sc.history
             fname = sc.fname
