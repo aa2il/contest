@@ -25,7 +25,7 @@ import os
 
 from scoring import *
 from arrl_ss import *
-from cwopen import *
+#from cwopen import *
 from qsop import *
 from cqp import *
 from wwdigi import *
