@@ -1,3 +1,21 @@
+###############################################################################
+#
+# Under uv:
+#     cd ~/Python/contest
+#     rm -r .venv/ pyproject.toml .python-version uv.lock
+#     uv init
+#     rm main.py
+#     uv add -r requirements.txt
+#
+# Since we often run this script from another directory, embed the dependencies
+# into the script itself:
+#
+#     uv add --script cabrillo.py -r requirements.txt
+#
+###############################################################################
+#
+# OLD method using miniconda:
+#
 # If necessary, activate the "sandbox:"
 #
 #  cd ~/Python/contest
@@ -23,7 +41,12 @@ xlrd
 unidecode
 pyhamtools
 numpy
+scipy
 pandas
 levenshtein
+chardet
+psutil
 
+# Need this for matplotlib back-end
+pyqt6
 

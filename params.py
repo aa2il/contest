@@ -25,9 +25,7 @@ import os
 
 from scoring import *
 from arrl_ss import *
-#from cwopen import *
 from qsop import *
-from cqp import *
 from wwdigi import *
 from mak import *
 from rttyru import *
@@ -417,26 +415,22 @@ class PARAMS:
         elif args.cqp:
 
             # California QSO Party
-            sc = CQP_SCORING(P)
+            sc = CQP_SCORING(P,self.TRAP_ERRORS)
             self.sc=sc
             
             self.history = self.HIST_DIR+'master.csv'
             self.HIST2=sc.read_hist2(args.hist)
             
-            MY_CALL1 = self.SETTINGS['MY_CALL'].split('/')[0]
-            MY_CALL2 = self.SETTINGS['MY_CALL'].replace('/','_')
-            #DIR_NAME = '~/'+MY_CALL1+'/'
-            #fname = MY_CALL2+'_2021.adif'    # Testing
-            DIR_NAME = '~/'+MY_CALL1+'/'
-            fname = MY_CALL2+'.adif'
-            
-            DIR_NAME = '../pyKeyer/CQP/'      # 2022
-            fname = 'CQP.csv'
-            fname = 'CQP.adif'
-
-            DIR_NAME = '../pyKeyer/'      # 2024
-            DIR_NAME = './'   
-            fname = 'W6A.adif'
+            #print('fname=',fname)
+            if fname==None:
+                MY_CALL1 = self.SETTINGS['MY_CALL'].split('/')[0]
+                MY_CALL2 = self.SETTINGS['MY_CALL'].replace('/','_')
+                DIR_NAME = '~/'+MY_CALL1+'/'
+                fname = MY_CALL2+'.adif'
+            else:
+                DIR_NAME = './'
+            print('fname=',fname)
+            #sys.exit(0)
             
         elif args.rac or args.ocdx:
 

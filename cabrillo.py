@@ -1,3 +1,23 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "chardet",
+#     "levenshtein",
+#     "matplotlib",
+#     "numpy",
+#     "pandas",
+#     "psutil",
+#     "pyhamtools",
+#     "pyqt6",
+#     "pyserial",
+#     "scipy",
+#     "unidecode",
+#     "xlrd",
+# ]
+# ///
+
+#
 #! /home/joea/miniconda3/envs/aa2il/bin/python -u
 #
 # NEW: /home/joea/miniconda3/envs/aa2il/bin/python -u
@@ -345,7 +365,7 @@ for i in range(len(qsos)):
                 gap_min = (date_off - qsos[i-1]['time_stamp']).total_seconds() / 60.0
                 if P.sc.contest!='Specific Call':
                     print('\nTime gap:',gap_min,'minutes')
-                if gap_min>30:
+                if gap_min>P.sc.min_time_gap:
                     cum_gap += gap_min
                     print('\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Time Gap %%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
                     print(date_off,rec['call'],qsos[i-1]['call'])
@@ -439,6 +459,39 @@ P.sc.check_multis(qsos)
 P.sc.summary()
 print(" ")
 
+# Plot score vs time
+if len(P.sc.scores)>0 and True:
+    #print(P.sc.times)
+    #print(P.sc.scores)
+    if P.sc.times[-1]<2*60:
+        tscale=1
+        lab1='(minutes)'
+    else:
+        tscale=1./60.
+        lab1='(hours)'
+    if P.sc.scores[-1]<1e4:
+        sscale=1
+        lab2=''
+    else:
+        sscale=.001
+        lab2='(K)'
+ 
+    fig, ax = plt.subplots()
+    times=tscale*np.array(P.sc.times)
+    scores=sscale*np.array(P.sc.scores)
+    ax.plot(times,scores,color='red',label='All Modes')
+    ax.set_xlabel('Time from Start '+lab1)
+    ax.set_ylabel('Score '+lab2)
+    fig.suptitle(P.sc.contest)
+    ax.grid(True)    
+    #plt.xlim(0,tend*tscale)
+    #plt.ylim(0,200)
+    #ax.legend(loc='upper left')
+    plt.show()
+
+#sys.exit(0)
+
+
 # Actual stop time & average qso rate
 print('Start Date/Time:',P.sc.date0)
 print('End   Date/Time:',P.sc.date1)
@@ -450,7 +503,10 @@ print('Total time off:\t\t%8.1f minutes\t=%8.1f hours' % (cum_gap, cum_gap/60.) 
 duration = (P.sc.date1 - P.sc.date0).total_seconds() / 60.0
 print('Contest duration:\t%8.1f minutes \t=%8.1f hours' %(duration,duration/60.) )
 op_time=duration-cum_gap
-print('Operating time:\t\t%8.1f minutes \t=%8.1f hours' % (op_time,op_time/60.) )
+hrs  = int(op_time/60)
+mins = int( op_time-60*hrs + 0.5 )
+print('Operating time:\t\t%8.1f minutes \t=%8.1f hours \t= %d:%d hours' %
+      (op_time,op_time/60.,hrs,mins) )
 ave_rate = P.sc.nqsos2/(op_time/60.)
 print('Average rate:\t\t%8.1f per hour\n' % ave_rate)
 
@@ -464,9 +520,11 @@ print('tend=',tend)
 t=0
 dt=1./60.
 idx=0
+#print('times5=',times5,len(times5))
 while t<tend:
     times2.append(t)
-    while times5[idx]<=t:
+    #print(t,idx)
+    while idx<len(times5) and times5[idx]<=t:
         #r=rates[idx]
         r=rate_inst[idx]
         idx+=1

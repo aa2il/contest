@@ -41,7 +41,7 @@ set SESSION=""
 #set CONTEST="cqwwrtty"           # CQ WW RTTY
 #set CONTEST="cwss"               # ARRL Sweepstakes
 #set CONTEST="fd"                 # Winter or ARRL Field Day
-#set CONTEST="cqp"                # Commiefornia QSO Party
+set CONTEST="cqp"                # Commiefornia QSO Party
 #set CONTEST="state"              # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
 #set CONTEST="cqmm"                # CQMM
@@ -63,33 +63,39 @@ set SESSION=""
 # Select specific CWT/MST sessions or State QSO party here
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
-#set SESSION="W7"                  # State QSO party
+#set SESSION="WA"                  # State QSO party
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
 #set TIME_LIMIT="-nograph -limit 10"               # NAQP
 
+# Most of time, I'm running assited
+set ASSISTED=""
+set ASSISTED="-assisted"
+
 # Select input file
 set LOG_FILE=""
 #set LOG_FILE="-i ../pyKeyer/AA2IL.adif"       
 set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/logs/wsjtx_log.adi"
-if( "X$CONTEST" == "XNAQPCW" )then
+set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/AA2IL/W6A.adif ~/logs/wsjtx_log.adi"
+if( "X$CONTEST" == "Xnaqpcw" )then
     set LOG_FILE="-i NAQP.csv"  
     set LOG_FILE="-i NAQP.adif"
-else if( ("X$CONTEST" == "Xstate") && ("X${LOG_FILE}" == "X") )then
+else if( "X$CONTEST" == "Xcqp" )then
+    set LOG_FILE="-i W6A4.csv"  
+    #set LOG_FILE="-i W6A.adif"
+    #set ASSISTED="-hist ../pyKeyer/CQP/lotwreport.adi"
+else if( "X$CONTEST" == "Xstate" )then
     set LOG_FILE="-i STATE_QPs.csv"                  # One or more state QPs
-    set LOG_FILE="-i STATE_QPs.adif"                 # One or more state QPs
+    #set LOG_FILE="-i STATE_QPs.adif"                 # One or more state QPs
 else if( "X$CONTEST" == "Xcwopen" )then
     set LOG_FILE="-i CWOPEN.csv"
     set SESSION=1               # CWOpen Session 1, 2 or 3 or blank for ALL
 endif
-echo LOG_FILE=$LOG_FILE
-#exit
 
-# Most of time, I'm running assited
-set ASSISTED=""
-set ASSISTED="-assisted"
-#set ASSISTED="-hist ../pyKeyer/CQP/lotwreport.adi"
+echo CONTEST  = $CONTEST
+echo LOG_FILE = $LOG_FILE
+#exit
 
 # Figure out if we're in a weekly practice contests
 echo " "
