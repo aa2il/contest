@@ -24,7 +24,7 @@ from settings import CONFIG_PARAMS
 import os
 
 from scoring import *
-from arrl_ss import *
+#from arrl_ss import *
 from qsop import *
 from wwdigi import *
 from mak import *

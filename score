@@ -41,7 +41,7 @@ set SESSION=""
 #set CONTEST="cqwwrtty"           # CQ WW RTTY
 #set CONTEST="cwss"               # ARRL Sweepstakes
 #set CONTEST="fd"                 # Winter or ARRL Field Day
-set CONTEST="cqp"                # Commiefornia QSO Party
+#set CONTEST="cqp"                # Commiefornia QSO Party
 #set CONTEST="state"              # State (other than CA) QSO Party
 #set CONTEST="wwdigi"             # CQ WW Digi 
 #set CONTEST="cqmm"                # CQMM
@@ -63,7 +63,7 @@ set CONTEST="cqp"                # Commiefornia QSO Party
 # Select specific CWT/MST sessions or State QSO party here
 #set SESSION="19"                 # Session start time
 #set SESSION="03"                 # Session start time
-#set SESSION="WA"                  # State QSO party
+#set SESSION="PA"                  # State QSO party
 
 set TIME_LIMIT=""
 set TIME_LIMIT="-nograph"
