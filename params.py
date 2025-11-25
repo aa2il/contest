@@ -141,6 +141,8 @@ class PARAMS:
         self.output_file = args.o.replace('MY_CALL',MY_CALL)
         load_cty_info(DIR=DATA_DIR)
 
+        DIR_NAME=""
+
         #######################################################################################
 
         # Contest-specific stuff
@@ -284,11 +286,11 @@ class PARAMS:
             sc = ARRL_SS_SCORING(P,self.TRAP_ERRORS)
             self.sc=sc
             
-            fname = 'AA2IL.adif'
-            DIR_NAME = '~/Python/pyKeyer'
+            #fname = 'AA2IL.adif'
+            #DIR_NAME = '~/Python/pyKeyer'
 
-            fname = 'SS.csv'
-            DIR_NAME = '~/Python/pyKeyer/SS_2024'
+            #fname = 'SS.csv'
+            #DIR_NAME = '~/Python/pyKeyer/SS_2024'
             
             self.history = self.HIST_DIR2+'/SSCW-2024-*.txt'
             #self.history = self.HIST_DIR+'master.csv'

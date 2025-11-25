@@ -75,9 +75,9 @@ set ASSISTED="-assisted"
 
 # Select input file
 set LOG_FILE=""
-#set LOG_FILE="-i ../pyKeyer/AA2IL.adif"       
-set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/logs/wsjtx_log.adi"
-set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/AA2IL/W6A.adif ~/logs/wsjtx_log.adi"
+set LOG_FILE="-i ~/AA2IL/AA2IL.adif"
+#set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/logs/wsjtx_log.adi"
+#set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/AA2IL/W6A.adif ~/logs/wsjtx_log.adi"
 if( "X$CONTEST" == "Xnaqpcw" )then
     set LOG_FILE="-i NAQP.csv"  
     set LOG_FILE="-i NAQP.adif"
