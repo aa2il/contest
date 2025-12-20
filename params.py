@@ -24,11 +24,9 @@ from settings import CONFIG_PARAMS
 import os
 
 from scoring import *
-#from arrl_ss import *
 from qsop import *
 from wwdigi import *
 from mak import *
-from rttyru import *
 from cqww import *
 from arrl_dx import *
 from rac import *
@@ -195,21 +193,18 @@ class PARAMS:
         elif args.ten:
 
             # ARRL 10m contest
-            sc = ARRL_RTTY_RU_SCORING(P,'ARRL-10')
+            sc = ARRL_RTTY_RU_SCORING(P,'ARRL-10',self.TRAP_ERRORS)
             self.sc=sc
             self.history = self.HIST_DIR+'master.csv'
             
             fname = 'AA2IL_2021.adif'
             fname = 'AA2IL.adif'
             DIR_NAME = '~/AA2IL'
-
-            #DIR_NAME = '../pyKeyer'
-            #fname = 'AA2IL.adif'
             output_file = sc.output_file
     
         elif args.cq160m:
 
-            # ARRL 10m contest
+            # CQ 160m contest
             sc = ARRL_RTTY_RU_SCORING(P,'CQ-160')
             self.sc=sc
             
