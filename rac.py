@@ -5,6 +5,10 @@
 #
 # Routines for scoring RAC winter contest
 #
+# To Do:
+#   - Figure out which weekend the winter contest is
+#   - Move this file to libs/scoring
+#
 ############################################################################################
 #
 # This program is free software: you can redistribute it and/or modify
@@ -76,9 +80,10 @@ class RAC_SCORING(CONTEST_SCORING):
         elif self.contest_name=='CANADA-WINTER':
             
             # RAC Winter Contest occurs in Dec - not sure of which weekend - 3rd or 4th full weekend?
-            # Or perhaps its last full weekend in Dec? Let's go with that ...
+            # Or perhaps its last full weekend in Dec?
+            # In 2025, it was the 3rd seekend
             day1=datetime.date(year,12,1).weekday()                            # Day of week of 1st of month 0=Monday, 6=Sunday
-            sat2=1 + ((5-day1) % 7) + 4*7                                      # Day no. for 5th Saturday = 1 since day1 is the 1st of the month
+            sat2=1 + ((5-day1) % 7) + 2*7                                      # Day no. for 5th Saturday = 1 since day1 is the 1st of the month
                                                                                # No. days until 5th Saturday (day 5) + 14 more days
             if sat2+1>31:
                 print('\nRAC SCORING - need to make some adjustments!')
@@ -90,7 +95,7 @@ class RAC_SCORING(CONTEST_SCORING):
                 #sys.exit(0)
                 
             self.date0=datetime.datetime(year,12,sat2,0)                       # Contest starts at 0000 UTC on Saturday (Friday night local) ...
-            self.date1 = self.date0 + datetime.timedelta(hours=48)             # ... and ends at 1200 UTC on Sunday
+            self.date1 = self.date0 + datetime.timedelta(hours=24)             # ... and ends at 1200 UTC on Sunday
             self.RAC  = True
             
         elif self.contest_name=='OCDX':
@@ -109,9 +114,9 @@ class RAC_SCORING(CONTEST_SCORING):
         # Playing with dates
         if True:
             print('\nContest Name=',self.contest_name)
-            print('nnow=',now,'\tday=',now.day,now.weekday())
-            print('date0=',self.date0)
-            print('date1=',self.date1)
+            print('\tnow=',now,'\tday=',now.day,now.weekday())
+            print('\tdate0=',self.date0)
+            print('\tdate1=',self.date1)
             #print('day1=',day1,'\tsat2=',sat2,'\tdate0=',self.date0)
             #sys.exit(0)
 

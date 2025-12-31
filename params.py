@@ -445,8 +445,8 @@ class PARAMS:
             #fname = MY_CALL+'_2022.adif'
             DIR_NAME = '~/'+MY_CALL+'/'
 
-            fname = 'RAC.csv'
-            DIR_NAME='./'
+            #fname = 'RAC.csv'
+            #DIR_NAME='./'
             
         elif args.sst:
 
