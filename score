@@ -30,7 +30,7 @@ set SESSION=""
 #set CONTEST="mst"                # ICWC Medium Speed Test
 
 #set CONTEST="rttyru"             # ARRL RTTY Round-up
-#set CONTEST="naqpcw"             # North American QSO Party CW
+set CONTEST="naqpcw"             # North American QSO Party CW
 #set CONTEST="naqprtty"           # North American QSO Party RTTY
 #set CONTEST="cq160m"             # CQ 160m CW
 #set CONTEST="arrl_dx"            # ARRL Intl DX - both CW & SSB versions
@@ -56,7 +56,7 @@ set SESSION=""
 #set CONTEST="sats"               # Satellites worked  - worked in 2021
 #set CONTEST="ftru"               # FT Round-up - December
 #set CONTEST="ten"                 # ARRL 10-meter 
-set CONTEST="rac"                 # RAC Summer and Winter Contests
+#set CONTEST="rac"                 # RAC Summer and Winter Contests
 #set CONTEST="mak"                 # Makrothen rtty
 #set CONTEST="ocdx"                 # Oceania DX CW
 
@@ -65,13 +65,15 @@ set CONTEST="rac"                 # RAC Summer and Winter Contests
 #set SESSION="03"                 # Session start time
 #set SESSION="PA"                  # State QSO party
 
-set TIME_LIMIT=""
-set TIME_LIMIT="-nograph"
-#set TIME_LIMIT="-nograph -limit 10"               # NAQP
-
 # Most of time, I'm running assited
 set ASSISTED=""
 set ASSISTED="-assisted"
+
+# Other options
+set OPTS=""
+set OPTS="$OPTS -nograph"                        # Skip memory graph 
+#set OPTS="$OPTS -notrap"                        # For first time through
+#set OPTS="$OPTS -limit 10"                      # Include 10-hour time limit for NAQP
 
 # Select input file
 set LOG_FILE=""
@@ -79,8 +81,10 @@ set LOG_FILE="-i ~/AA2IL/AA2IL.adif"
 #set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/logs/wsjtx_log.adi"
 #set LOG_FILE="-i ~/AA2IL/AA2IL.adif ~/AA2IL/W6A.adif ~/logs/wsjtx_log.adi"
 if( "X$CONTEST" == "Xnaqpcw" )then
-    set LOG_FILE="-i NAQP.csv"  
-    set LOG_FILE="-i NAQP.adif"
+    #set LOG_FILE="-i NAQP.csv"  
+    #set LOG_FILE="-i NAQP2.csv"  
+    #set LOG_FILE="-i NAQP.adif"
+    set LOG_FILE="-i AA2IL.adif"
 else if( "X$CONTEST" == "Xcqp" )then
     set LOG_FILE="-i W6A4.csv"  
     #set LOG_FILE="-i W6A.adif"
@@ -144,8 +148,8 @@ echo CONTEST=$CONTEST     SESSION=$SESSION
 echo " "
 set EXE="~/Python/contest/cabrillo.py"
 pwd
-echo $EXE -$CONTEST $SESSION $TIME_LIMIT $ASSISTED $LOG_FILE
-$EXE -$CONTEST $SESSION  $TIME_LIMIT $ASSISTED $LOG_FILE
+echo $EXE -$CONTEST $SESSION $ASSISTED $OPTS $LOG_FILE
+$EXE -$CONTEST $SESSION $ASSISTED $OPTS $LOG_FILE
 
 # cabrillo.py -cqp -hist lotwreport.adi
 

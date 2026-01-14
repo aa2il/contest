@@ -212,7 +212,8 @@ for f in P.input_files:
         qsos1,hdr=read_csv_file(fname)
     else:
         qsos1 = parse_adif(fname)
-    #print qsos1
+        #nflagged=parse_adif.nflagged
+    #print(qsos1)
     #qsos.append(qsos1)
     qsos2 = qsos2 + qsos1
     #print qsos2
@@ -220,6 +221,7 @@ for f in P.input_files:
     #print(qsos1[0])
     #print(qsos1[-1])
     print("There are ",len(qsos1),len(qsos2)," QSOs")
+    #print('There were ',nflagged,' flags on the field')
 
 #sys.exit(0)
     
